@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>New page</title>
+    <link rel="stylesheet" href="style.css" />
+    <link rel="icon" type="image/png" href="icon.png">
+</head>
+<body>
+
+    <!-- ========================================== -->
+    <!-- OVERLAY DE SELECCIÓN DE USUARIO           -->
+    <!-- ========================================== -->
+    <div id="userOverlay" class="overlay">
+        <div class="overlay-card">
+            <div class="logo">RTBROK</div>
+            <h2>Selecciona tu usuario</h2>
+            <p>Elige quién eres para acceder a tu dashboard</p>
+            <div id="userList" class="user-list">
+                <!-- Skeleton loading -->
+                <div class="skeleton-user"></div>
+                <div class="skeleton-user"></div>
+                <div class="skeleton-user"></div>
+            </div>
+            <div style="margin-top: 24px;">
+                <button id="refreshUsersBtn" class="btn-secondary"><span data-heroicon="arrowPath"></span>Recargar usuarios</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ========================================== -->
+    <!-- DASHBOARD PRINCIPAL                        -->
+    <!-- ========================================== -->
+    <div id="dashboard" class="dashboard" style="display:none;">
+
+        <!-- HEADER -->
+        <header class="dashboard-header">
+            <div class="header-left">
+                <span class="brand">RTBROK</span>
+                <span class="brand-sub">DASHBOARD</span>
+            </div>
+            <div class="header-center">
+                <span class="greeting"><span data-heroicon="spark"></span><span id="greetingName">Usuario</span></span>
+                <span class="subgreeting">Concentrate en lo importante, tú haces que las cosas sucedan.</span>
+            </div>
+            <div class="header-right">
+                <div class="clock-stack">
+                    <strong id="clockValue">--:--:--</strong>
+                    <span id="weatherValue" class="weather-value">Cargando...</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- BARRA DE BÚSQUEDA (siempre visible) -->
+        <div class="search-bar">
+            <div class="search-field">
+                <span class="search-icon" data-heroicon="magnifyingGlass"></span>
+                <input 
+                    type="text" 
+                    id="globalSearch" 
+                    placeholder="Buscar en Google (Enter) o filtrar tareas..." 
+                    disabled
+                />
+            </div>
+        </div>
+
+        <!-- ======================================== -->
+        <!-- CUERPO PRINCIPAL (3 secciones)          -->
+        <!-- ======================================== -->
+        <div class="dashboard-body">
+
+            <!-- SECCIÓN 1: ÚLTIMAS 4 OBRAS -->
+            <section class="col-obras">
+                <div class="section-header">
+                    <h3><span data-heroicon="photo"></span>ÚLTIMAS 4 OBRAS REGISTRADAS</h3>
+                    <span class="badge-count" id="obrasCount">0</span>
+                </div>
+                <div id="obrasList" class="obras-row">
+                    <!-- Skeleton loading -->
+                    <div class="skeleton-obra"></div>
+                    <div class="skeleton-obra"></div>
+                    <div class="skeleton-obra"></div>
+                    <div class="skeleton-obra"></div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN 2: TAREAS DEL SISTEMA -->
+            <section class="col-tareas">
+                <div class="section-header">
+                    <h3><span data-heroicon="clipboard"></span>Tareas del Sistema</h3>
+                    <span class="badge-count" id="sysTaskCount">0</span>
+                </div>
+
+                <!-- Filtros -->
+                <div class="filter-bar">
+                    <select id="filterStatus">
+                        <option value="all">Todos</option>
+                        <option value="pendiente">Pendientes</option>
+                        <option value="en_curso">En curso</option>
+                        <option value="en_revision">En revisión</option>
+                        <option value="completado">Completadas</option>
+                        <option value="bloqueada">Bloqueadas</option>
+                    </select>
+                    <select id="filterPriority">
+                        <option value="all">Prioridad</option>
+                        <option value="alta">Alta</option>
+                        <option value="media">Media</option>
+                        <option value="baja">Baja</option>
+                    </select>
+                    <span class="loading-spinner small" id="taskSpinner" style="display:none;"></span>
+                </div>
+
+                <!-- Lista de tareas del sistema -->
+                <div id="systemTaskList" class="task-list">
+                    <!-- Skeleton loading -->
+                    <div class="skeleton-task"></div>
+                    <div class="skeleton-task"></div>
+                    <div class="skeleton-task"></div>
+                </div>
+            </section>
+
+            <!-- SECCIÓN 3: TAREAS PERSONALES + HERRAMIENTAS -->
+            <section class="col-personales">
+                <div class="section-header">
+                    <h3><span data-heroicon="pencil"></span>Mis Pendientes</h3>
+                    <span class="badge-count" id="personalTaskCount">0</span>
+                    <button id="addPersonalBtn" class="btn-small">+ Agregar</button>
+                </div>
+
+                <div id="personalTaskList" class="task-list">
+                    <!-- Skeleton loading -->
+                    <div class="skeleton-task"></div>
+                    <div class="skeleton-task"></div>
+                </div>
+
+                <div class="tools-section">
+                    <h4><span data-heroicon="wrench"></span>HERRAMIENTAS RTBROK</h4>
+                    <div class="tools-grid">
+                        <a class="tool-button" href="https://frontline-zeta-ecru.vercel.app/movil/" target="_blank" rel="noopener noreferrer">
+                            <span data-heroicon="tag"></span>
+                            <span>Generador de Catálogos</span>
+                        </a>
+                        <a class="tool-button" href="https://diegoturijancontacto-sudo.github.io/Finanzas/mobile/" target="_blank" rel="noopener noreferrer">
+                            <span data-heroicon="clipboard"></span>
+                            <span>Registro de Obra</span>
+                        </a>
+                        <a class="tool-button" href="https://diegoturijancontacto-sudo.github.io/search/" target="_blank" rel="noopener noreferrer">
+                            <span data-heroicon="spark"></span>
+                            <span>Reportes y Tareas</span>
+                        </a>
+                    </div>
+                </div>
+
+            </section>
+
+        </div><!-- /dashboard-body -->
+
+        <footer class="dashboard-footer">
+            <div class="footer-session">
+                <span class="footer-label">Usuario activo</span>
+                <strong id="footerUserName">Invitado</strong>
+            </div>
+            <div class="footer-center-copy">
+                <span>RTBROK © 2026</span>
+                <span>Sistema de gestión y control de obra</span>
+            </div>
+            <div class="footer-actions">
+                <span id="userBadge" class="badge"><span data-heroicon="user"></span><span>IN</span></span>
+                <button id="logoutBtn" class="btn-ghost">Cerrar sesión</button>
+            </div>
+        </footer>
+
+        <!-- TOAST NOTIFICATIONS -->
+        <div id="toastContainer"></div>
+
+    </div><!-- /dashboard -->
+
+    <script src="app.js"></script>
+</body>
+</html>
