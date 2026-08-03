@@ -823,8 +823,9 @@ async function init() {
         return;
     }
 
-    // Entrar directamente al buscador y cargar usuarios en segundo plano
-    showSearchFirstView();
+    // Mantener visible el selector para usuarios nuevos y cargar la lista ahí mismo
+    dom.overlay.style.display = 'flex';
+    dom.dashboard.style.display = 'none';
     const users = await loadUsers();
     renderUserList(users);
 }
