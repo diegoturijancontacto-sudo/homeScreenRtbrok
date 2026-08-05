@@ -190,7 +190,7 @@
 
                 <!-- 3-Dot Pagination Indicator Bar -->
                 <div class="flex items-center justify-center gap-3 pt-2">
-                    <button onclick="switchTab('dashboard')" id="dot-dashboard" class="w-3 h-3 rounded-full bg-indigo-500 transition-all shadow-md cursor-pointer" title="Dashboard"></button>
+                    <button onclick="switchTab('dashboard')" id="dot-dashboard" class="w-6 h-3 rounded-full bg-indigo-500 transition-all shadow-md cursor-pointer" title="Dashboard"></button>
                     <button onclick="switchTab('tasks')" id="dot-tasks" class="w-3 h-3 rounded-full bg-slate-700 hover:bg-slate-600 transition-all shadow-md cursor-pointer" title="Tareas"></button>
                     <button onclick="switchTab('artworks')" id="dot-artworks" class="w-3 h-3 rounded-full bg-slate-700 hover:bg-slate-600 transition-all shadow-md cursor-pointer" title="Obras"></button>
                 </div>
@@ -301,6 +301,29 @@
             window.open(searchUrl, '_blank');
         }
 
+        // Helper to convert Google Drive viewer URL to direct previewable thumbnail/image URL if possible
+        function resolveImageUrl(adjuntos, fallbackName) {
+            if (Array.isArray(adjuntos) && adjuntos.length > 0) {
+                // Find first attachment with a URL
+                const validAdj = adjuntos.find(a => a.url);
+                if (validAdj && validAdj.url) {
+                    let rawUrl = validAdj.url;
+                    // If Google Drive link, convert to direct viewer/thumbnail format or use as is
+                    if (rawUrl.includes('drive.google.com')) {
+                        // Extract file ID if present
+                        const matchId = rawUrl.match(/\/d\/([a-zA-Z0-9_-]+)/) || rawUrl.match(/id=([a-zA-Z0-9_-]+)/);
+                        if (matchId && matchId[1]) {
+                            // Use Google thumbnail/usercontent link
+                            return `https://lh3.googleusercontent.com/d/${matchId[1]}=w800`;
+                        }
+                    }
+                    return rawUrl;
+                }
+            }
+            // Fallback placeholder with name
+            return `https://placehold.co/400x300/1e293b/94a3b8?text=${encodeURIComponent(fallbackName || 'Obra')}`;
+        }
+
         // Fetch Data from Google Apps Script endpoints with robust CORS fallback / JSONP simulation
         async function fetchAllData() {
             try {
@@ -376,24 +399,29 @@
                 `).join('');
             }
 
-            // Widget Artworks
+            // Widget Artworks with dynamic image resolver from adjuntos
             const artworksGrid = document.getElementById('widget-artworks-grid');
             const recentArtworks = appData.artworks.slice(0, 4);
             if (recentArtworks.length === 0) {
                 artworksGrid.innerHTML = `<p class="text-xs text-slate-500 text-center col-span-2 py-6">No hay obras disponibles.</p>`;
             } else {
-                artworksGrid.innerHTML = recentArtworks.map(a => `
-                    <div class="group relative rounded-xl overflow-hidden border border-slate-800/80 bg-slate-950/60 flex flex-col">
-                        <div class="h-24 bg-slate-800 relative overflow-hidden flex items-center justify-center">
-                            <img src="https://placehold.co/300x200/1e293b/94a3b8?text=${encodeURIComponent(a.nombre_obra || 'Obra')}" alt="${a.nombre_obra}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                            <div class="absolute top-2 right-2 bg-slate-900/80 backdrop-blur px-1.5 py-0.5 rounded text-[10px] text-slate-300 font-mono">${a.estatus || 'Consolidación'}</div>
+                artworksGrid.innerHTML = recentArtworks.map(a => {
+                    const imgUrl = resolveImageUrl(a.adjuntos, a.nombre_obra);
+                    return `
+                        <div class="group relative rounded-xl overflow-hidden border border-slate-800/80 bg-slate-950/60 flex flex-col">
+                            <div class="h-28 bg-slate-800 relative overflow-hidden flex items-center justify-center">
+                                <img src="${imgUrl}" alt="${a.nombre_obra || 'Obra'}" 
+                                     onerror="this.onerror=null; this.src='https://placehold.co/300x200/1e293b/94a3b8?text=${encodeURIComponent(a.nombre_obra || 'Obra')}';"
+                                     class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                                <div class="absolute top-2 right-2 bg-slate-900/80 backdrop-blur px-1.5 py-0.5 rounded text-[10px] text-slate-300 font-mono">${a.estatus || 'Consolidación'}</div>
+                            </div>
+                            <div class="p-2 flex flex-col justify-between flex-1">
+                                <p class="text-xs font-semibold text-slate-200 truncate">${a.nombre_obra || 'Sin Título'}</p>
+                                <p class="text-[10px] text-slate-400 truncate">${a.autor || 'Autor desconocido'}</p>
+                            </div>
                         </div>
-                        <div class="p-2 flex flex-col justify-between flex-1">
-                            <p class="text-xs font-semibold text-slate-200 truncate">${a.nombre_obra || 'Sin Título'}</p>
-                            <p class="text-[10px] text-slate-400 truncate">${a.autor || 'Autor desconocido'}</p>
-                        </div>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
             }
         }
 
@@ -428,7 +456,7 @@
             lucide.createIcons();
         }
 
-        // Render Artworks Grid
+        // Render Artworks Grid with actual image extraction from adjuntos
         function renderArtworksGrid() {
             const container = document.getElementById('artworks-grid-container');
             const artworks = appData.artworks;
@@ -437,26 +465,33 @@
                 return;
             }
 
-            container.innerHTML = artworks.map(a => `
-                <div class="bg-slate-950/60 border border-slate-800/80 rounded-2xl overflow-hidden flex flex-col group hover:border-slate-700 transition shadow-lg">
-                    <div class="h-44 bg-slate-900 relative overflow-hidden flex items-center justify-center">
-                        <img src="https://placehold.co/400x300/1e293b/94a3b8?text=${encodeURIComponent(a.nombre_obra || 'Obra')}" alt="${a.nombre_obra}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                        <div class="absolute top-3 right-3 bg-slate-900/90 backdrop-blur px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-200 border border-slate-700">${a.estatus || 'Consolidación'}</div>
-                        <div class="absolute bottom-3 left-3 bg-slate-900/90 backdrop-blur px-2.5 py-1 rounded-lg text-xs font-mono text-purple-300 border border-slate-700">${a.asignacion || 'obra-X'}</div>
-                    </div>
-                    <div class="p-4 flex flex-col justify-between flex-1 gap-3">
-                        <div>
-                            <h4 class="font-bold text-sm text-slate-100">${a.nombre_obra || 'Sin Título'}</h4>
-                            <p class="text-xs text-slate-400 mt-0.5">Autor: <span class="text-slate-300">${a.autor || 'Desconocido'}</span></p>
-                            <p class="text-xs text-slate-400">Ubicación: <span class="text-slate-300">${a.ubicacion || 'N/A'}</span></p>
+            container.innerHTML = artworks.map(a => {
+                const imgUrl = resolveImageUrl(a.adjuntos, a.nombre_obra);
+                const adjuntosCount = Array.isArray(a.adjuntos) ? a.adjuntos.length : 0;
+                return `
+                    <div class="bg-slate-950/60 border border-slate-800/80 rounded-2xl overflow-hidden flex flex-col group hover:border-slate-700 transition shadow-lg">
+                        <div class="h-48 bg-slate-900 relative overflow-hidden flex items-center justify-center">
+                            <img src="${imgUrl}" alt="${a.nombre_obra || 'Obra'}" 
+                                 onerror="this.onerror=null; this.src='https://placehold.co/400x300/1e293b/94a3b8?text=${encodeURIComponent(a.nombre_obra || 'Obra')}';"
+                                 class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <div class="absolute top-3 right-3 bg-slate-900/90 backdrop-blur px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-200 border border-slate-700">${a.estatus || 'Consolidación'}</div>
+                            <div class="absolute bottom-3 left-3 bg-slate-900/90 backdrop-blur px-2.5 py-1 rounded-lg text-xs font-mono text-purple-300 border border-slate-700">${a.asignacion || 'obra-X'}</div>
+                            ${adjuntosCount > 0 ? `<div class="absolute bottom-3 right-3 bg-indigo-600/90 backdrop-blur px-2 py-0.5 rounded-md text-[10px] text-white flex items-center gap-1 font-medium"><i data-lucide="paperclip" class="w-3 h-3"></i> ${adjuntosCount}</div>` : ''}
                         </div>
-                        <div class="flex items-center justify-between pt-3 border-t border-slate-800/80 text-xs">
-                            <span class="font-semibold text-emerald-400">${a.tipo_moneda || 'MXN'} $${Number(a.precio_lista || 0).toLocaleString()}</span>
-                            <span class="text-slate-500 font-mono">${a.superficie || 0} m²</span>
+                        <div class="p-4 flex flex-col justify-between flex-1 gap-3">
+                            <div>
+                                <h4 class="font-bold text-sm text-slate-100 truncate" title="${a.nombre_obra || 'Sin Título'}">${a.nombre_obra || 'Sin Título'}</h4>
+                                <p class="text-xs text-slate-400 mt-0.5 truncate">Autor: <span class="text-slate-300">${a.autor || 'Desconocido'}</span></p>
+                                <p class="text-xs text-slate-400 truncate">Ubicación: <span class="text-slate-300">${a.ubicacion || 'N/A'}</span></p>
+                            </div>
+                            <div class="flex items-center justify-between pt-3 border-t border-slate-800/80 text-xs">
+                                <span class="font-semibold text-emerald-400">${a.tipo_moneda || 'MXN'} $${Number(a.precio_lista || 0).toLocaleString()}</span>
+                                <span class="text-slate-500 font-mono">${a.superficie || 0} m²</span>
+                            </div>
                         </div>
                     </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
             lucide.createIcons();
         }
 
@@ -505,9 +540,9 @@
 
         function getMockArtworks() {
             return [
-                { nombre_obra: 'Residencia Minimalista Sol', autor: 'Carlos Mendoza', ubicacion: 'Puebla, MX', estatus: 'Consolidación', tipo_moneda: 'MXN', precio_lista: 4500000, superficie: 320 },
-                { nombre_obra: 'Torre Corporativa Cenit', autor: 'Sofía Valdés', ubicacion: 'CDMX', estatus: 'Bodega', tipo_moneda: 'MXN', precio_lista: 12000000, superficie: 850 },
-                { nombre_obra: 'Pabellón Botánico', autor: 'Estudio Arquitectura', ubicacion: 'Monterrey', estatus: 'Vendida', tipo_moneda: 'MXN', precio_lista: 6800000, superficie: 410 }
+                { nombre_obra: 'Residencia Minimalista Sol', autor: 'Carlos Mendoza', ubicacion: 'Puebla, MX', estatus: 'Consolidación', tipo_moneda: 'MXN', precio_lista: 4500000, superficie: 320, adjuntos: [] },
+                { nombre_obra: 'Torre Corporativa Cenit', autor: 'Sofía Valdés', ubicacion: 'CDMX', estatus: 'Bodega', tipo_moneda: 'MXN', precio_lista: 12000000, superficie: 850, adjuntos: [] },
+                { nombre_obra: 'Pabellón Botánico', autor: 'Estudio Arquitectura', ubicacion: 'Monterrey', estatus: 'Vendida', tipo_moneda: 'MXN', precio_lista: 6800000, superficie: 410, adjuntos: [] }
             ];
         }
     </script>
