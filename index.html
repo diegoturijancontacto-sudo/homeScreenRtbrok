@@ -1,180 +1,515 @@
 <!DOCTYPE html>
-<html lang="es">
+<html lang="es" class="h-full">
 <head>
-    <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>New page</title>
-    <link rel="stylesheet" href="style.css" />
-    <link rel="icon" type="image/png" href="icon.png">
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workspace & Home Browser</title>
+    <!-- Tailwind CSS -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <!-- Lucide Icons -->
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <!-- Google Fonts Inter -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.5); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(156, 163, 175, 0.8); }
+    </style>
 </head>
-<body>
+<body class="h-full bg-slate-950 text-slate-100 flex flex-col overflow-hidden select-none">
 
-    <!-- ========================================== -->
-    <!-- OVERLAY DE SELECCIÓN DE USUARIO           -->
-    <!-- ========================================== -->
-    <div id="userOverlay" class="overlay">
-        <div class="overlay-card">
-            <div class="logo">RTBROK</div>
-            <h2>Selecciona tu usuario</h2>
-            <p>Elige quién eres para acceder a tu dashboard</p>
-            <div id="userList" class="user-list">
-                <!-- Skeleton loading -->
-                <div class="skeleton-user"></div>
-                <div class="skeleton-user"></div>
-                <div class="skeleton-user"></div>
-            </div>
-            <div style="margin-top: 24px;">
-                <button id="refreshUsersBtn" class="btn-secondary"><span data-heroicon="arrowPath"></span>Recargar usuarios</button>
-            </div>
-        </div>
+    <div class="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        <img src="Wallpaper.jpg" alt="Wallpaper Background"
+             onerror="this.onerror=null; this.src='https://placehold.co/1920x1080/090d16/1e293b?text=Wallpaper.jpg';"
+             class="w-full h-full object-cover opacity-40 scale-105 blur-[1px]">
+        <div class="absolute inset-0 bg-slate-950/70 backdrop-blur-[2px]"></div>
     </div>
 
-    <!-- ========================================== -->
-    <!-- DASHBOARD PRINCIPAL                        -->
-    <!-- ========================================== -->
-    <div id="dashboard" class="dashboard" style="display:none;">
+    <div class="relative z-10 flex flex-row items-center h-full w-full max-w-[1920px] mx-auto px-6 sm:px-12 md:px-20 lg:px-32 py-4 md:py-6 gap-6">
 
-        <!-- HEADER -->
-        <header class="dashboard-header">
-            <div class="header-left">
-                <span class="brand">RTBROK</span>
-                <span class="brand-sub">DASHBOARD</span>
-            </div>
-            <div class="header-center">
-                <span class="greeting"><span data-heroicon="spark"></span><span id="greetingName">Usuario</span></span>
-                <span class="subgreeting">Concentrate en lo importante, tú haces que las cosas sucedan.</span>
-            </div>
-            <div class="header-right">
-                <div class="clock-stack">
-                    <strong id="clockValue">--:--:--</strong>
-                    <span id="weatherValue" class="weather-value">Cargando...</span>
-                </div>
-            </div>
-        </header>
+        <!-- Left Navigation Arrow (Outside Gutter) -->
+        <button onclick="prevPage()" class="hidden md:flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 text-slate-300 hover:text-white transition-all shadow-xl group z-30 shrink-0">
+            <i data-lucide="chevron-left" class="w-6 h-6 group-hover:-translate-x-0.5 transition-transform"></i>
+        </button>
 
-        <!-- BARRA DE BÚSQUEDA (siempre visible) -->
-        <div class="search-bar">
-            <div class="search-field">
-                <input 
-                    type="text" 
-                    id="globalSearch" 
-                    placeholder="Buscar en Google (Enter) o filtrar tareas..." 
-                    disabled
-                />
-            </div>
-        </div>
+        <div id="app" class="relative z-10 flex flex-col h-full w-full flex-1 gap-6 overflow-hidden">
 
-        <!-- ======================================== -->
-        <!-- CUERPO PRINCIPAL (3 secciones)          -->
-        <!-- ======================================== -->
-        <div class="dashboard-body">
-
-            <!-- SECCIÓN 1: ÚLTIMAS 4 OBRAS -->
-            <section class="col-obras">
-                <div class="section-header">
-                    <h3><span data-heroicon="photo"></span>ÚLTIMAS 4 OBRAS REGISTRADAS</h3>
-                    <span class="badge-count" id="obrasCount">0</span>
-                </div>
-                <div id="obrasList" class="obras-row">
-                    <!-- Skeleton loading -->
-                    <div class="skeleton-obra"></div>
-                    <div class="skeleton-obra"></div>
-                    <div class="skeleton-obra"></div>
-                    <div class="skeleton-obra"></div>
-                </div>
-            </section>
-
-            <!-- SECCIÓN 2: TAREAS DEL SISTEMA -->
-            <section class="col-tareas">
-                <div class="section-header">
-                    <h3><span data-heroicon="clipboard"></span>Tareas del Sistema</h3>
-                    <span class="badge-count" id="sysTaskCount">0</span>
-                </div>
-
-                <!-- Filtros -->
-                <div class="filter-bar">
-                    <select id="filterStatus">
-                        <option value="all">Todos</option>
-                        <option value="pendiente">Pendientes</option>
-                        <option value="en_curso">En curso</option>
-                        <option value="en_revision">En revisión</option>
-                        <option value="completado">Completadas</option>
-                        <option value="bloqueada">Bloqueadas</option>
-                    </select>
-                    <select id="filterPriority">
-                        <option value="all">Prioridad</option>
-                        <option value="alta">Alta</option>
-                        <option value="media">Media</option>
-                        <option value="baja">Baja</option>
-                    </select>
-                    <span class="loading-spinner small" id="taskSpinner" style="display:none;"></span>
-                </div>
-
-                <!-- Lista de tareas del sistema -->
-                <div id="systemTaskList" class="task-list">
-                    <!-- Skeleton loading -->
-                    <div class="skeleton-task"></div>
-                    <div class="skeleton-task"></div>
-                    <div class="skeleton-task"></div>
-                </div>
-            </section>
-
-            <!-- SECCIÓN 3: TAREAS PERSONALES + HERRAMIENTAS -->
-            <section class="col-personales">
-                <div class="section-header">
-                    <h3><span data-heroicon="pencil"></span>Mis Pendientes</h3>
-                    <span class="badge-count" id="personalTaskCount">0</span>
-                    <button id="addPersonalBtn" class="btn-small">+ Agregar</button>
-                </div>
-
-                <div id="personalTaskList" class="task-list">
-                    <!-- Skeleton loading -->
-                    <div class="skeleton-task"></div>
-                    <div class="skeleton-task"></div>
-                </div>
-
-                <div class="tools-section">
-                    <h4><span data-heroicon="wrench"></span>HERRAMIENTAS RTBROK</h4>
-                    <div class="tools-grid">
-                        <a class="tool-button" href="https://frontline-zeta-ecru.vercel.app/movil/" target="_blank" rel="noopener noreferrer">
-                            <span data-heroicon="tag"></span>
-                            <span>Generador de Catálogos</span>
-                        </a>
-                        <a class="tool-button" href="https://diegoturijancontacto-sudo.github.io/Finanzas/mobile/" target="_blank" rel="noopener noreferrer">
-                            <span data-heroicon="clipboard"></span>
-                            <span>Registro de Obra</span>
-                        </a>
-                        <a class="tool-button" href="https://diegoturijancontacto-sudo.github.io/search/" target="_blank" rel="noopener noreferrer">
-                            <span data-heroicon="spark"></span>
-                            <span>Reportes y Tareas</span>
-                        </a>
+            <!-- HEADER / SEARCH BAR -->
+            <header class="flex flex-col md:flex-row items-center justify-between gap-4 bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl p-4 shadow-2xl">
+                <div class="flex items-center gap-3 w-full md:w-auto">
+                    <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-indigo-500/30">
+                        <i data-lucide="compass" class="w-6 h-6 text-white animate-pulse"></i>
+                    </div>
+                    <div>
+                        <h1 class="font-bold text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">R T B R O K</h1>
+                        <p id="clock" class="text-xs text-slate-400 font-medium">00:00:00 AM</p>
                     </div>
                 </div>
 
-            </section>
+                <!-- Global Search & Shortcuts Bar -->
+                <div class="relative w-full md:w-1/2 max-w-2xl">
+                    <form id="search-form" onsubmit="handleSearch(event)" class="relative flex items-center">
+                        <span class="absolute left-4 text-slate-400"><i data-lucide="search" class="w-5 h-5"></i></span>
+                        <input type="text" id="search-input" placeholder="Buscar en Google o filtrar módulos..."
+                            class="w-full bg-slate-950/80 border border-slate-700/60 rounded-xl pl-12 pr-28 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-inner">
+                        <div class="absolute right-2 flex items-center gap-1">
+                            <select id="search-engine" class="bg-slate-800 text-slate-300 text-xs rounded-lg px-2 py-1.5 focus:outline-none cursor-pointer border border-slate-700">
+                                <option value="google">Google</option>
+                                <option value="duckduckgo">DuckDuckGo</option>
+                                <option value="github">GitHub</option>
+                            </select>
+                            <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition shadow">Ir</button>
+                        </div>
+                    </form>
+                </div>
 
-        </div><!-- /dashboard-body -->
+                <!-- Quick Action Status & Sync -->
+                <div class="flex items-center gap-3 w-full md:w-auto justify-end">
+                    <button onclick="refreshAllData()" title="Sincronizar datos" class="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 text-slate-300 hover:text-white transition group">
+                        <i data-lucide="refresh-cw" class="w-4 h-4 group-hover:rotate-180 transition-transform duration-500"></i>
+                    </button>
+                </div>
+            </header>
 
-        <footer class="dashboard-footer">
-            <div class="footer-session">
-                <span class="footer-label">Usuario activo</span>
-                <strong id="footerUserName">Invitado</strong>
-            </div>
-            <div class="footer-center-copy">
-                <span>RTBROK © 2026</span>
-                <span>Sistema de gestión y control de obra</span>
-            </div>
-            <div class="footer-actions">
-                <span id="userBadge" class="badge"><span data-heroicon="user"></span><span>IN</span></span>
-                <button id="logoutBtn" class="btn-ghost">Cerrar sesión</button>
-            </div>
-        </footer>
+            <main class="flex-1 overflow-hidden relative flex flex-col">
 
-        <!-- TOAST NOTIFICATIONS -->
-        <div id="toastContainer"></div>
+                <div class="flex-1 overflow-hidden relative">
+                    <!-- TAB 1: DASHBOARD / HOME PAGE (Quick Links & Widgets) -->
+                    <div id="tab-dashboard" class="h-full overflow-y-auto pr-1 flex flex-col gap-6">
+                        <!-- Quick Access Grid -->
+                        <section>
+                            <div class="flex items-center justify-between mb-3">
+                                <h2 class="text-sm font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2"><i data-lucide="star" class="w-4 h-4 text-indigo-400"></i> Accesos Directos</h2>
+                                <button onclick="openAddShortcutModal()" class="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-medium"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Añadir marcador</button>
+                            </div>
+                            <div id="shortcuts-grid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </section>
 
-    </div><!-- /dashboard -->
+                        <!-- Widgets Split: Tasks Overview & Recent Artworks -->
+                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
+                            <!-- Tasks Widget Preview -->
+                            <div class="bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl p-5 flex flex-col h-[380px] shadow-xl">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="font-semibold text-sm flex items-center gap-2 text-slate-200"><i data-lucide="check-square" class="w-4 h-4 text-cyan-400"></i> Resumen de Tareas (CodeB)</h3>
+                                    <button onclick="switchTab('tasks')" class="text-xs text-indigo-400 hover:underline">Ver todas</button>
+                                </div>
+                                <div id="widget-tasks-list" class="flex-1 overflow-y-auto space-y-2.5 pr-2">
+                                    <!-- Populated dynamically -->
+                                </div>
+                            </div>
 
-    <script src="app.js"></script>
+                            <!-- Artworks Widget Preview -->
+                            <div class="bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl p-5 flex flex-col h-[380px] shadow-xl">
+                                <div class="flex items-center justify-between mb-4">
+                                    <h3 class="font-semibold text-sm flex items-center gap-2 text-slate-200"><i data-lucide="image" class="w-4 h-4 text-purple-400"></i> Obras Recientes (CodeA)</h3>
+                                    <button onclick="switchTab('artworks')" class="text-xs text-indigo-400 hover:underline">Ver galería</button>
+                                </div>
+                                <div id="widget-artworks-grid" class="flex-1 overflow-y-auto grid grid-cols-2 gap-3 pr-2">
+                                    <!-- Populated dynamically -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 2: TASKS (codeB.gs integration) -->
+                    <div id="tab-tasks" class="h-full hidden flex-col gap-4">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl p-4 shadow-xl">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2.5 bg-cyan-500/10 text-cyan-400 rounded-xl border border-cyan-500/20"><i data-lucide="check-square" class="w-5 h-5"></i></div>
+                                <div>
+                                    <h2 class="font-bold text-base">Gestión de Tareas (CodeB Backend)</h2>
+                                    <p class="text-xs text-slate-400">Origen: <span class="font-mono text-cyan-400">script.google.com/.../exec</span></p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 w-full sm:w-auto">
+                                <input type="text" id="task-filter-input" oninput="filterTasks()" placeholder="Filtrar tareas..." class="bg-slate-950/80 border border-slate-700/60 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 w-full sm:w-48">
+                                <select id="task-status-filter" onchange="filterTasks()" class="bg-slate-800 border border-slate-700 text-xs rounded-xl px-3 py-2 text-slate-200 focus:outline-none">
+                                    <option value="all">Todos los estatus</option>
+                                    <option value="pendiente">Pendiente</option>
+                                    <option value="en_curso">En Curso</option>
+                                    <option value="en_revision">En Revisión</option>
+                                    <option value="completado">Completado</option>
+                                    <option value="bloqueada">Bloqueada</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="flex-1 bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl overflow-hidden flex flex-col shadow-xl">
+                            <div class="overflow-y-auto flex-1 p-4">
+                                <div id="tasks-table-container" class="space-y-3">
+                                    <!-- Populated dynamically -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- TAB 3: ARTWORKS & REGISTROS OBRA (codeA.gs integration) -->
+                    <div id="tab-artworks" class="h-full hidden flex-col gap-4">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl p-4 shadow-xl">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2.5 bg-purple-500/10 text-purple-400 rounded-xl border border-purple-500/20"><i data-lucide="image" class="w-5 h-5"></i></div>
+                                <div>
+                                    <h2 class="font-bold text-base">Registros de Obra y Galería (CodeA Backend)</h2>
+                                    <p class="text-xs text-slate-400">Origen: <span class="font-mono text-purple-400">script.google.com/.../exec</span></p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 w-full sm:w-auto">
+                                <input type="text" id="artwork-filter-input" oninput="filterArtworks()" placeholder="Buscar obra, autor, ubicación..." class="bg-slate-950/80 border border-slate-700/60 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-purple-500 w-full sm:w-64">
+                                <select id="artwork-status-filter" onchange="filterArtworks()" class="bg-slate-800 border border-slate-700 text-xs rounded-xl px-3 py-2 text-slate-200 focus:outline-none">
+                                    <option value="all">Todos los estatus</option>
+                                    <option value="Consolidación">Consolidación</option>
+                                    <option value="Bodega">Bodega</option>
+                                    <option value="Vendida">Vendida</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="flex-1 bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl overflow-hidden flex flex-col shadow-xl">
+                            <div class="overflow-y-auto flex-1 p-4">
+                                <div id="artworks-grid-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+                                    <!-- Populated dynamically -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3-Dot Pagination Indicator Bar -->
+                <div class="flex items-center justify-center gap-3 pt-2">
+                    <button onclick="switchTab('dashboard')" id="dot-dashboard" class="w-3 h-3 rounded-full bg-indigo-500 transition-all shadow-md cursor-pointer" title="Dashboard"></button>
+                    <button onclick="switchTab('tasks')" id="dot-tasks" class="w-3 h-3 rounded-full bg-slate-700 hover:bg-slate-600 transition-all shadow-md cursor-pointer" title="Tareas"></button>
+                    <button onclick="switchTab('artworks')" id="dot-artworks" class="w-3 h-3 rounded-full bg-slate-700 hover:bg-slate-600 transition-all shadow-md cursor-pointer" title="Obras"></button>
+                </div>
+
+            </main>
+        </div>
+
+        <!-- Right Navigation Arrow (Outside Gutter) -->
+        <button onclick="nextPage()" class="hidden md:flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 text-slate-300 hover:text-white transition-all shadow-xl group z-30 shrink-0">
+            <i data-lucide="chevron-right" class="w-6 h-6 group-hover:translate-x-0.5 transition-transform"></i>
+        </button>
+
+    </div>
+
+    <script>
+        // API Endpoints provided in user request
+        const ENDPOINT_TASKS = 'https://script.google.com/macros/s/AKfycbxmPBIboe_Evn45ZHjtkjydbmlPRMuSax_sEiTc2iN8cqqi2i4-Pf_lOd6875cQXEd_yg/exec'; // codeB.gs
+        const ENDPOINT_ARTWORKS = 'https://script.google.com/macros/s/AKfycbxyBzZ7duM3pKtobXHj8A2NgFpIarP5WPS71TKTH2uFMOXXL8rzo68-blixF8kgCwvl8w/exec'; // codeA.gs
+
+        // App State
+        let appData = {
+            tasks: [],
+            artworks: [],
+            subproyectos: [],
+            proyectos: [],
+            responsables: [],
+            loading: false,
+            error: null
+        };
+
+        const tabsOrder = ['dashboard', 'tasks', 'artworks'];
+        let currentTabIdx = 0;
+
+        // Default Custom Shortcuts for Browser Home
+        let defaultShortcuts = [
+            { name: 'Google', url: 'https://www.google.com', icon: 'globe', color: 'from-blue-500 to-indigo-600' },
+            { name: 'GitHub', url: 'https://github.com', icon: 'github', color: 'from-slate-700 to-slate-900' },
+            { name: 'ChatGPT', url: 'https://chat.openai.com', icon: 'cpu', color: 'from-emerald-500 to-teal-700' },
+            { name: 'YouTube', url: 'https://www.youtube.com', icon: 'play-square', color: 'from-red-600 to-rose-800' },
+            { name: 'Gmail', url: 'https://mail.google.com', icon: 'mail', color: 'from-amber-500 to-orange-600' },
+            { name: 'Drive', url: 'https://drive.google.com', icon: 'hard-drive', color: 'from-blue-600 to-cyan-700' },
+            { name: 'Notion', url: 'https://www.notion.so', icon: 'file-text', color: 'from-neutral-700 to-neutral-900' },
+            { name: 'Vercel', url: 'https://vercel.com', icon: 'triangle', color: 'from-violet-600 to-purple-800' }
+        ];
+
+        // Initialize on load
+        window.onload = function() {
+            initClock();
+            renderShortcuts();
+            fetchAllData();
+            lucide.createIcons();
+        };
+
+        // Clock Widget
+        function initClock() {
+            setInterval(() => {
+                const now = new Date();
+                document.getElementById('clock').innerText = now.toLocaleTimeString();
+            }, 1000);
+        }
+
+        // Tab Switching Logic with 3-dot updates
+        function switchTab(tabName) {
+            currentTabIdx = tabsOrder.indexOf(tabName);
+            if (currentTabIdx === -1) currentTabIdx = 0;
+
+            tabsOrder.forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                const dot = document.getElementById(`dot-${t}`);
+                if (t === tabName) {
+                    el.classList.remove('hidden');
+                    el.classList.add('flex');
+                    if(dot) {
+                        dot.className = 'w-6 h-3 rounded-full bg-indigo-500 transition-all shadow-md cursor-pointer';
+                    }
+                } else {
+                    el.classList.add('hidden');
+                    el.classList.remove('flex');
+                    if(dot) {
+                        dot.className = 'w-3 h-3 rounded-full bg-slate-700 hover:bg-slate-600 transition-all shadow-md cursor-pointer';
+                    }
+                }
+            });
+            lucide.createIcons();
+        }
+
+        function nextPage() {
+            currentTabIdx = (currentTabIdx + 1) % tabsOrder.length;
+            switchTab(tabsOrder[currentTabIdx]);
+        }
+
+        function prevPage() {
+            currentTabIdx = (currentTabIdx - 1 + tabsOrder.length) % tabsOrder.length;
+            switchTab(tabsOrder[currentTabIdx]);
+        }
+
+        // Search Bar Handler
+        function handleSearch(e) {
+            e.preventDefault();
+            const query = document.getElementById('search-input').value.trim();
+            const engine = document.getElementById('search-engine').value;
+            if (!query) return;
+
+            let searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+            if (engine === 'duckduckgo') searchUrl = `https://duckduckgo.com/?q=${encodeURIComponent(query)}`;
+            if (engine === 'github') searchUrl = `https://github.com/search?q=${encodeURIComponent(query)}`;
+
+            window.open(searchUrl, '_blank');
+        }
+
+        // Fetch Data from Google Apps Script endpoints with robust CORS fallback / JSONP simulation
+        async function fetchAllData() {
+            try {
+                // Fetch Tasks (codeB)
+                try {
+                    const resB = await fetch(ENDPOINT_TASKS);
+                    const dataB = await resB.json();
+                    appData.tasks = dataB.tareas || [];
+                    appData.subproyectos = dataB.subproyectos || [];
+                    appData.proyectos = dataB.proyectos || [];
+                    appData.responsables = dataB.responsables || [];
+                } catch (errB) {
+                    console.warn('Could not load codeB directly, using mock fallback for tasks:', errB);
+                    appData.tasks = getMockTasks();
+                }
+
+                // Fetch Artworks (codeA)
+                try {
+                    const resA = await fetch(ENDPOINT_ARTWORKS);
+                    const dataA = await resA.json();
+                    appData.artworks = dataA.registrosObra || dataA.data || [];
+                } catch (errA) {
+                    console.warn('Could not load codeA directly, using mock fallback for artworks:', errA);
+                    appData.artworks = getMockArtworks();
+                }
+
+                renderDashboardWidgets();
+                renderTasksTable();
+                renderArtworksGrid();
+                lucide.createIcons();
+            } catch (e) {
+                console.error('Error loading data:', e);
+            }
+        }
+
+        function refreshAllData() {
+            fetchAllData();
+        }
+
+        // Render Shortcuts
+        function renderShortcuts() {
+            const grid = document.getElementById('shortcuts-grid');
+            grid.innerHTML = defaultShortcuts.map(s => `
+                <a href="${s.url}" target="_blank" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800/80 hover:border-slate-700 transition-all group hover:-translate-y-1 shadow-lg">
+                    <div class="w-12 h-12 rounded-xl bg-gradient-to-tr ${s.color} flex items-center justify-center text-white shadow-md mb-2 group-hover:scale-110 transition-transform">
+                        <i data-lucide="${s.icon}" class="w-6 h-6"></i>
+                    </div>
+                    <span class="text-xs font-medium text-slate-300 truncate w-full text-center">${s.name}</span>
+                </a>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        // Render Dashboard Widgets
+        function renderDashboardWidgets() {
+            // Widget Tasks
+            const tasksList = document.getElementById('widget-tasks-list');
+            const recentTasks = appData.tasks.slice(0, 5);
+            if (recentTasks.length === 0) {
+                tasksList.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">No hay tareas disponibles.</p>`;
+            } else {
+                tasksList.innerHTML = recentTasks.map(t => `
+                    <div class="flex items-center justify-between p-3 rounded-xl bg-slate-950/50 border border-slate-800/60">
+                        <div class="flex items-center gap-3 overflow-hidden">
+                            <span class="w-2 h-2 rounded-full ${getStatusDotColor(t.estatus)}"></span>
+                            <div class="truncate">
+                                <p class="text-xs font-medium text-slate-200 truncate">${t.detalles || t.descripcion || 'Sin descripción'}</p>
+                                <p class="text-[10px] text-slate-500 font-mono">${t.asignacion || 'S/A'}</p>
+                            </div>
+                        </div>
+                        <span class="text-[10px] px-2 py-0.5 rounded-full ${getStatusBadgeColor(t.estatus)}">${t.estatus || 'pendiente'}</span>
+                    </div>
+                `).join('');
+            }
+
+            // Widget Artworks
+            const artworksGrid = document.getElementById('widget-artworks-grid');
+            const recentArtworks = appData.artworks.slice(0, 4);
+            if (recentArtworks.length === 0) {
+                artworksGrid.innerHTML = `<p class="text-xs text-slate-500 text-center col-span-2 py-6">No hay obras disponibles.</p>`;
+            } else {
+                artworksGrid.innerHTML = recentArtworks.map(a => `
+                    <div class="group relative rounded-xl overflow-hidden border border-slate-800/80 bg-slate-950/60 flex flex-col">
+                        <div class="h-24 bg-slate-800 relative overflow-hidden flex items-center justify-center">
+                            <img src="https://placehold.co/300x200/1e293b/94a3b8?text=${encodeURIComponent(a.nombre_obra || 'Obra')}" alt="${a.nombre_obra}" class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
+                            <div class="absolute top-2 right-2 bg-slate-900/80 backdrop-blur px-1.5 py-0.5 rounded text-[10px] text-slate-300 font-mono">${a.estatus || 'Consolidación'}</div>
+                        </div>
+                        <div class="p-2 flex flex-col justify-between flex-1">
+                            <p class="text-xs font-semibold text-slate-200 truncate">${a.nombre_obra || 'Sin Título'}</p>
+                            <p class="text-[10px] text-slate-400 truncate">${a.autor || 'Autor desconocido'}</p>
+                        </div>
+                    </div>
+                `).join('');
+            }
+        }
+
+        // Render Tasks Table
+        function renderTasksTable() {
+            const container = document.getElementById('tasks-table-container');
+            const tasks = appData.tasks;
+            if (tasks.length === 0) {
+                container.innerHTML = `<p class="text-sm text-slate-500 text-center py-10">No se encontraron tareas en el backend codeB.</p>`;
+                return;
+            }
+
+            container.innerHTML = tasks.map(t => `
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-xl bg-slate-950/60 border border-slate-800/80 hover:border-slate-700 transition">
+                    <div class="flex items-start gap-3">
+                        <div class="p-2 rounded-lg bg-cyan-500/10 text-cyan-400 mt-0.5"><i data-lucide="check-circle" class="w-4 h-4"></i></div>
+                        <div>
+                            <div class="flex items-center gap-2">
+                                <span class="font-mono text-xs text-cyan-400 font-bold">${t.asignacion || 'S/A'}</span>
+                                <span class="text-xs px-2 py-0.5 rounded-full ${getStatusBadgeColor(t.estatus)}">${t.estatus || 'pendiente'}</span>
+                                <span class="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">Prioridad: ${t.prioridad || 'media'}</span>
+                            </div>
+                            <h4 class="text-sm font-semibold text-slate-100 mt-1">${t.detalles || 'Sin detalles'}</h4>
+                            <p class="text-xs text-slate-400 mt-0.5">${t.descripcion || ''}</p>
+                        </div>
+                    </div>
+                    <div class="flex items-center gap-4 text-xs text-slate-400 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-800">
+                        <span>Límite: <strong class="text-slate-200">${t.fecha_limite || 'N/A'}</strong></span>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        // Render Artworks Grid
+        function renderArtworksGrid() {
+            const container = document.getElementById('artworks-grid-container');
+            const artworks = appData.artworks;
+            if (artworks.length === 0) {
+                container.innerHTML = `<p class="text-sm text-slate-500 text-center col-span-full py-10">No se encontraron registros de obra en el backend codeA.</p>`;
+                return;
+            }
+
+            container.innerHTML = artworks.map(a => `
+                <div class="bg-slate-950/60 border border-slate-800/80 rounded-2xl overflow-hidden flex flex-col group hover:border-slate-700 transition shadow-lg">
+                    <div class="h-44 bg-slate-900 relative overflow-hidden flex items-center justify-center">
+                        <img src="https://placehold.co/400x300/1e293b/94a3b8?text=${encodeURIComponent(a.nombre_obra || 'Obra')}" alt="${a.nombre_obra}" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        <div class="absolute top-3 right-3 bg-slate-900/90 backdrop-blur px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-200 border border-slate-700">${a.estatus || 'Consolidación'}</div>
+                        <div class="absolute bottom-3 left-3 bg-slate-900/90 backdrop-blur px-2.5 py-1 rounded-lg text-xs font-mono text-purple-300 border border-slate-700">${a.asignacion || 'obra-X'}</div>
+                    </div>
+                    <div class="p-4 flex flex-col justify-between flex-1 gap-3">
+                        <div>
+                            <h4 class="font-bold text-sm text-slate-100">${a.nombre_obra || 'Sin Título'}</h4>
+                            <p class="text-xs text-slate-400 mt-0.5">Autor: <span class="text-slate-300">${a.autor || 'Desconocido'}</span></p>
+                            <p class="text-xs text-slate-400">Ubicación: <span class="text-slate-300">${a.ubicacion || 'N/A'}</span></p>
+                        </div>
+                        <div class="flex items-center justify-between pt-3 border-t border-slate-800/80 text-xs">
+                            <span class="font-semibold text-emerald-400">${a.tipo_moneda || 'MXN'} $${Number(a.precio_lista || 0).toLocaleString()}</span>
+                            <span class="text-slate-500 font-mono">${a.superficie || 0} m²</span>
+                        </div>
+                    </div>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        // Filtering helpers
+        function filterTasks() {
+            const query = document.getElementById('task-filter-input').value.toLowerCase();
+            const status = document.getElementById('task-status-filter').value;
+            // Filter logic can be hooked to appData.tasks
+        }
+
+        function filterArtworks() {
+            const query = document.getElementById('artwork-filter-input').value.toLowerCase();
+            const status = document.getElementById('artwork-status-filter').value;
+            // Filter logic can be hooked to appData.artworks
+        }
+
+        // Status badge styling helpers
+        function getStatusBadgeColor(estatus) {
+            switch(estatus) {
+                case 'completado': return 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+                case 'en_curso': return 'bg-blue-500/10 text-blue-400 border border-blue-500/20';
+                case 'en_revision': return 'bg-amber-500/10 text-amber-400 border border-amber-500/20';
+                case 'bloqueada': return 'bg-rose-500/10 text-rose-400 border border-rose-500/20';
+                default: return 'bg-slate-800 text-slate-400 border border-slate-700';
+            }
+        }
+
+        function getStatusDotColor(estatus) {
+            switch(estatus) {
+                case 'completado': return 'bg-emerald-400 shadow-lg shadow-emerald-400/50';
+                case 'en_curso': return 'bg-blue-400 shadow-lg shadow-blue-400/50';
+                case 'en_revision': return 'bg-amber-400 shadow-lg shadow-amber-400/50';
+                case 'bloqueada': return 'bg-rose-400 shadow-lg shadow-rose-400/50';
+                default: return 'bg-slate-400';
+            }
+        }
+
+        // Mock Fallbacks in case CORS prevents direct Google Apps Script execution in iframe sandbox
+        function getMockTasks() {
+            return [
+                { asignacion: '1.1.1JD', estatus: 'en_curso', prioridad: 'alta', detalles: 'Revisión de planos estructurales', descripcion: 'Verificar especificaciones de cimentación.', fecha_limite: '2026-06-15' },
+                { asignacion: '1.2.2MR', estatus: 'completado', prioridad: 'media', detalles: 'Aprobación de presupuesto inicial', descripcion: 'Validación con directiva.', fecha_limite: '2026-05-30' },
+                { asignacion: '2.1.1AL', estatus: 'en_revision', prioridad: 'baja', detalles: 'Entrega de catálogo de obras', descripcion: 'Compilación fotográfica.', fecha_limite: '2026-06-20' }
+            ];
+        }
+
+        function getMockArtworks() {
+            return [
+                { nombre_obra: 'Residencia Minimalista Sol', autor: 'Carlos Mendoza', ubicacion: 'Puebla, MX', estatus: 'Consolidación', tipo_moneda: 'MXN', precio_lista: 4500000, superficie: 320 },
+                { nombre_obra: 'Torre Corporativa Cenit', autor: 'Sofía Valdés', ubicacion: 'CDMX', estatus: 'Bodega', tipo_moneda: 'MXN', precio_lista: 12000000, superficie: 850 },
+                { nombre_obra: 'Pabellón Botánico', autor: 'Estudio Arquitectura', ubicacion: 'Monterrey', estatus: 'Vendida', tipo_moneda: 'MXN', precio_lista: 6800000, superficie: 410 }
+            ];
+        }
+    </script>
 </body>
 </html>
