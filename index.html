@@ -3,14 +3,13 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Home</title>
+    <title>Workspace & Home Browser</title>
     <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
     <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
     <!-- Google Fonts Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="icon" href="./icon.png" type="image/png">   
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -90,7 +89,7 @@
                             <!-- Tasks Widget Preview -->
                             <div class="bg-zinc-900/60 backdrop-blur-xl border border-zinc-800/80 rounded-2xl p-5 flex flex-col h-[380px] shadow-xl">
                                 <div class="flex items-center justify-between mb-3">
-                                    <div class="flex items-center gap-1 bg-zinc-950/60 p-1 rounded-xl border border-zinc-800">
+                                    <div class="flex items-center gap-1 bg-zinc-950/60 p-1 rounded-1xl border border-zinc-800">
                                         <button onclick="switchTaskWidgetTab('equipo')" id="widget-tab-equipo" class="px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition">Equipo</button>
                                         <button onclick="switchTaskWidgetTab('yo')" id="widget-tab-yo" class="px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition">Yo</button>
                                     </div>
@@ -99,7 +98,39 @@
                                 
                                 <!-- Equipo Tab Content -->
                                 <div id="widget-tasks-equipo-pane" class="flex-1 overflow-y-auto pr-1 flex flex-col bg-zinc-950/40 rounded-xl border border-zinc-800/60 divide-y divide-zinc-800/60">
-                                    <!-- Populated dynamically -->
+                                    <!-- Skeleton Loader Initial State -->
+                                    <div class="p-4 space-y-3 animate-pulse">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
+                                                <div class="space-y-1.5">
+                                                    <div class="h-3 w-36 bg-zinc-800 rounded"></div>
+                                                    <div class="h-2 w-20 bg-zinc-800/60 rounded"></div>
+                                                </div>
+                                            </div>
+                                            <div class="h-4 w-16 bg-zinc-800 rounded-full"></div>
+                                        </div>
+                                        <div class="flex items-center justify-between pt-2">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
+                                                <div class="space-y-1.5">
+                                                    <div class="h-3 w-28 bg-zinc-800 rounded"></div>
+                                                    <div class="h-2 w-16 bg-zinc-800/60 rounded"></div>
+                                                </div>
+                                            </div>
+                                            <div class="h-4 w-16 bg-zinc-800 rounded-full"></div>
+                                        </div>
+                                        <div class="flex items-center justify-between pt-2">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
+                                                <div class="space-y-1.5">
+                                                    <div class="h-3 w-32 bg-zinc-800 rounded"></div>
+                                                    <div class="h-2 w-24 bg-zinc-800/60 rounded"></div>
+                                                </div>
+                                            </div>
+                                            <div class="h-4 w-16 bg-zinc-800 rounded-full"></div>
+                                        </div>
+                                    </div>
                                 </div>
 
                                 <!-- Yo Tab Content -->
@@ -121,7 +152,21 @@
                                     <button onclick="switchTab('artworks')" class="text-xs text-indigo-400 hover:underline">Ver galería</button>
                                 </div>
                                 <div id="widget-artworks-grid" class="flex-1 overflow-y-auto grid grid-cols-2 gap-3 pr-2">
-                                    <!-- Populated dynamically -->
+                                    <!-- Skeleton Loader Initial State -->
+                                    <div class="rounded-xl border border-zinc-800/80 bg-zinc-950/60 flex flex-col animate-pulse">
+                                        <div class="h-28 bg-zinc-800/60"></div>
+                                        <div class="p-2 space-y-2">
+                                            <div class="h-3 w-4/5 bg-zinc-800 rounded"></div>
+                                            <div class="h-2.5 w-1/2 bg-zinc-800/60 rounded"></div>
+                                        </div>
+                                    </div>
+                                    <div class="rounded-xl border border-zinc-800/80 bg-zinc-950/60 flex flex-col animate-pulse">
+                                        <div class="h-28 bg-zinc-800/60"></div>
+                                        <div class="p-2 space-y-2">
+                                            <div class="h-3 w-4/5 bg-zinc-800 rounded"></div>
+                                            <div class="h-2.5 w-1/2 bg-zinc-800/60 rounded"></div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -152,7 +197,33 @@
                         <div class="flex-1 bg-zinc-900/60 backdrop-blur-xl border border-zinc-800/80 rounded-2xl overflow-hidden flex flex-col shadow-xl">
                             <div class="overflow-y-auto flex-1 p-4">
                                 <div id="tasks-table-container" class="space-y-3">
-                                    <!-- Populated dynamically -->
+                                    <!-- Skeleton Loader -->
+                                    <div class="p-4 rounded-xl bg-zinc-950/60 border border-zinc-800/80 animate-pulse flex items-center justify-between">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded-lg bg-zinc-800"></div>
+                                            <div class="space-y-2">
+                                                <div class="flex gap-2">
+                                                    <div class="h-3 w-16 bg-zinc-800 rounded"></div>
+                                                    <div class="h-3 w-20 bg-zinc-800 rounded-full"></div>
+                                                </div>
+                                                <div class="h-4 w-64 bg-zinc-800 rounded"></div>
+                                            </div>
+                                        </div>
+                                        <div class="h-3 w-24 bg-zinc-800 rounded"></div>
+                                    </div>
+                                    <div class="p-4 rounded-xl bg-zinc-950/60 border border-zinc-800/80 animate-pulse flex items-center justify-between">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-8 h-8 rounded-lg bg-zinc-800"></div>
+                                            <div class="space-y-2">
+                                                <div class="flex gap-2">
+                                                    <div class="h-3 w-16 bg-zinc-800 rounded"></div>
+                                                    <div class="h-3 w-20 bg-zinc-800 rounded-full"></div>
+                                                </div>
+                                                <div class="h-4 w-48 bg-zinc-800 rounded"></div>
+                                            </div>
+                                        </div>
+                                        <div class="h-3 w-24 bg-zinc-800 rounded"></div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
@@ -181,7 +252,31 @@
                         <div class="flex-1 bg-zinc-900/60 backdrop-blur-xl border border-zinc-800/80 rounded-2xl overflow-hidden flex flex-col shadow-xl">
                             <div class="overflow-y-auto flex-1 p-4">
                                 <div id="artworks-grid-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                                    <!-- Populated dynamically -->
+                                    <!-- Skeleton Loader -->
+                                    <div class="bg-zinc-950/60 border border-zinc-800/80 rounded-2xl overflow-hidden flex flex-col animate-pulse">
+                                        <div class="h-48 bg-zinc-800/60"></div>
+                                        <div class="p-4 space-y-3">
+                                            <div class="h-4 w-3/4 bg-zinc-800 rounded"></div>
+                                            <div class="h-3 w-1/2 bg-zinc-800/60 rounded"></div>
+                                            <div class="h-3 w-2/3 bg-zinc-800/60 rounded"></div>
+                                            <div class="pt-3 border-t border-zinc-800 flex justify-between">
+                                                <div class="h-3 w-20 bg-zinc-800 rounded"></div>
+                                                <div class="h-3 w-12 bg-zinc-800 rounded"></div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                    <div class="bg-zinc-950/60 border border-zinc-800/80 rounded-2xl overflow-hidden flex flex-col animate-pulse">
+                                        <div class="h-48 bg-zinc-800/60"></div>
+                                        <div class="p-4 space-y-3">
+                                            <div class="h-4 w-3/4 bg-zinc-800 rounded"></div>
+                                            <div class="h-3 w-1/2 bg-zinc-800/60 rounded"></div>
+                                            <div class="h-3 w-2/3 bg-zinc-800/60 rounded"></div>
+                                            <div class="pt-3 border-t border-zinc-800 flex justify-between">
+                                                <div class="h-3 w-20 bg-zinc-800 rounded"></div>
+                                                <div class="h-3 w-12 bg-zinc-800 rounded"></div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
                         </div>
