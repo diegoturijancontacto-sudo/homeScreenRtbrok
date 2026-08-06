@@ -34,86 +34,87 @@
         <img src="Wallpaper.jpg" alt="Wallpaper Background"
              onerror="this.onerror=null; this.src='https://placehold.co/1920x1080/090d16/1e293b?text=Wallpaper.jpg';"
              class="w-full h-full object-cover opacity-40 scale-105 blur-[1px]">
-        <div class="absolute inset-0 bg-slate-950/70 backdrop-blur-[2px]"></div>
+        <!-- Opacity decreased by half (from 35% to 17.5%) -->
+        <div class="absolute inset-0 bg-slate-950/17.5 backdrop-blur-[2px]"></div>
+    </div>
+
+    <!-- RTBROK Brand Top Left (Outside Gutter) -->
+    <div class="absolute top-4 left-6 sm:left-12 md:left-20 lg:left-32 z-30">
+        <h1 class="font-bold text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">R T B R O K</h1>
+    </div>
+
+    <!-- Clock Top Right (Outside Gutter, without seconds) -->
+    <div class="absolute top-4 right-6 sm:right-12 md:right-20 lg:right-32 z-30">
+        <p id="clock" class="text-xs text-slate-400 font-medium">00:00</p>
     </div>
 
     <div class="relative z-10 flex flex-row items-center h-full w-full max-w-[1920px] mx-auto px-6 sm:px-12 md:px-20 lg:px-32 py-4 md:py-6 gap-6">
 
         <!-- Left Navigation Arrow (Outside Gutter) -->
-        <button onclick="prevPage()" class="hidden md:flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 text-slate-300 hover:text-white transition-all shadow-xl group z-30 shrink-0">
+        <button onclick="prevPage()" class="hidden md:flex items-center justify-center w-12 h-12 rounded-2xl bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-700/80 text-slate-300 hover:text-white transition-all shadow-xl group z-30 shrink-0">
             <i data-lucide="chevron-left" class="w-6 h-6 group-hover:-translate-x-0.5 transition-transform"></i>
         </button>
 
-        <div id="app" class="relative z-10 flex flex-col h-full w-full flex-1 gap-6 overflow-hidden">
+        <div id="app" class="relative z-10 flex flex-col h-full w-full flex-1 gap-6 overflow-hidden pt-8">
 
-            <!-- HEADER / SEARCH BAR -->
-            <header class="flex flex-col md:flex-row items-center justify-between gap-4 bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl p-4 shadow-2xl">
-                <div class="flex items-center gap-3 w-full md:w-auto">
-                    <div class="h-10 w-10 rounded-xl bg-gradient-to-tr from-indigo-500 to-cyan-400 flex items-center justify-center shadow-lg shadow-indigo-500/30">
-                        <i data-lucide="compass" class="w-6 h-6 text-white animate-pulse"></i>
+            <div class="w-full">
+                <form id="search-form" onsubmit="handleSearch(event)" class="relative flex items-center w-full">
+                    <span class="absolute left-4 text-slate-400"><i data-lucide="search" class="w-5 h-5"></i></span>
+                    <input type="text" id="search-input" placeholder="Buscar en Google o filtrar módulos..."
+                        class="w-full bg-zinc-900/80 backdrop-blur-xl border border-zinc-700/60 rounded-2xl pl-12 pr-28 py-3.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-2xl">
+                    <div class="absolute right-2 flex items-center gap-1">
+                        <select id="search-engine" class="bg-zinc-800 text-slate-300 text-xs rounded-xl px-2.5 py-2 focus:outline-none cursor-pointer border border-zinc-700">
+                            <option value="google">Google</option>
+                            <option value="duckduckgo">DuckDuckGo</option>
+                            <option value="github">GitHub</option>
+                        </select>
+                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white p-2 rounded-xl text-xs font-medium transition shadow flex items-center justify-center"><i data-lucide="arrow-right" class="w-4 h-4"></i></button>
                     </div>
-                    <div>
-                        <h1 class="font-bold text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">R T B R O K</h1>
-                        <p id="clock" class="text-xs text-slate-400 font-medium">00:00:00 AM</p>
-                    </div>
-                </div>
-
-                <!-- Global Search & Shortcuts Bar -->
-                <div class="relative w-full md:w-1/2 max-w-2xl">
-                    <form id="search-form" onsubmit="handleSearch(event)" class="relative flex items-center">
-                        <span class="absolute left-4 text-slate-400"><i data-lucide="search" class="w-5 h-5"></i></span>
-                        <input type="text" id="search-input" placeholder="Buscar en Google o filtrar módulos..."
-                            class="w-full bg-slate-950/80 border border-slate-700/60 rounded-xl pl-12 pr-28 py-3 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-inner">
-                        <div class="absolute right-2 flex items-center gap-1">
-                            <select id="search-engine" class="bg-slate-800 text-slate-300 text-xs rounded-lg px-2 py-1.5 focus:outline-none cursor-pointer border border-slate-700">
-                                <option value="google">Google</option>
-                                <option value="duckduckgo">DuckDuckGo</option>
-                                <option value="github">GitHub</option>
-                            </select>
-                            <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition shadow">Ir</button>
-                        </div>
-                    </form>
-                </div>
-
-                <!-- Quick Action Status & Sync -->
-                <div class="flex items-center gap-3 w-full md:w-auto justify-end">
-                    <button onclick="refreshAllData()" title="Sincronizar datos" class="p-2.5 rounded-xl bg-slate-800/80 hover:bg-slate-700/80 border border-slate-700/60 text-slate-300 hover:text-white transition group">
-                        <i data-lucide="refresh-cw" class="w-4 h-4 group-hover:rotate-180 transition-transform duration-500"></i>
-                    </button>
-                </div>
-            </header>
+                </form>
+            </div>
 
             <main class="flex-1 overflow-hidden relative flex flex-col">
 
                 <div class="flex-1 overflow-hidden relative">
-                    <!-- TAB 1: DASHBOARD / HOME PAGE (Quick Links & Widgets) -->
                     <div id="tab-dashboard" class="h-full overflow-y-auto pr-1 flex flex-col gap-6">
-                        <!-- Quick Access Grid -->
+                        <!-- Quick Access Grid (Titles removed) -->
                         <section>
-                            <div class="flex items-center justify-between mb-3">
-                                <h2 class="text-sm font-semibold text-slate-400 uppercase tracking-wider flex items-center gap-2"><i data-lucide="star" class="w-4 h-4 text-indigo-400"></i> Accesos Directos</h2>
-                                <button onclick="openAddShortcutModal()" class="text-xs text-indigo-400 hover:text-indigo-300 flex items-center gap-1 font-medium"><i data-lucide="plus" class="w-3.5 h-3.5"></i> Añadir marcador</button>
-                            </div>
                             <div id="shortcuts-grid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
                                 <!-- Populated dynamically -->
                             </div>
                         </section>
 
-                        <!-- Widgets Split: Tasks Overview & Recent Artworks -->
+                        <!-- Widgets Split with Gray Cards -->
                         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
                             <!-- Tasks Widget Preview -->
-                            <div class="bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl p-5 flex flex-col h-[380px] shadow-xl">
-                                <div class="flex items-center justify-between mb-4">
-                                    <h3 class="font-semibold text-sm flex items-center gap-2 text-slate-200"><i data-lucide="check-square" class="w-4 h-4 text-cyan-400"></i> Resumen de Tareas (CodeB)</h3>
-                                    <button onclick="switchTab('tasks')" class="text-xs text-indigo-400 hover:underline">Ver todas</button>
+                            <div class="bg-zinc-900/60 backdrop-blur-xl border border-zinc-800/80 rounded-2xl p-5 flex flex-col h-[380px] shadow-xl">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center gap-1 bg-zinc-950/60 p-1 rounded-xl border border-zinc-800">
+                                        <button onclick="switchTaskWidgetTab('equipo')" id="widget-tab-equipo" class="px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition">Equipo</button>
+                                        <button onclick="switchTaskWidgetTab('yo')" id="widget-tab-yo" class="px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition">Yo</button>
+                                    </div>
+                                    <h3 class="font-semibold text-sm flex items-center gap-2 text-slate-200">Resumen de Tareas</h3>
                                 </div>
-                                <div id="widget-tasks-list" class="flex-1 overflow-y-auto space-y-2.5 pr-2">
+                                
+                                <!-- Equipo Tab Content -->
+                                <div id="widget-tasks-equipo-pane" class="flex-1 overflow-y-auto pr-1 flex flex-col bg-zinc-950/40 rounded-xl border border-zinc-800/60 divide-y divide-zinc-800/60">
                                     <!-- Populated dynamically -->
+                                </div>
+
+                                <!-- Yo Tab Content -->
+                                <div id="widget-tasks-yo-pane" class="flex-1 overflow-y-auto pr-1 hidden flex-col bg-zinc-950/40 rounded-xl border border-zinc-800/60">
+                                    <div class="p-2 border-b border-zinc-800/60 flex gap-2">
+                                        <input type="text" id="new-local-task-input" placeholder="Nueva tarea personal..." class="flex-1 bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+                                        <button onclick="addLocalTask()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition">Añadir</button>
+                                    </div>
+                                    <div id="widget-tasks-yo-list" class="flex-1 overflow-y-auto divide-y divide-zinc-800/60">
+                                        <!-- Populated dynamically -->
+                                    </div>
                                 </div>
                             </div>
 
                             <!-- Artworks Widget Preview -->
-                            <div class="bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl p-5 flex flex-col h-[380px] shadow-xl">
+                            <div class="bg-zinc-900/60 backdrop-blur-xl border border-zinc-800/80 rounded-2xl p-5 flex flex-col h-[380px] shadow-xl">
                                 <div class="flex items-center justify-between mb-4">
                                     <h3 class="font-semibold text-sm flex items-center gap-2 text-slate-200"><i data-lucide="image" class="w-4 h-4 text-purple-400"></i> Obras Recientes (CodeA)</h3>
                                     <button onclick="switchTab('artworks')" class="text-xs text-indigo-400 hover:underline">Ver galería</button>
@@ -125,9 +126,8 @@
                         </div>
                     </div>
 
-                    <!-- TAB 2: TASKS (codeB.gs integration) -->
                     <div id="tab-tasks" class="h-full hidden flex-col gap-4">
-                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl p-4 shadow-xl">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-zinc-900/60 backdrop-blur-xl border border-zinc-800/80 rounded-2xl p-4 shadow-xl">
                             <div class="flex items-center gap-3">
                                 <div class="p-2.5 bg-cyan-500/10 text-cyan-400 rounded-xl border border-cyan-500/20"><i data-lucide="check-square" class="w-5 h-5"></i></div>
                                 <div>
@@ -136,8 +136,8 @@
                                 </div>
                             </div>
                             <div class="flex items-center gap-2 w-full sm:w-auto">
-                                <input type="text" id="task-filter-input" oninput="filterTasks()" placeholder="Filtrar tareas..." class="bg-slate-950/80 border border-slate-700/60 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 w-full sm:w-48">
-                                <select id="task-status-filter" onchange="filterTasks()" class="bg-slate-800 border border-slate-700 text-xs rounded-xl px-3 py-2 text-slate-200 focus:outline-none">
+                                <input type="text" id="task-filter-input" oninput="filterTasks()" placeholder="Filtrar tareas..." class="bg-zinc-950/80 border border-zinc-700/60 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 w-full sm:w-48">
+                                <select id="task-status-filter" onchange="filterTasks()" class="bg-zinc-800 border border-zinc-700 text-xs rounded-xl px-3 py-2 text-slate-200 focus:outline-none">
                                     <option value="all">Todos los estatus</option>
                                     <option value="pendiente">Pendiente</option>
                                     <option value="en_curso">En Curso</option>
@@ -148,7 +148,7 @@
                             </div>
                         </div>
 
-                        <div class="flex-1 bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl overflow-hidden flex flex-col shadow-xl">
+                        <div class="flex-1 bg-zinc-900/60 backdrop-blur-xl border border-zinc-800/80 rounded-2xl overflow-hidden flex flex-col shadow-xl">
                             <div class="overflow-y-auto flex-1 p-4">
                                 <div id="tasks-table-container" class="space-y-3">
                                     <!-- Populated dynamically -->
@@ -157,9 +157,8 @@
                         </div>
                     </div>
 
-                    <!-- TAB 3: ARTWORKS & REGISTROS OBRA (codeA.gs integration) -->
                     <div id="tab-artworks" class="h-full hidden flex-col gap-4">
-                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl p-4 shadow-xl">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-zinc-900/60 backdrop-blur-xl border border-zinc-800/80 rounded-2xl p-4 shadow-xl">
                             <div class="flex items-center gap-3">
                                 <div class="p-2.5 bg-purple-500/10 text-purple-400 rounded-xl border border-purple-500/20"><i data-lucide="image" class="w-5 h-5"></i></div>
                                 <div>
@@ -168,8 +167,8 @@
                                 </div>
                             </div>
                             <div class="flex items-center gap-2 w-full sm:w-auto">
-                                <input type="text" id="artwork-filter-input" oninput="filterArtworks()" placeholder="Buscar obra, autor, ubicación..." class="bg-slate-950/80 border border-slate-700/60 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-purple-500 w-full sm:w-64">
-                                <select id="artwork-status-filter" onchange="filterArtworks()" class="bg-slate-800 border border-slate-700 text-xs rounded-xl px-3 py-2 text-slate-200 focus:outline-none">
+                                <input type="text" id="artwork-filter-input" oninput="filterArtworks()" placeholder="Buscar obra, autor, ubicación..." class="bg-zinc-950/80 border border-zinc-700/60 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-purple-500 w-full sm:w-64">
+                                <select id="artwork-status-filter" onchange="filterArtworks()" class="bg-zinc-800 border border-zinc-700 text-xs rounded-xl px-3 py-2 text-slate-200 focus:outline-none">
                                     <option value="all">Todos los estatus</option>
                                     <option value="Consolidación">Consolidación</option>
                                     <option value="Bodega">Bodega</option>
@@ -178,7 +177,7 @@
                             </div>
                         </div>
 
-                        <div class="flex-1 bg-slate-900/60 backdrop-blur-xl border border-slate-800/80 rounded-2xl overflow-hidden flex flex-col shadow-xl">
+                        <div class="flex-1 bg-zinc-900/60 backdrop-blur-xl border border-zinc-800/80 rounded-2xl overflow-hidden flex flex-col shadow-xl">
                             <div class="overflow-y-auto flex-1 p-4">
                                 <div id="artworks-grid-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
                                     <!-- Populated dynamically -->
@@ -191,15 +190,15 @@
                 <!-- 3-Dot Pagination Indicator Bar -->
                 <div class="flex items-center justify-center gap-3 pt-2">
                     <button onclick="switchTab('dashboard')" id="dot-dashboard" class="w-6 h-3 rounded-full bg-indigo-500 transition-all shadow-md cursor-pointer" title="Dashboard"></button>
-                    <button onclick="switchTab('tasks')" id="dot-tasks" class="w-3 h-3 rounded-full bg-slate-700 hover:bg-slate-600 transition-all shadow-md cursor-pointer" title="Tareas"></button>
-                    <button onclick="switchTab('artworks')" id="dot-artworks" class="w-3 h-3 rounded-full bg-slate-700 hover:bg-slate-600 transition-all shadow-md cursor-pointer" title="Obras"></button>
+                    <button onclick="switchTab('tasks')" id="dot-tasks" class="w-3 h-3 rounded-full bg-zinc-700 hover:bg-zinc-600 transition-all shadow-md cursor-pointer" title="Tareas"></button>
+                    <button onclick="switchTab('artworks')" id="dot-artworks" class="w-3 h-3 rounded-full bg-zinc-700 hover:bg-zinc-600 transition-all shadow-md cursor-pointer" title="Obras"></button>
                 </div>
 
             </main>
         </div>
 
         <!-- Right Navigation Arrow (Outside Gutter) -->
-        <button onclick="nextPage()" class="hidden md:flex items-center justify-center w-12 h-12 rounded-2xl bg-slate-900/80 hover:bg-slate-800 border border-slate-700/80 text-slate-300 hover:text-white transition-all shadow-xl group z-30 shrink-0">
+        <button onclick="nextPage()" class="hidden md:flex items-center justify-center w-12 h-12 rounded-2xl bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-700/80 text-slate-300 hover:text-white transition-all shadow-xl group z-30 shrink-0">
             <i data-lucide="chevron-right" class="w-6 h-6 group-hover:translate-x-0.5 transition-transform"></i>
         </button>
 
@@ -221,19 +220,22 @@
             error: null
         };
 
+        // Local tasks state stored in localStorage
+        let localTasks = JSON.parse(localStorage.getItem('rtbrok_local_tasks') || '[]');
+
         const tabsOrder = ['dashboard', 'tasks', 'artworks'];
         let currentTabIdx = 0;
 
-        // Default Custom Shortcuts for Browser Home
+        // Shortcuts with Instagram, Base de datos, and Generador de catálogos
         let defaultShortcuts = [
-            { name: 'Google', url: 'https://www.google.com', icon: 'globe', color: 'from-blue-500 to-indigo-600' },
-            { name: 'GitHub', url: 'https://github.com', icon: 'github', color: 'from-slate-700 to-slate-900' },
+            { name: 'Instagram', url: 'https://www.instagram.com', icon: 'instagram', color: 'from-pink-500 to-purple-600' },
+            { name: 'Base de datos', url: 'https://diegoturijancontacto-sudo.github.io/Finanzas/mobile/', icon: 'database', color: 'from-zinc-700 to-zinc-900' },
             { name: 'ChatGPT', url: 'https://chat.openai.com', icon: 'cpu', color: 'from-emerald-500 to-teal-700' },
             { name: 'YouTube', url: 'https://www.youtube.com', icon: 'play-square', color: 'from-red-600 to-rose-800' },
             { name: 'Gmail', url: 'https://mail.google.com', icon: 'mail', color: 'from-amber-500 to-orange-600' },
             { name: 'Drive', url: 'https://drive.google.com', icon: 'hard-drive', color: 'from-blue-600 to-cyan-700' },
             { name: 'Notion', url: 'https://www.notion.so', icon: 'file-text', color: 'from-neutral-700 to-neutral-900' },
-            { name: 'Vercel', url: 'https://vercel.com', icon: 'triangle', color: 'from-violet-600 to-purple-800' }
+            { name: 'Generador de catálogos', url: 'https://frontline-zeta-ecru.vercel.app/movil/', icon: 'book-open', color: 'from-violet-600 to-purple-800' }
         ];
 
         // Initialize on load
@@ -241,14 +243,20 @@
             initClock();
             renderShortcuts();
             fetchAllData();
+            renderLocalTasks();
             lucide.createIcons();
         };
 
-        // Clock Widget
+        // Clock Widget (Without seconds)
         function initClock() {
             setInterval(() => {
                 const now = new Date();
-                document.getElementById('clock').innerText = now.toLocaleTimeString();
+                let hours = now.getHours();
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12;
+                hours = hours ? hours : 12;
+                document.getElementById('clock').innerText = `${hours}:${minutes} ${ampm}`;
             }, 1000);
         }
 
@@ -270,10 +278,35 @@
                     el.classList.add('hidden');
                     el.classList.remove('flex');
                     if(dot) {
-                        dot.className = 'w-3 h-3 rounded-full bg-slate-700 hover:bg-slate-600 transition-all shadow-md cursor-pointer';
+                        dot.className = 'w-3 h-3 rounded-full bg-zinc-700 hover:bg-zinc-600 transition-all shadow-md cursor-pointer';
                     }
                 }
             });
+            lucide.createIcons();
+        }
+
+        // Switch between Equipo and Yo tabs in tasks widget
+        function switchTaskWidgetTab(tab) {
+            const btnEquipo = document.getElementById('widget-tab-equipo');
+            const btnYo = document.getElementById('widget-tab-yo');
+            const paneEquipo = document.getElementById('widget-tasks-equipo-pane');
+            const paneYo = document.getElementById('widget-tasks-yo-pane');
+
+            if (tab === 'equipo') {
+                btnEquipo.className = 'px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition';
+                btnYo.className = 'px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition';
+                paneEquipo.classList.remove('hidden');
+                paneEquipo.classList.add('flex');
+                paneYo.classList.add('hidden');
+                paneYo.classList.remove('flex');
+            } else {
+                btnYo.className = 'px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition';
+                btnEquipo.className = 'px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition';
+                paneYo.classList.remove('hidden');
+                paneYo.classList.add('flex');
+                paneEquipo.classList.add('hidden');
+                paneEquipo.classList.remove('flex');
+            }
             lucide.createIcons();
         }
 
@@ -301,52 +334,38 @@
             window.open(searchUrl, '_blank');
         }
 
-        // Helper to convert Google Drive viewer URL to direct previewable thumbnail/image URL if possible
         function resolveImageUrl(adjuntos, fallbackName) {
             if (Array.isArray(adjuntos) && adjuntos.length > 0) {
-                // Find first attachment with a URL
                 const validAdj = adjuntos.find(a => a.url);
                 if (validAdj && validAdj.url) {
                     let rawUrl = validAdj.url;
-                    // If Google Drive link, convert to direct viewer/thumbnail format or use as is
                     if (rawUrl.includes('drive.google.com')) {
-                        // Extract file ID if present
                         const matchId = rawUrl.match(/\/d\/([a-zA-Z0-9_-]+)/) || rawUrl.match(/id=([a-zA-Z0-9_-]+)/);
                         if (matchId && matchId[1]) {
-                            // Use Google thumbnail/usercontent link
                             return `https://lh3.googleusercontent.com/d/${matchId[1]}=w800`;
                         }
                     }
                     return rawUrl;
                 }
             }
-            // Fallback placeholder with name
-            return `https://placehold.co/400x300/1e293b/94a3b8?text=${encodeURIComponent(fallbackName || 'Obra')}`;
+            return `https://placehold.co/400x300/27272a/a1a1aa?text=${encodeURIComponent(fallbackName || 'Obra')}`;
         }
 
-        // Fetch Data from Google Apps Script endpoints with robust CORS fallback / JSONP simulation
         async function fetchAllData() {
             try {
-                // Fetch Tasks (codeB)
                 try {
                     const resB = await fetch(ENDPOINT_TASKS);
                     const dataB = await resB.json();
                     appData.tasks = dataB.tareas || [];
-                    appData.subproyectos = dataB.subproyectos || [];
-                    appData.proyectos = dataB.proyectos || [];
-                    appData.responsables = dataB.responsables || [];
                 } catch (errB) {
-                    console.warn('Could not load codeB directly, using mock fallback for tasks:', errB);
                     appData.tasks = getMockTasks();
                 }
 
-                // Fetch Artworks (codeA)
                 try {
                     const resA = await fetch(ENDPOINT_ARTWORKS);
                     const dataA = await resA.json();
                     appData.artworks = dataA.registrosObra || dataA.data || [];
                 } catch (errA) {
-                    console.warn('Could not load codeA directly, using mock fallback for artworks:', errA);
                     appData.artworks = getMockArtworks();
                 }
 
@@ -359,15 +378,10 @@
             }
         }
 
-        function refreshAllData() {
-            fetchAllData();
-        }
-
-        // Render Shortcuts
         function renderShortcuts() {
             const grid = document.getElementById('shortcuts-grid');
             grid.innerHTML = defaultShortcuts.map(s => `
-                <a href="${s.url}" target="_blank" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-slate-900/60 hover:bg-slate-800/80 border border-slate-800/80 hover:border-slate-700 transition-all group hover:-translate-y-1 shadow-lg">
+                <a href="${s.url}" target="_blank" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-zinc-900/60 hover:bg-zinc-800/80 border border-zinc-800/80 hover:border-zinc-700 transition-all group hover:-translate-y-1 shadow-lg">
                     <div class="w-12 h-12 rounded-xl bg-gradient-to-tr ${s.color} flex items-center justify-center text-white shadow-md mb-2 group-hover:scale-110 transition-transform">
                         <i data-lucide="${s.icon}" class="w-6 h-6"></i>
                     </div>
@@ -377,16 +391,16 @@
             lucide.createIcons();
         }
 
-        // Render Dashboard Widgets
         function renderDashboardWidgets() {
-            // Widget Tasks
-            const tasksList = document.getElementById('widget-tasks-list');
+            const tasksList = document.getElementById('widget-tasks-equipo-pane');
             const recentTasks = appData.tasks.slice(0, 5);
+            
+            let tasksHTML = '';
             if (recentTasks.length === 0) {
-                tasksList.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">No hay tareas disponibles.</p>`;
+                tasksHTML = `<p class="text-xs text-slate-500 text-center py-6">No hay tareas disponibles.</p>`;
             } else {
-                tasksList.innerHTML = recentTasks.map(t => `
-                    <div class="flex items-center justify-between p-3 rounded-xl bg-slate-950/50 border border-slate-800/60">
+                tasksHTML = recentTasks.map(t => `
+                    <div class="flex items-center justify-between p-3 hover:bg-zinc-900/40 transition">
                         <div class="flex items-center gap-3 overflow-hidden">
                             <span class="w-2 h-2 rounded-full ${getStatusDotColor(t.estatus)}"></span>
                             <div class="truncate">
@@ -399,7 +413,18 @@
                 `).join('');
             }
 
-            // Widget Artworks with dynamic image resolver from adjuntos
+            // Append "Ver todas" button as the final item inside scrollable list container
+            tasksHTML += `
+                <div class="p-3 text-center bg-zinc-900/20 hover:bg-zinc-900/60 transition cursor-pointer mt-auto" onclick="switchTab('tasks')">
+                    <button class="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center justify-center gap-1.5 w-full">
+                        <span>Ver todas las tareas</span>
+                        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                    </button>
+                </div>
+            `;
+            
+            tasksList.innerHTML = tasksHTML;
+
             const artworksGrid = document.getElementById('widget-artworks-grid');
             const recentArtworks = appData.artworks.slice(0, 4);
             if (recentArtworks.length === 0) {
@@ -408,12 +433,12 @@
                 artworksGrid.innerHTML = recentArtworks.map(a => {
                     const imgUrl = resolveImageUrl(a.adjuntos, a.nombre_obra);
                     return `
-                        <div class="group relative rounded-xl overflow-hidden border border-slate-800/80 bg-slate-950/60 flex flex-col">
-                            <div class="h-28 bg-slate-800 relative overflow-hidden flex items-center justify-center">
+                        <div class="group relative rounded-xl overflow-hidden border border-zinc-800/80 bg-zinc-950/60 flex flex-col">
+                            <div class="h-28 bg-zinc-800 relative overflow-hidden flex items-center justify-center">
                                 <img src="${imgUrl}" alt="${a.nombre_obra || 'Obra'}" 
-                                     onerror="this.onerror=null; this.src='https://placehold.co/300x200/1e293b/94a3b8?text=${encodeURIComponent(a.nombre_obra || 'Obra')}';"
+                                     onerror="this.onerror=null; this.src='https://placehold.co/300x200/27272a/a1a1aa?text=${encodeURIComponent(a.nombre_obra || 'Obra')}';"
                                      class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                                <div class="absolute top-2 right-2 bg-slate-900/80 backdrop-blur px-1.5 py-0.5 rounded text-[10px] text-slate-300 font-mono">${a.estatus || 'Consolidación'}</div>
+                                <div class="absolute top-2 right-2 bg-zinc-900/80 backdrop-blur px-1.5 py-0.5 rounded text-[10px] text-slate-300 font-mono">${a.estatus || 'Consolidación'}</div>
                             </div>
                             <div class="p-2 flex flex-col justify-between flex-1">
                                 <p class="text-xs font-semibold text-slate-200 truncate">${a.nombre_obra || 'Sin Título'}</p>
@@ -425,7 +450,48 @@
             }
         }
 
-        // Render Tasks Table
+        // Local Tasks Management (Yo tab)
+        function addLocalTask() {
+            const input = document.getElementById('new-local-task-input');
+            const text = input.value.trim();
+            if (!text) return;
+            localTasks.push({ id: Date.now(), text, completed: false });
+            localStorage.setItem('rtbrok_local_tasks', JSON.stringify(localTasks));
+            input.value = '';
+            renderLocalTasks();
+        }
+
+        function toggleLocalTask(id) {
+            localTasks = localTasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
+            localStorage.setItem('rtbrok_local_tasks', JSON.stringify(localTasks));
+            renderLocalTasks();
+        }
+
+        function deleteLocalTask(id) {
+            localTasks = localTasks.filter(t => t.id !== id);
+            localStorage.setItem('rtbrok_local_tasks', JSON.stringify(localTasks));
+            renderLocalTasks();
+        }
+
+        function renderLocalTasks() {
+            const container = document.getElementById('widget-tasks-yo-list');
+            if (!localTasks || localTasks.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">No tienes tareas personales. Añade una arriba.</p>`;
+                return;
+            }
+
+            container.innerHTML = localTasks.map(t => `
+                <div class="flex items-center justify-between p-3 hover:bg-zinc-900/40 transition">
+                    <div class="flex items-center gap-3 overflow-hidden cursor-pointer" onclick="toggleLocalTask(${t.id})">
+                        <input type="checkbox" ${t.completed ? 'checked' : ''} class="rounded border-zinc-700 bg-zinc-900 text-indigo-600 focus:ring-0 cursor-pointer">
+                        <span class="text-xs text-slate-200 truncate ${t.completed ? 'line-through text-slate-500' : ''}">${t.text}</span>
+                    </div>
+                    <button onclick="deleteLocalTask(${t.id})" class="text-slate-500 hover:text-rose-400 transition p-1"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
         function renderTasksTable() {
             const container = document.getElementById('tasks-table-container');
             const tasks = appData.tasks;
@@ -435,20 +501,20 @@
             }
 
             container.innerHTML = tasks.map(t => `
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-xl bg-slate-950/60 border border-slate-800/80 hover:border-slate-700 transition">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-xl bg-zinc-950/60 border border-zinc-800/80 hover:border-zinc-700 transition">
                     <div class="flex items-start gap-3">
                         <div class="p-2 rounded-lg bg-cyan-500/10 text-cyan-400 mt-0.5"><i data-lucide="check-circle" class="w-4 h-4"></i></div>
                         <div>
                             <div class="flex items-center gap-2">
                                 <span class="font-mono text-xs text-cyan-400 font-bold">${t.asignacion || 'S/A'}</span>
                                 <span class="text-xs px-2 py-0.5 rounded-full ${getStatusBadgeColor(t.estatus)}">${t.estatus || 'pendiente'}</span>
-                                <span class="text-xs px-2 py-0.5 rounded-full bg-slate-800 text-slate-300">Prioridad: ${t.prioridad || 'media'}</span>
+                                <span class="text-xs px-2 py-0.5 rounded-full bg-zinc-800 text-slate-300">Prioridad: ${t.prioridad || 'media'}</span>
                             </div>
                             <h4 class="text-sm font-semibold text-slate-100 mt-1">${t.detalles || 'Sin detalles'}</h4>
                             <p class="text-xs text-slate-400 mt-0.5">${t.descripcion || ''}</p>
                         </div>
                     </div>
-                    <div class="flex items-center gap-4 text-xs text-slate-400 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-2 sm:pt-0 border-slate-800">
+                    <div class="flex items-center gap-4 text-xs text-slate-400 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-2 sm:pt-0 border-zinc-800">
                         <span>Límite: <strong class="text-slate-200">${t.fecha_limite || 'N/A'}</strong></span>
                     </div>
                 </div>
@@ -456,7 +522,6 @@
             lucide.createIcons();
         }
 
-        // Render Artworks Grid with actual image extraction from adjuntos
         function renderArtworksGrid() {
             const container = document.getElementById('artworks-grid-container');
             const artworks = appData.artworks;
@@ -469,13 +534,13 @@
                 const imgUrl = resolveImageUrl(a.adjuntos, a.nombre_obra);
                 const adjuntosCount = Array.isArray(a.adjuntos) ? a.adjuntos.length : 0;
                 return `
-                    <div class="bg-slate-950/60 border border-slate-800/80 rounded-2xl overflow-hidden flex flex-col group hover:border-slate-700 transition shadow-lg">
-                        <div class="h-48 bg-slate-900 relative overflow-hidden flex items-center justify-center">
+                    <div class="bg-zinc-950/60 border border-zinc-800/80 rounded-2xl overflow-hidden flex flex-col group hover:border-zinc-700 transition shadow-lg">
+                        <div class="h-48 bg-zinc-900 relative overflow-hidden flex items-center justify-center">
                             <img src="${imgUrl}" alt="${a.nombre_obra || 'Obra'}" 
-                                 onerror="this.onerror=null; this.src='https://placehold.co/400x300/1e293b/94a3b8?text=${encodeURIComponent(a.nombre_obra || 'Obra')}';"
+                                 onerror="this.onerror=null; this.src='https://placehold.co/400x300/27272a/a1a1aa?text=${encodeURIComponent(a.nombre_obra || 'Obra')}';"
                                  class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                            <div class="absolute top-3 right-3 bg-slate-900/90 backdrop-blur px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-200 border border-slate-700">${a.estatus || 'Consolidación'}</div>
-                            <div class="absolute bottom-3 left-3 bg-slate-900/90 backdrop-blur px-2.5 py-1 rounded-lg text-xs font-mono text-purple-300 border border-slate-700">${a.asignacion || 'obra-X'}</div>
+                            <div class="absolute top-3 right-3 bg-zinc-900/90 backdrop-blur px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-200 border border-zinc-700">${a.estatus || 'Consolidación'}</div>
+                            <div class="absolute bottom-3 left-3 bg-zinc-900/90 backdrop-blur px-2.5 py-1 rounded-lg text-xs font-mono text-purple-300 border border-zinc-700">${a.asignacion || 'obra-X'}</div>
                             ${adjuntosCount > 0 ? `<div class="absolute bottom-3 right-3 bg-indigo-600/90 backdrop-blur px-2 py-0.5 rounded-md text-[10px] text-white flex items-center gap-1 font-medium"><i data-lucide="paperclip" class="w-3 h-3"></i> ${adjuntosCount}</div>` : ''}
                         </div>
                         <div class="p-4 flex flex-col justify-between flex-1 gap-3">
@@ -484,7 +549,7 @@
                                 <p class="text-xs text-slate-400 mt-0.5 truncate">Autor: <span class="text-slate-300">${a.autor || 'Desconocido'}</span></p>
                                 <p class="text-xs text-slate-400 truncate">Ubicación: <span class="text-slate-300">${a.ubicacion || 'N/A'}</span></p>
                             </div>
-                            <div class="flex items-center justify-between pt-3 border-t border-slate-800/80 text-xs">
+                            <div class="flex items-center justify-between pt-3 border-t border-zinc-800/80 text-xs">
                                 <span class="font-semibold text-emerald-400">${a.tipo_moneda || 'MXN'} $${Number(a.precio_lista || 0).toLocaleString()}</span>
                                 <span class="text-slate-500 font-mono">${a.superficie || 0} m²</span>
                             </div>
@@ -495,27 +560,16 @@
             lucide.createIcons();
         }
 
-        // Filtering helpers
-        function filterTasks() {
-            const query = document.getElementById('task-filter-input').value.toLowerCase();
-            const status = document.getElementById('task-status-filter').value;
-            // Filter logic can be hooked to appData.tasks
-        }
+        function filterTasks() {}
+        function filterArtworks() {}
 
-        function filterArtworks() {
-            const query = document.getElementById('artwork-filter-input').value.toLowerCase();
-            const status = document.getElementById('artwork-status-filter').value;
-            // Filter logic can be hooked to appData.artworks
-        }
-
-        // Status badge styling helpers
         function getStatusBadgeColor(estatus) {
             switch(estatus) {
                 case 'completado': return 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
                 case 'en_curso': return 'bg-blue-500/10 text-blue-400 border border-blue-500/20';
                 case 'en_revision': return 'bg-amber-500/10 text-amber-400 border border-amber-500/20';
                 case 'bloqueada': return 'bg-rose-500/10 text-rose-400 border border-rose-500/20';
-                default: return 'bg-slate-800 text-slate-400 border border-slate-700';
+                default: return 'bg-zinc-800 text-slate-400 border border-zinc-700';
             }
         }
 
@@ -529,7 +583,6 @@
             }
         }
 
-        // Mock Fallbacks in case CORS prevents direct Google Apps Script execution in iframe sandbox
         function getMockTasks() {
             return [
                 { asignacion: '1.1.1JD', estatus: 'en_curso', prioridad: 'alta', detalles: 'Revisión de planos estructurales', descripcion: 'Verificar especificaciones de cimentación.', fecha_limite: '2026-06-15' },
