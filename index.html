@@ -4,12 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Workspace & Home Browser</title>
-    <!-- Tailwind CSS -->
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Lucide Icons -->
     <script src="https://unpkg.com/lucide@latest"></script>
-    <!-- Google Fonts Inter -->
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="./icon.png">
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -26,32 +24,45 @@
         ::-webkit-scrollbar-track { background: transparent; }
         ::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.5); border-radius: 3px; }
         ::-webkit-scrollbar-thumb:hover { background: rgba(156, 163, 175, 0.8); }
+        .modal-overlay { background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); }
+        .modal-card { max-height: 90vh; overflow-y: auto; }
+        .user-card-selectable {
+            transition: all 0.15s ease;
+        }
+        .user-card-selectable:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
+        }
+        .user-card-selectable.selected {
+            border-color: #6366f1 !important;
+            background: rgba(99, 102, 241, 0.15) !important;
+            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
+        }
     </style>
 </head>
 <body class="h-full bg-slate-950 text-slate-100 flex flex-col overflow-hidden select-none">
 
     <div class="absolute inset-0 overflow-hidden pointer-events-none z-0">
-        <img src="Wallpaper.jpg" alt="Wallpaper Background"
+        <img id="bg-wallpaper" src="Wallpaper.jpg" alt="Wallpaper Background"
              onerror="this.onerror=null; this.src='https://placehold.co/1920x1080/090d16/1e293b?text=Wallpaper.jpg';"
              class="w-full h-full object-cover opacity-40 scale-105 blur-[1px]">
-        <!-- Opacity decreased by half (from 35% to 17.5%) -->
         <div class="absolute inset-0 bg-slate-950/17.5 backdrop-blur-[2px]"></div>
     </div>
 
-    <!-- RTBROK Brand Top Left (Outside Gutter) -->
-    <div class="absolute top-4 left-6 sm:left-12 md:left-20 lg:left-32 z-30">
+    <!-- RTBROK Brand Top Left -->
+    <div class="absolute top-4 left-6 sm:left-12 z-30">
         <h1 class="font-bold text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">R T B R O K</h1>
     </div>
 
-    <!-- Clock Top Right (Outside Gutter, without seconds) -->
-    <div class="absolute top-4 right-6 sm:right-12 md:right-20 lg:right-32 z-30">
+    <!-- Clock Top Right -->
+    <div class="absolute top-4 right-6 sm:right-12 z-30">
         <p id="clock" class="text-xs text-slate-400 font-medium">00:00</p>
     </div>
 
-    <div class="relative z-10 flex flex-row items-center h-full w-full max-w-[1920px] mx-auto px-6 sm:px-12 md:px-20 lg:px-32 py-4 md:py-6 gap-6">
+    <div class="relative z-10 flex flex-row items-center h-full w-full max-w-[960px] mx-auto px-4 sm:px-8 py-4 md:py-6 gap-6">
 
-        <!-- Left Navigation Arrow (Outside Gutter) -->
-        <button onclick="prevPage()" class="hidden md:flex items-center justify-center w-12 h-12 rounded-2xl bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-700/80 text-slate-300 hover:text-white transition-all shadow-xl group z-30 shrink-0">
+        <!-- Left Navigation Arrow -->
+        <button onclick="prevPage()" class="hidden md:flex absolute -left-16 items-center justify-center w-12 h-12 rounded-2xl bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-700/80 text-slate-300 hover:text-white transition-all shadow-xl group z-30 shrink-0">
             <i data-lucide="chevron-left" class="w-6 h-6 group-hover:-translate-x-0.5 transition-transform"></i>
         </button>
 
@@ -74,102 +85,68 @@
             </div>
 
             <main class="flex-1 overflow-hidden relative flex flex-col">
-
                 <div class="flex-1 overflow-hidden relative">
+
                     <div id="tab-dashboard" class="h-full overflow-y-auto pr-1 flex flex-col gap-6">
-                        <!-- Quick Access Grid (Titles removed) -->
+
+                        <!-- Top: Instagram-style Artworks Grid -->
                         <section>
-                            <div id="shortcuts-grid" class="grid grid-cols-2 sm:grid-cols-4 md:grid-cols-6 lg:grid-cols-8 gap-4">
-                                <!-- Populated dynamically -->
+                            <div id="top-artworks-grid" class="grid grid-cols-4 gap-1 sm:gap-2">
+                                <div class="aspect-square bg-zinc-900/80 animate-pulse rounded-md"></div>
+                                <div class="aspect-square bg-zinc-900/80 animate-pulse rounded-md"></div>
+                                <div class="aspect-square bg-zinc-900/80 animate-pulse rounded-md"></div>
+                                <div class="aspect-square bg-zinc-900/80 animate-pulse rounded-md"></div>
                             </div>
                         </section>
 
-                        <!-- Widgets Split with Gray Cards -->
-                        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6 pb-6">
-                            <!-- Tasks Widget Preview -->
-                            <div class="bg-zinc-900/60 backdrop-blur-xl border border-zinc-800/80 rounded-2xl p-5 flex flex-col h-[380px] shadow-xl">
-                                <div class="flex items-center justify-between mb-3">
-                                    <div class="flex items-center gap-1 bg-zinc-950/60 p-1 rounded-1xl border border-zinc-800">
-                                        <button onclick="switchTaskWidgetTab('equipo')" id="widget-tab-equipo" class="px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition">Equipo</button>
-                                        <button onclick="switchTaskWidgetTab('yo')" id="widget-tab-yo" class="px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition">Yo</button>
-                                    </div>
-                                    <h3 class="font-semibold text-sm flex items-center gap-2 text-slate-200">Resumen de Tareas</h3>
+                        <!-- Middle: Tasks Widget -->
+                        <div class="bg-zinc-900/60 backdrop-blur-xl border border-zinc-800/80 rounded-2xl p-5 flex flex-col h-[360px] shadow-xl">
+                            <div class="flex items-center justify-between mb-3">
+                                <div class="flex items-center gap-1 bg-zinc-950/60 p-1 rounded-1xl border border-zinc-800">
+                                    <button onclick="switchTaskWidgetTab('equipo')" id="widget-tab-equipo" class="px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition">Equipo</button>
+                                    <button onclick="switchTaskWidgetTab('yo')" id="widget-tab-yo" class="px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition">Yo</button>
                                 </div>
-                                
-                                <!-- Equipo Tab Content -->
-                                <div id="widget-tasks-equipo-pane" class="flex-1 overflow-y-auto pr-1 flex flex-col bg-zinc-950/40 rounded-xl border border-zinc-800/60 divide-y divide-zinc-800/60">
-                                    <!-- Skeleton Loader Initial State -->
-                                    <div class="p-4 space-y-3 animate-pulse">
-                                        <div class="flex items-center justify-between">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
-                                                <div class="space-y-1.5">
-                                                    <div class="h-3 w-36 bg-zinc-800 rounded"></div>
-                                                    <div class="h-2 w-20 bg-zinc-800/60 rounded"></div>
-                                                </div>
-                                            </div>
-                                            <div class="h-4 w-16 bg-zinc-800 rounded-full"></div>
-                                        </div>
-                                        <div class="flex items-center justify-between pt-2">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
-                                                <div class="space-y-1.5">
-                                                    <div class="h-3 w-28 bg-zinc-800 rounded"></div>
-                                                    <div class="h-2 w-16 bg-zinc-800/60 rounded"></div>
-                                                </div>
-                                            </div>
-                                            <div class="h-4 w-16 bg-zinc-800 rounded-full"></div>
-                                        </div>
-                                        <div class="flex items-center justify-between pt-2">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
-                                                <div class="space-y-1.5">
-                                                    <div class="h-3 w-32 bg-zinc-800 rounded"></div>
-                                                    <div class="h-2 w-24 bg-zinc-800/60 rounded"></div>
-                                                </div>
-                                            </div>
-                                            <div class="h-4 w-16 bg-zinc-800 rounded-full"></div>
-                                        </div>
-                                    </div>
+                                <div class="flex items-center gap-2">
+                                    <span id="widget-title" class="font-semibold text-sm text-slate-200">Equipo</span>
+                                    <button onclick="openAddTaskModal()" id="btn-add-task-equipo" class="p-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 hover:text-indigo-300 transition" title="Añadir tarea">
+                                        <i data-lucide="plus" class="w-4 h-4"></i>
+                                    </button>
                                 </div>
+                            </div>
 
-                                <!-- Yo Tab Content -->
-                                <div id="widget-tasks-yo-pane" class="flex-1 overflow-y-auto pr-1 hidden flex-col bg-zinc-950/40 rounded-xl border border-zinc-800/60">
-                                    <div class="p-2 border-b border-zinc-800/60 flex gap-2">
-                                        <input type="text" id="new-local-task-input" placeholder="Nueva tarea personal..." class="flex-1 bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500">
-                                        <button onclick="addLocalTask()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition">Añadir</button>
-                                    </div>
-                                    <div id="widget-tasks-yo-list" class="flex-1 overflow-y-auto divide-y divide-zinc-800/60">
-                                        <!-- Populated dynamically -->
+                            <!-- Equipo Tab Content -->
+                            <div id="widget-tasks-equipo-pane" class="flex-1 overflow-y-auto pr-1 flex flex-col bg-zinc-950/40 rounded-xl border border-zinc-800/60 divide-y divide-zinc-800/60">
+                                <div class="p-4 space-y-3 animate-pulse">
+                                    <div class="flex items-center justify-between">
+                                        <div class="flex items-center gap-3">
+                                            <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
+                                            <div class="space-y-1.5">
+                                                <div class="h-3 w-36 bg-zinc-800 rounded"></div>
+                                                <div class="h-2 w-20 bg-zinc-800/60 rounded"></div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </div>
 
-                            <!-- Artworks Widget Preview -->
-                            <div class="bg-zinc-900/60 backdrop-blur-xl border border-zinc-800/80 rounded-2xl p-5 flex flex-col h-[380px] shadow-xl">
-                                <div class="flex items-center justify-between mb-4">
-                                    <h3 class="font-semibold text-sm flex items-center gap-2 text-slate-200"><i data-lucide="image" class="w-4 h-4 text-purple-400"></i> Obras Recientes (CodeA)</h3>
-                                    <button onclick="switchTab('artworks')" class="text-xs text-indigo-400 hover:underline">Ver galería</button>
+                            <!-- Yo Tab Content -->
+                            <div id="widget-tasks-yo-pane" class="flex-1 overflow-y-auto pr-1 hidden flex-col bg-zinc-950/40 rounded-xl border border-zinc-800/60">
+                                <div class="p-2 border-b border-zinc-800/60 flex gap-2">
+                                    <input type="text" id="new-local-task-input" placeholder="Nueva tarea personal..." class="flex-1 bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+                                    <button onclick="addLocalTask()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition">Añadir</button>
                                 </div>
-                                <div id="widget-artworks-grid" class="flex-1 overflow-y-auto grid grid-cols-2 gap-3 pr-2">
-                                    <!-- Skeleton Loader Initial State -->
-                                    <div class="rounded-xl border border-zinc-800/80 bg-zinc-950/60 flex flex-col animate-pulse">
-                                        <div class="h-28 bg-zinc-800/60"></div>
-                                        <div class="p-2 space-y-2">
-                                            <div class="h-3 w-4/5 bg-zinc-800 rounded"></div>
-                                            <div class="h-2.5 w-1/2 bg-zinc-800/60 rounded"></div>
-                                        </div>
-                                    </div>
-                                    <div class="rounded-xl border border-zinc-800/80 bg-zinc-950/60 flex flex-col animate-pulse">
-                                        <div class="h-28 bg-zinc-800/60"></div>
-                                        <div class="p-2 space-y-2">
-                                            <div class="h-3 w-4/5 bg-zinc-800 rounded"></div>
-                                            <div class="h-2.5 w-1/2 bg-zinc-800/60 rounded"></div>
-                                        </div>
-                                    </div>
+                                <div id="widget-tasks-yo-list" class="flex-1 overflow-y-auto divide-y divide-zinc-800/60">
+                                    <!-- Populated dynamically -->
                                 </div>
                             </div>
                         </div>
+
+                        <!-- Bottom: Shortcuts Grid -->
+                        <section class="pb-6">
+                            <div id="shortcuts-grid" class="grid grid-cols-4 gap-4">
+                                <!-- Populated dynamically -->
+                            </div>
+                        </section>
                     </div>
 
                     <div id="tab-tasks" class="h-full hidden flex-col gap-4">
@@ -197,33 +174,7 @@
                         <div class="flex-1 bg-zinc-900/60 backdrop-blur-xl border border-zinc-800/80 rounded-2xl overflow-hidden flex flex-col shadow-xl">
                             <div class="overflow-y-auto flex-1 p-4">
                                 <div id="tasks-table-container" class="space-y-3">
-                                    <!-- Skeleton Loader -->
-                                    <div class="p-4 rounded-xl bg-zinc-950/60 border border-zinc-800/80 animate-pulse flex items-center justify-between">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-8 h-8 rounded-lg bg-zinc-800"></div>
-                                            <div class="space-y-2">
-                                                <div class="flex gap-2">
-                                                    <div class="h-3 w-16 bg-zinc-800 rounded"></div>
-                                                    <div class="h-3 w-20 bg-zinc-800 rounded-full"></div>
-                                                </div>
-                                                <div class="h-4 w-64 bg-zinc-800 rounded"></div>
-                                            </div>
-                                        </div>
-                                        <div class="h-3 w-24 bg-zinc-800 rounded"></div>
-                                    </div>
-                                    <div class="p-4 rounded-xl bg-zinc-950/60 border border-zinc-800/80 animate-pulse flex items-center justify-between">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-8 h-8 rounded-lg bg-zinc-800"></div>
-                                            <div class="space-y-2">
-                                                <div class="flex gap-2">
-                                                    <div class="h-3 w-16 bg-zinc-800 rounded"></div>
-                                                    <div class="h-3 w-20 bg-zinc-800 rounded-full"></div>
-                                                </div>
-                                                <div class="h-4 w-48 bg-zinc-800 rounded"></div>
-                                            </div>
-                                        </div>
-                                        <div class="h-3 w-24 bg-zinc-800 rounded"></div>
-                                    </div>
+                                    <!-- Populated dynamically -->
                                 </div>
                             </div>
                         </div>
@@ -234,12 +185,12 @@
                             <div class="flex items-center gap-3">
                                 <div class="p-2.5 bg-purple-500/10 text-purple-400 rounded-xl border border-purple-500/20"><i data-lucide="image" class="w-5 h-5"></i></div>
                                 <div>
-                                    <h2 class="font-bold text-base">Registros de Obra y Galería (CodeA Backend)</h2>
+                                    <h2 class="font-bold text-base">Registros de Obra y Galería (CodeA)</h2>
                                     <p class="text-xs text-slate-400">Origen: <span class="font-mono text-purple-400">script.google.com/.../exec</span></p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2 w-full sm:w-auto">
-                                <input type="text" id="artwork-filter-input" oninput="filterArtworks()" placeholder="Buscar obra, autor, ubicación..." class="bg-zinc-950/80 border border-zinc-700/60 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-purple-500 w-full sm:w-64">
+                                <input type="text" id="artwork-filter-input" oninput="filterArtworks()" placeholder="Buscar..." class="bg-zinc-950/80 border border-zinc-700/60 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-purple-500 w-full sm:w-64">
                                 <select id="artwork-status-filter" onchange="filterArtworks()" class="bg-zinc-800 border border-zinc-700 text-xs rounded-xl px-3 py-2 text-slate-200 focus:outline-none">
                                     <option value="all">Todos los estatus</option>
                                     <option value="Consolidación">Consolidación</option>
@@ -251,32 +202,8 @@
 
                         <div class="flex-1 bg-zinc-900/60 backdrop-blur-xl border border-zinc-800/80 rounded-2xl overflow-hidden flex flex-col shadow-xl">
                             <div class="overflow-y-auto flex-1 p-4">
-                                <div id="artworks-grid-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
-                                    <!-- Skeleton Loader -->
-                                    <div class="bg-zinc-950/60 border border-zinc-800/80 rounded-2xl overflow-hidden flex flex-col animate-pulse">
-                                        <div class="h-48 bg-zinc-800/60"></div>
-                                        <div class="p-4 space-y-3">
-                                            <div class="h-4 w-3/4 bg-zinc-800 rounded"></div>
-                                            <div class="h-3 w-1/2 bg-zinc-800/60 rounded"></div>
-                                            <div class="h-3 w-2/3 bg-zinc-800/60 rounded"></div>
-                                            <div class="pt-3 border-t border-zinc-800 flex justify-between">
-                                                <div class="h-3 w-20 bg-zinc-800 rounded"></div>
-                                                <div class="h-3 w-12 bg-zinc-800 rounded"></div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                    <div class="bg-zinc-950/60 border border-zinc-800/80 rounded-2xl overflow-hidden flex flex-col animate-pulse">
-                                        <div class="h-48 bg-zinc-800/60"></div>
-                                        <div class="p-4 space-y-3">
-                                            <div class="h-4 w-3/4 bg-zinc-800 rounded"></div>
-                                            <div class="h-3 w-1/2 bg-zinc-800/60 rounded"></div>
-                                            <div class="h-3 w-2/3 bg-zinc-800/60 rounded"></div>
-                                            <div class="pt-3 border-t border-zinc-800 flex justify-between">
-                                                <div class="h-3 w-20 bg-zinc-800 rounded"></div>
-                                                <div class="h-3 w-12 bg-zinc-800 rounded"></div>
-                                            </div>
-                                        </div>
-                                    </div>
+                                <div id="artworks-grid-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    <!-- Populated dynamically -->
                                 </div>
                             </div>
                         </div>
@@ -284,7 +211,7 @@
                 </div>
 
                 <!-- 3-Dot Pagination Indicator Bar -->
-                <div class="flex items-center justify-center gap-3 pt-2">
+                <div class="flex items-center justify-center gap-3 pt-2 pb-1">
                     <button onclick="switchTab('dashboard')" id="dot-dashboard" class="w-6 h-3 rounded-full bg-indigo-500 transition-all shadow-md cursor-pointer" title="Dashboard"></button>
                     <button onclick="switchTab('tasks')" id="dot-tasks" class="w-3 h-3 rounded-full bg-zinc-700 hover:bg-zinc-600 transition-all shadow-md cursor-pointer" title="Tareas"></button>
                     <button onclick="switchTab('artworks')" id="dot-artworks" class="w-3 h-3 rounded-full bg-zinc-700 hover:bg-zinc-600 transition-all shadow-md cursor-pointer" title="Obras"></button>
@@ -293,143 +220,366 @@
             </main>
         </div>
 
-        <!-- Right Navigation Arrow (Outside Gutter) -->
-        <button onclick="nextPage()" class="hidden md:flex items-center justify-center w-12 h-12 rounded-2xl bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-700/80 text-slate-300 hover:text-white transition-all shadow-xl group z-30 shrink-0">
+        <!-- Right Navigation Arrow -->
+        <button onclick="nextPage()" class="hidden md:flex absolute -right-16 items-center justify-center w-12 h-12 rounded-2xl bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-700/80 text-slate-300 hover:text-white transition-all shadow-xl group z-30 shrink-0">
             <i data-lucide="chevron-right" class="w-6 h-6 group-hover:translate-x-0.5 transition-transform"></i>
         </button>
 
     </div>
 
-    <script>
-        // API Endpoints provided in user request
-        const ENDPOINT_TASKS = 'https://script.google.com/macros/s/AKfycbxmPBIboe_Evn45ZHjtkjydbmlPRMuSax_sEiTc2iN8cqqi2i4-Pf_lOd6875cQXEd_yg/exec'; // codeB.gs
-        const ENDPOINT_ARTWORKS = 'https://script.google.com/macros/s/AKfycbxyBzZ7duM3pKtobXHj8A2NgFpIarP5WPS71TKTH2uFMOXXL8rzo68-blixF8kgCwvl8w/exec'; // codeA.gs
+    <!-- Floating Settings Button -->
+    <div class="absolute bottom-6 right-6 sm:right-12 z-40">
+        <button onclick="openSettingsModal()" class="w-11 h-11 rounded-2xl bg-zinc-900/90 hover:bg-zinc-800 border border-zinc-700/80 text-slate-300 hover:text-white transition-all shadow-2xl flex items-center justify-center group" title="Ajustes de Fondo">
+            <i data-lucide="settings" class="w-5 h-5 group-hover:rotate-90 transition-transform duration-300"></i>
+        </button>
+    </div>
 
-        // App State
+    <!-- Settings Modal -->
+    <div id="settings-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-zinc-900 border border-zinc-700 rounded-3xl w-full max-w-md p-6 shadow-2xl flex flex-col gap-5">
+            <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+                <h3 class="font-bold text-base text-slate-100 flex items-center gap-2">
+                    <i data-lucide="settings" class="w-4 h-4 text-indigo-400"></i> Ajustes de Fondo de Pantalla
+                </h3>
+                <button onclick="closeSettingsModal()" class="text-slate-400 hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="flex flex-col gap-4">
+                <p class="text-xs text-slate-400">Sube una imagen desde tu dispositivo para personalizar el fondo de pantalla. Se guardará localmente en tu navegador.</p>
+                <div class="flex flex-col gap-2">
+                    <label class="text-xs font-semibold text-slate-300">Seleccionar imagen:</label>
+                    <input type="file" id="wallpaper-upload" accept="image/*" class="text-xs text-slate-400 file:mr-4 file:py-2 file:px-4 file:rounded-xl file:border-0 file:text-xs file:font-semibold file:bg-indigo-600 file:text-white hover:file:bg-indigo-500 file:cursor-pointer cursor-pointer border border-zinc-800 bg-zinc-950 rounded-xl p-2">
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-2 pt-3 border-t border-zinc-800">
+                <button onclick="resetWallpaper()" class="px-4 py-2 rounded-xl text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-slate-300 transition">Restaurar Original</button>
+                <button onclick="saveWallpaper()" class="px-4 py-2 rounded-xl text-xs font-medium bg-indigo-600 hover:bg-indigo-500 text-white transition">Guardar y Aplicar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- MODAL: Login / Selección de Usuario (Director) -->
+    <!-- ============================================================ -->
+    <div id="login-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-zinc-900 border border-zinc-700 rounded-3xl w-full max-w-md p-6 shadow-2xl flex flex-col gap-5 modal-card">
+            <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+                <h3 class="font-bold text-base text-slate-100 flex items-center gap-2">
+                    <i data-lucide="user-check" class="w-4 h-4 text-indigo-400"></i> Iniciar Sesión
+                </h3>
+                <button onclick="closeLoginModal()" class="text-slate-400 hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="flex flex-col gap-4">
+                <p class="text-xs text-slate-400">Selecciona un usuario con rol <span class="text-indigo-400 font-semibold">Director</span> para crear tareas.</p>
+                <div id="login-users-list" class="flex flex-col gap-2 max-h-64 overflow-y-auto">
+                    <!-- Populated dynamically -->
+                    <div class="text-center text-slate-500 text-xs py-4">Cargando usuarios...</div>
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-2 pt-3 border-t border-zinc-800">
+                <button onclick="closeLoginModal()" class="px-4 py-2 rounded-xl text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-slate-300 transition">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- MODAL: Seleccionar Proyecto, Subproyecto y Responsable -->
+    <!-- ============================================================ -->
+    <div id="select-project-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-zinc-900 border border-zinc-700 rounded-3xl w-full max-w-lg p-6 shadow-2xl flex flex-col gap-5 modal-card">
+            <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+                <h3 class="font-bold text-base text-slate-100 flex items-center gap-2">
+                    <i data-lucide="folder-tree" class="w-4 h-4 text-cyan-400"></i> Nueva Tarea
+                </h3>
+                <button onclick="closeSelectProjectModal()" class="text-slate-400 hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="flex flex-col gap-4">
+                <!-- Usuario autenticado -->
+                <div class="flex items-center gap-2 p-2 bg-indigo-600/10 rounded-xl border border-indigo-600/20">
+                    <i data-lucide="user" class="w-4 h-4 text-indigo-400"></i>
+                    <span class="text-xs text-slate-300">Creando como: <span id="auth-user-display" class="font-semibold text-indigo-400">-</span></span>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <label class="text-xs font-semibold text-slate-300">Proyecto</label>
+                    <select id="project-select" class="bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                        <option value="">Selecciona un proyecto...</option>
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <label class="text-xs font-semibold text-slate-300">Subproyecto</label>
+                    <select id="subproject-select" class="bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500" disabled>
+                        <option value="">Primero selecciona un proyecto</option>
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <label class="text-xs font-semibold text-slate-300">Asignar a (Responsable)</label>
+                    <select id="responsible-select" class="bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                        <option value="">Selecciona un responsable...</option>
+                    </select>
+                    <p class="text-[10px] text-slate-500">Puedes asignar la tarea a cualquier usuario del sistema</p>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <label class="text-xs font-semibold text-slate-300">Detalles de la tarea</label>
+                    <input type="text" id="new-task-details" placeholder="Ej: Revisar documentación..." class="bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+                    <textarea id="new-task-description" placeholder="Descripción detallada..." class="bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 h-16 resize-none"></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="flex flex-col gap-2">
+                        <label class="text-xs font-semibold text-slate-300">Prioridad</label>
+                        <select id="new-task-priority" class="bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                            <option value="baja">Baja</option>
+                            <option value="media" selected>Media</option>
+                            <option value="alta">Alta</option>
+                            <option value="urgente">Urgente</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <label class="text-xs font-semibold text-slate-300">Fecha Límite</label>
+                        <input type="date" id="new-task-deadline" class="bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-2 pt-3 border-t border-zinc-800">
+                <button onclick="closeSelectProjectModal()" class="px-4 py-2 rounded-xl text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-slate-300 transition">Cancelar</button>
+                <button onclick="confirmAddTask()" class="px-4 py-2 rounded-xl text-xs font-medium bg-indigo-600 hover:bg-indigo-500 text-white transition flex items-center gap-2">
+                    <i data-lucide="plus" class="w-4 h-4"></i> Crear Tarea
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ENDPOINT_TASKS = 'https://script.google.com/macros/s/AKfycbxmPBIboe_Evn45ZHjtkjydbmlPRMuSax_sEiTc2iN8cqqi2i4-Pf_lOd6875cQXEd_yg/exec';
+        const ENDPOINT_ARTWORKS = 'https://script.google.com/macros/s/AKfycbxyBzZ7duM3pKtobXHj8A2NgFpIarP5WPS71TKTH2uFMOXXL8rzo68-blixF8kgCwvl8w/exec';
+
+        const CACHE_KEY_TASKS = 'rtbrok_cache_tasks';
+        const CACHE_KEY_ARTWORKS = 'rtbrok_cache_artworks';
+        const CACHE_KEY_TIMESTAMP = 'rtbrok_cache_timestamp';
+        const CACHE_DURATION = 5 * 60 * 1000;
+
         let appData = {
             tasks: [],
             artworks: [],
-            subproyectos: [],
             proyectos: [],
+            subproyectos: [],
             responsables: [],
             loading: false,
             error: null
         };
 
-        // Local tasks state stored in localStorage
         let localTasks = JSON.parse(localStorage.getItem('rtbrok_local_tasks') || '[]');
-
         const tabsOrder = ['dashboard', 'tasks', 'artworks'];
         let currentTabIdx = 0;
 
-        // Shortcuts with Instagram, Base de datos, and Generador de catálogos
+        // Estado para el flujo de creación de tareas
+        let taskFlow = {
+            authenticatedUser: null, // { id, nombre, rol }
+            selectedProyecto: null,
+            selectedSubproyecto: null,
+            selectedResponsable: null,
+            step: 'login' // 'login' | 'select-project'
+        };
+
         let defaultShortcuts = [
             { name: 'Instagram', url: 'https://www.instagram.com', icon: 'instagram', color: 'from-pink-500 to-purple-600' },
             { name: 'Base de datos', url: 'https://diegoturijancontacto-sudo.github.io/Finanzas/mobile/', icon: 'database', color: 'from-zinc-700 to-zinc-900' },
-            { name: 'ChatGPT', url: 'https://chat.openai.com', icon: 'cpu', color: 'from-emerald-500 to-teal-700' },
-            { name: 'YouTube', url: 'https://www.youtube.com', icon: 'play-square', color: 'from-red-600 to-rose-800' },
-            { name: 'Gmail', url: 'https://mail.google.com', icon: 'mail', color: 'from-amber-500 to-orange-600' },
             { name: 'Drive', url: 'https://drive.google.com', icon: 'hard-drive', color: 'from-blue-600 to-cyan-700' },
-            { name: 'Notion', url: 'https://www.notion.so', icon: 'file-text', color: 'from-neutral-700 to-neutral-900' },
-            { name: 'Generador de catálogos', url: 'https://frontline-zeta-ecru.vercel.app/movil/', icon: 'book-open', color: 'from-violet-600 to-purple-800' }
+            { name: 'Catálogos', url: 'https://frontline-zeta-ecru.vercel.app/movil/', icon: 'book-open', color: 'from-violet-600 to-purple-800' }
         ];
 
-        // Initialize on load
+        function getCachedData(key) {
+            try { return JSON.parse(localStorage.getItem(key)); } catch(e) { return null; }
+        }
+
+        function setCachedData(key, data) {
+            try { localStorage.setItem(key, JSON.stringify(data)); } catch(e) {}
+        }
+
+        function isCacheValid() {
+            const timestamp = localStorage.getItem(CACHE_KEY_TIMESTAMP);
+            if (!timestamp) return false;
+            return (Date.now() - parseInt(timestamp)) < CACHE_DURATION;
+        }
+
+        function updateCacheTimestamp() {
+            localStorage.setItem(CACHE_KEY_TIMESTAMP, Date.now().toString());
+        }
+
+        function loadFromCache() {
+            const cachedTasks = getCachedData(CACHE_KEY_TASKS);
+            const cachedArtworks = getCachedData(CACHE_KEY_ARTWORKS);
+            if (cachedTasks) appData.tasks = cachedTasks;
+            if (cachedArtworks) appData.artworks = cachedArtworks;
+            return cachedTasks !== null && cachedArtworks !== null;
+        }
+
         window.onload = function() {
             initClock();
             renderShortcuts();
-            fetchAllData();
+            const hasCache = loadFromCache();
+            renderDashboardWidgets();
+            renderTasksTable();
+            renderArtworksGrid();
             renderLocalTasks();
+            loadSavedWallpaper();
             lucide.createIcons();
+
+            // Cargar proyectos, subproyectos y responsables para el modal
+            fetchProyectosYSubproyectos();
+
+            if (!isCacheValid() || !hasCache) {
+                fetchAllData();
+            } else {
+                setInterval(() => { if (!isCacheValid()) fetchAllData(); }, 30000);
+            }
         };
 
-        // Clock Widget (Without seconds)
+        // ============================================================
+        // FETCH PROYECTOS Y SUBPROYECTOS
+        // ============================================================
+        async function fetchProyectosYSubproyectos() {
+            try {
+                const res = await fetch(ENDPOINT_TASKS);
+                const data = await res.json();
+                appData.proyectos = data.proyectos || [];
+                appData.subproyectos = data.subproyectos || [];
+                appData.responsables = data.responsables || [];
+            } catch (e) {
+                console.error('Error fetching proyectos:', e);
+                appData.proyectos = [];
+                appData.subproyectos = [];
+                appData.responsables = [];
+            }
+        }
+
+        // ============================================================
+        // LOAD SAVED WALLPAPER
+        // ============================================================
+        function loadSavedWallpaper() {
+            const savedBg = localStorage.getItem('rtbrok_custom_wallpaper');
+            if (savedBg) document.getElementById('bg-wallpaper').src = savedBg;
+        }
+
+        // ============================================================
+        // SETTINGS MODAL
+        // ============================================================
+        function openSettingsModal() {
+            document.getElementById('settings-modal').classList.remove('hidden');
+            document.getElementById('settings-modal').classList.add('flex');
+            lucide.createIcons();
+        }
+
+        function closeSettingsModal() {
+            document.getElementById('settings-modal').classList.add('hidden');
+            document.getElementById('settings-modal').classList.remove('flex');
+        }
+
+        function saveWallpaper() {
+            const fileInput = document.getElementById('wallpaper-upload');
+            if (fileInput.files && fileInput.files[0]) {
+                const reader = new FileReader();
+                reader.onload = function(e) {
+                    try {
+                        localStorage.setItem('rtbrok_custom_wallpaper', e.target.result);
+                        document.getElementById('bg-wallpaper').src = e.target.result;
+                        closeSettingsModal();
+                    } catch (err) {
+                        alert('La imagen es demasiado grande. Selecciona una más ligera.');
+                    }
+                };
+                reader.readAsDataURL(fileInput.files[0]);
+            } else { closeSettingsModal(); }
+        }
+
+        function resetWallpaper() {
+            localStorage.removeItem('rtbrok_custom_wallpaper');
+            document.getElementById('bg-wallpaper').src = 'Wallpaper.jpg';
+            document.getElementById('wallpaper-upload').value = '';
+            closeSettingsModal();
+        }
+
+        // ============================================================
+        // CLOCK
+        // ============================================================
         function initClock() {
             setInterval(() => {
                 const now = new Date();
                 let hours = now.getHours();
                 const minutes = String(now.getMinutes()).padStart(2, '0');
                 const ampm = hours >= 12 ? 'PM' : 'AM';
-                hours = hours % 12;
-                hours = hours ? hours : 12;
+                hours = hours % 12 || 12;
                 document.getElementById('clock').innerText = `${hours}:${minutes} ${ampm}`;
             }, 1000);
         }
 
-        // Tab Switching Logic with 3-dot updates
+        // ============================================================
+        // TAB NAVIGATION
+        // ============================================================
         function switchTab(tabName) {
             currentTabIdx = tabsOrder.indexOf(tabName);
             if (currentTabIdx === -1) currentTabIdx = 0;
-
             tabsOrder.forEach(t => {
                 const el = document.getElementById(`tab-${t}`);
                 const dot = document.getElementById(`dot-${t}`);
                 if (t === tabName) {
-                    el.classList.remove('hidden');
-                    el.classList.add('flex');
-                    if(dot) {
-                        dot.className = 'w-6 h-3 rounded-full bg-indigo-500 transition-all shadow-md cursor-pointer';
-                    }
+                    el.classList.replace('hidden', 'flex');
+                    if(dot) dot.className = 'w-6 h-3 rounded-full bg-indigo-500 transition-all shadow-md cursor-pointer';
                 } else {
-                    el.classList.add('hidden');
-                    el.classList.remove('flex');
-                    if(dot) {
-                        dot.className = 'w-3 h-3 rounded-full bg-zinc-700 hover:bg-zinc-600 transition-all shadow-md cursor-pointer';
-                    }
+                    el.classList.replace('flex', 'hidden');
+                    if(dot) dot.className = 'w-3 h-3 rounded-full bg-zinc-700 hover:bg-zinc-600 transition-all shadow-md cursor-pointer';
                 }
             });
             lucide.createIcons();
         }
 
-        // Switch between Equipo and Yo tabs in tasks widget
         function switchTaskWidgetTab(tab) {
-            const btnEquipo = document.getElementById('widget-tab-equipo');
+            const btnEq = document.getElementById('widget-tab-equipo');
             const btnYo = document.getElementById('widget-tab-yo');
-            const paneEquipo = document.getElementById('widget-tasks-equipo-pane');
+            const paneEq = document.getElementById('widget-tasks-equipo-pane');
             const paneYo = document.getElementById('widget-tasks-yo-pane');
+            const title = document.getElementById('widget-title');
 
             if (tab === 'equipo') {
-                btnEquipo.className = 'px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition';
+                btnEq.className = 'px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition';
                 btnYo.className = 'px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition';
-                paneEquipo.classList.remove('hidden');
-                paneEquipo.classList.add('flex');
-                paneYo.classList.add('hidden');
-                paneYo.classList.remove('flex');
+                paneEq.classList.replace('hidden', 'flex');
+                paneYo.classList.replace('flex', 'hidden');
+                title.textContent = 'Equipo';
+                document.getElementById('btn-add-task-equipo').classList.remove('hidden');
             } else {
                 btnYo.className = 'px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition';
-                btnEquipo.className = 'px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition';
-                paneYo.classList.remove('hidden');
-                paneYo.classList.add('flex');
-                paneEquipo.classList.add('hidden');
-                paneEquipo.classList.remove('flex');
+                btnEq.className = 'px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition';
+                paneYo.classList.replace('hidden', 'flex');
+                paneEq.classList.replace('flex', 'hidden');
+                title.textContent = 'Personal';
+                document.getElementById('btn-add-task-equipo').classList.add('hidden');
             }
-            lucide.createIcons();
         }
 
-        function nextPage() {
-            currentTabIdx = (currentTabIdx + 1) % tabsOrder.length;
-            switchTab(tabsOrder[currentTabIdx]);
-        }
+        function nextPage() { switchTab(tabsOrder[(currentTabIdx + 1) % tabsOrder.length]); }
+        function prevPage() { switchTab(tabsOrder[(currentTabIdx - 1 + tabsOrder.length) % tabsOrder.length]); }
 
-        function prevPage() {
-            currentTabIdx = (currentTabIdx - 1 + tabsOrder.length) % tabsOrder.length;
-            switchTab(tabsOrder[currentTabIdx]);
-        }
-
-        // Search Bar Handler
+        // ============================================================
+        // SEARCH
+        // ============================================================
         function handleSearch(e) {
             e.preventDefault();
             const query = document.getElementById('search-input').value.trim();
             const engine = document.getElementById('search-engine').value;
             if (!query) return;
-
-            let searchUrl = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
-            if (engine === 'duckduckgo') searchUrl = `https://duckduckgo.com/?q=${encodeURIComponent(query)}`;
-            if (engine === 'github') searchUrl = `https://github.com/search?q=${encodeURIComponent(query)}`;
-
-            window.open(searchUrl, '_blank');
+            let url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+            if (engine === 'duckduckgo') url = `https://duckduckgo.com/?q=${encodeURIComponent(query)}`;
+            if (engine === 'github') url = `https://github.com/search?q=${encodeURIComponent(query)}`;
+            window.open(url, '_blank');
         }
 
+        // ============================================================
+        // IMAGE RESOLVER
+        // ============================================================
         function resolveImageUrl(adjuntos, fallbackName) {
             if (Array.isArray(adjuntos) && adjuntos.length > 0) {
                 const validAdj = adjuntos.find(a => a.url);
@@ -437,43 +587,51 @@
                     let rawUrl = validAdj.url;
                     if (rawUrl.includes('drive.google.com')) {
                         const matchId = rawUrl.match(/\/d\/([a-zA-Z0-9_-]+)/) || rawUrl.match(/id=([a-zA-Z0-9_-]+)/);
-                        if (matchId && matchId[1]) {
-                            return `https://lh3.googleusercontent.com/d/${matchId[1]}=w800`;
-                        }
+                        if (matchId && matchId[1]) return `https://lh3.googleusercontent.com/d/${matchId[1]}=w800`;
                     }
                     return rawUrl;
                 }
             }
-            return `https://placehold.co/400x300/27272a/a1a1aa?text=${encodeURIComponent(fallbackName || 'Obra')}`;
+            return `https://placehold.co/400x400/27272a/a1a1aa?text=${encodeURIComponent(fallbackName || 'Obra')}`;
         }
 
+        // ============================================================
+        // FETCH ALL DATA
+        // ============================================================
         async function fetchAllData() {
             try {
                 try {
                     const resB = await fetch(ENDPOINT_TASKS);
                     const dataB = await resB.json();
                     appData.tasks = dataB.tareas || [];
-                } catch (errB) {
-                    appData.tasks = getMockTasks();
+                    appData.proyectos = dataB.proyectos || [];
+                    appData.subproyectos = dataB.subproyectos || [];
+                    appData.responsables = dataB.responsables || [];
+                    setCachedData(CACHE_KEY_TASKS, appData.tasks);
+                } catch (err) {
+                    if (!appData.tasks.length) appData.tasks = getMockTasks();
                 }
 
                 try {
                     const resA = await fetch(ENDPOINT_ARTWORKS);
                     const dataA = await resA.json();
                     appData.artworks = dataA.registrosObra || dataA.data || [];
-                } catch (errA) {
-                    appData.artworks = getMockArtworks();
+                    setCachedData(CACHE_KEY_ARTWORKS, appData.artworks);
+                } catch (err) {
+                    if (!appData.artworks.length) appData.artworks = getMockArtworks();
                 }
 
+                updateCacheTimestamp();
                 renderDashboardWidgets();
                 renderTasksTable();
                 renderArtworksGrid();
                 lucide.createIcons();
-            } catch (e) {
-                console.error('Error loading data:', e);
-            }
+            } catch (e) { console.error('Error:', e); }
         }
 
+        // ============================================================
+        // RENDER SHORTCUTS
+        // ============================================================
         function renderShortcuts() {
             const grid = document.getElementById('shortcuts-grid');
             grid.innerHTML = defaultShortcuts.map(s => `
@@ -484,18 +642,37 @@
                     <span class="text-xs font-medium text-slate-300 truncate w-full text-center">${s.name}</span>
                 </a>
             `).join('');
-            lucide.createIcons();
         }
 
+        // ============================================================
+        // RENDER DASHBOARD WIDGETS
+        // ============================================================
         function renderDashboardWidgets() {
+            // Render Artworks Grid
+            const topGrid = document.getElementById('top-artworks-grid');
+            const recentArtworks = appData.artworks.slice(0, 4);
+            if (recentArtworks.length === 0) {
+                topGrid.innerHTML = `<div class="col-span-4 text-center text-slate-500 text-xs py-8">No hay obras recientes</div>`;
+            } else {
+                topGrid.innerHTML = recentArtworks.map(a => {
+                    const imgUrl = resolveImageUrl(a.adjuntos, a.nombre_obra);
+                    return `
+                        <div class="aspect-square bg-zinc-800 overflow-hidden relative group rounded-lg shadow-sm border border-zinc-800/50">
+                            <img src="${imgUrl}" alt="${a.nombre_obra || 'Obra'}"
+                                 onerror="this.onerror=null; this.src='https://placehold.co/400x400/27272a/a1a1aa?text=Obra';"
+                                 class="w-full h-full object-cover group-hover:scale-105 transition duration-500 cursor-pointer">
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            // Render Tasks Widget
             const tasksList = document.getElementById('widget-tasks-equipo-pane');
             const recentTasks = appData.tasks.slice(0, 5);
-            
-            let tasksHTML = '';
             if (recentTasks.length === 0) {
-                tasksHTML = `<p class="text-xs text-slate-500 text-center py-6">No hay tareas disponibles.</p>`;
+                tasksList.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">No hay tareas disponibles.</p>`;
             } else {
-                tasksHTML = recentTasks.map(t => `
+                let html = recentTasks.map(t => `
                     <div class="flex items-center justify-between p-3 hover:bg-zinc-900/40 transition">
                         <div class="flex items-center gap-3 overflow-hidden">
                             <span class="w-2 h-2 rounded-full ${getStatusDotColor(t.estatus)}"></span>
@@ -507,46 +684,21 @@
                         <span class="text-[10px] px-2 py-0.5 rounded-full ${getStatusBadgeColor(t.estatus)}">${t.estatus || 'pendiente'}</span>
                     </div>
                 `).join('');
-            }
-
-            // Append "Ver todas" button as the final item inside scrollable list container
-            tasksHTML += `
-                <div class="p-3 text-center bg-zinc-900/20 hover:bg-zinc-900/60 transition cursor-pointer mt-auto" onclick="switchTab('tasks')">
-                    <button class="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center justify-center gap-1.5 w-full">
-                        <span>Ver todas las tareas</span>
-                        <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-                    </button>
-                </div>
-            `;
-            
-            tasksList.innerHTML = tasksHTML;
-
-            const artworksGrid = document.getElementById('widget-artworks-grid');
-            const recentArtworks = appData.artworks.slice(0, 4);
-            if (recentArtworks.length === 0) {
-                artworksGrid.innerHTML = `<p class="text-xs text-slate-500 text-center col-span-2 py-6">No hay obras disponibles.</p>`;
-            } else {
-                artworksGrid.innerHTML = recentArtworks.map(a => {
-                    const imgUrl = resolveImageUrl(a.adjuntos, a.nombre_obra);
-                    return `
-                        <div class="group relative rounded-xl overflow-hidden border border-zinc-800/80 bg-zinc-950/60 flex flex-col">
-                            <div class="h-28 bg-zinc-800 relative overflow-hidden flex items-center justify-center">
-                                <img src="${imgUrl}" alt="${a.nombre_obra || 'Obra'}" 
-                                     onerror="this.onerror=null; this.src='https://placehold.co/300x200/27272a/a1a1aa?text=${encodeURIComponent(a.nombre_obra || 'Obra')}';"
-                                     class="w-full h-full object-cover group-hover:scale-105 transition duration-300">
-                                <div class="absolute top-2 right-2 bg-zinc-900/80 backdrop-blur px-1.5 py-0.5 rounded text-[10px] text-slate-300 font-mono">${a.estatus || 'Consolidación'}</div>
-                            </div>
-                            <div class="p-2 flex flex-col justify-between flex-1">
-                                <p class="text-xs font-semibold text-slate-200 truncate">${a.nombre_obra || 'Sin Título'}</p>
-                                <p class="text-[10px] text-slate-400 truncate">${a.autor || 'Autor desconocido'}</p>
-                            </div>
-                        </div>
-                    `;
-                }).join('');
+                html += `
+                    <div class="p-3 text-center bg-zinc-900/20 hover:bg-zinc-900/60 transition cursor-pointer mt-auto" onclick="switchTab('tasks')">
+                        <button class="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center justify-center gap-1.5 w-full">
+                            <span>Ver todas las tareas</span>
+                            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                `;
+                tasksList.innerHTML = html;
             }
         }
 
-        // Local Tasks Management (Yo tab)
+        // ============================================================
+        // LOCAL TASKS (Tab "Yo")
+        // ============================================================
         function addLocalTask() {
             const input = document.getElementById('new-local-task-input');
             const text = input.value.trim();
@@ -575,7 +727,6 @@
                 container.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">No tienes tareas personales. Añade una arriba.</p>`;
                 return;
             }
-
             container.innerHTML = localTasks.map(t => `
                 <div class="flex items-center justify-between p-3 hover:bg-zinc-900/40 transition">
                     <div class="flex items-center gap-3 overflow-hidden cursor-pointer" onclick="toggleLocalTask(${t.id})">
@@ -588,15 +739,16 @@
             lucide.createIcons();
         }
 
+        // ============================================================
+        // RENDER TASKS TABLE
+        // ============================================================
         function renderTasksTable() {
             const container = document.getElementById('tasks-table-container');
-            const tasks = appData.tasks;
-            if (tasks.length === 0) {
-                container.innerHTML = `<p class="text-sm text-slate-500 text-center py-10">No se encontraron tareas en el backend codeB.</p>`;
+            if (appData.tasks.length === 0) {
+                container.innerHTML = `<p class="text-sm text-slate-500 text-center py-10">No se encontraron tareas.</p>`;
                 return;
             }
-
-            container.innerHTML = tasks.map(t => `
+            container.innerHTML = appData.tasks.map(t => `
                 <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-xl bg-zinc-950/60 border border-zinc-800/80 hover:border-zinc-700 transition">
                     <div class="flex items-start gap-3">
                         <div class="p-2 rounded-lg bg-cyan-500/10 text-cyan-400 mt-0.5"><i data-lucide="check-circle" class="w-4 h-4"></i></div>
@@ -604,7 +756,6 @@
                             <div class="flex items-center gap-2">
                                 <span class="font-mono text-xs text-cyan-400 font-bold">${t.asignacion || 'S/A'}</span>
                                 <span class="text-xs px-2 py-0.5 rounded-full ${getStatusBadgeColor(t.estatus)}">${t.estatus || 'pendiente'}</span>
-                                <span class="text-xs px-2 py-0.5 rounded-full bg-zinc-800 text-slate-300">Prioridad: ${t.prioridad || 'media'}</span>
                             </div>
                             <h4 class="text-sm font-semibold text-slate-100 mt-1">${t.detalles || 'Sin detalles'}</h4>
                             <p class="text-xs text-slate-400 mt-0.5">${t.descripcion || ''}</p>
@@ -615,50 +766,44 @@
                     </div>
                 </div>
             `).join('');
-            lucide.createIcons();
         }
 
+        // ============================================================
+        // RENDER ARTWORKS GRID
+        // ============================================================
         function renderArtworksGrid() {
             const container = document.getElementById('artworks-grid-container');
-            const artworks = appData.artworks;
-            if (artworks.length === 0) {
-                container.innerHTML = `<p class="text-sm text-slate-500 text-center col-span-full py-10">No se encontraron registros de obra en el backend codeA.</p>`;
+            if (appData.artworks.length === 0) {
+                container.innerHTML = `<p class="text-sm text-slate-500 text-center col-span-full py-10">No se encontraron registros de obra.</p>`;
                 return;
             }
-
-            container.innerHTML = artworks.map(a => {
+            container.innerHTML = appData.artworks.map(a => {
                 const imgUrl = resolveImageUrl(a.adjuntos, a.nombre_obra);
-                const adjuntosCount = Array.isArray(a.adjuntos) ? a.adjuntos.length : 0;
+                const adjCount = Array.isArray(a.adjuntos) ? a.adjuntos.length : 0;
                 return `
                     <div class="bg-zinc-950/60 border border-zinc-800/80 rounded-2xl overflow-hidden flex flex-col group hover:border-zinc-700 transition shadow-lg">
-                        <div class="h-48 bg-zinc-900 relative overflow-hidden flex items-center justify-center">
-                            <img src="${imgUrl}" alt="${a.nombre_obra || 'Obra'}" 
-                                 onerror="this.onerror=null; this.src='https://placehold.co/400x300/27272a/a1a1aa?text=${encodeURIComponent(a.nombre_obra || 'Obra')}';"
-                                 class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                            <div class="absolute top-3 right-3 bg-zinc-900/90 backdrop-blur px-2.5 py-1 rounded-lg text-xs font-semibold text-slate-200 border border-zinc-700">${a.estatus || 'Consolidación'}</div>
-                            <div class="absolute bottom-3 left-3 bg-zinc-900/90 backdrop-blur px-2.5 py-1 rounded-lg text-xs font-mono text-purple-300 border border-zinc-700">${a.asignacion || 'obra-X'}</div>
-                            ${adjuntosCount > 0 ? `<div class="absolute bottom-3 right-3 bg-indigo-600/90 backdrop-blur px-2 py-0.5 rounded-md text-[10px] text-white flex items-center gap-1 font-medium"><i data-lucide="paperclip" class="w-3 h-3"></i> ${adjuntosCount}</div>` : ''}
+                        <div class="h-40 bg-zinc-900 relative overflow-hidden flex items-center justify-center">
+                            <img src="${imgUrl}" alt="Obra" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <div class="absolute top-2 right-2 bg-zinc-900/90 backdrop-blur px-2 py-0.5 rounded text-[10px] text-slate-200 border border-zinc-700">${a.estatus || 'Consolidación'}</div>
+                            ${adjCount > 0 ? `<div class="absolute bottom-2 right-2 bg-indigo-600/90 backdrop-blur px-1.5 py-0.5 rounded text-[10px] text-white flex items-center gap-1"><i data-lucide="paperclip" class="w-3 h-3"></i> ${adjCount}</div>` : ''}
                         </div>
-                        <div class="p-4 flex flex-col justify-between flex-1 gap-3">
+                        <div class="p-3 flex flex-col justify-between flex-1 gap-2">
                             <div>
-                                <h4 class="font-bold text-sm text-slate-100 truncate" title="${a.nombre_obra || 'Sin Título'}">${a.nombre_obra || 'Sin Título'}</h4>
-                                <p class="text-xs text-slate-400 mt-0.5 truncate">Autor: <span class="text-slate-300">${a.autor || 'Desconocido'}</span></p>
-                                <p class="text-xs text-slate-400 truncate">Ubicación: <span class="text-slate-300">${a.ubicacion || 'N/A'}</span></p>
-                            </div>
-                            <div class="flex items-center justify-between pt-3 border-t border-zinc-800/80 text-xs">
-                                <span class="font-semibold text-emerald-400">${a.tipo_moneda || 'MXN'} $${Number(a.precio_lista || 0).toLocaleString()}</span>
-                                <span class="text-slate-500 font-mono">${a.superficie || 0} m²</span>
+                                <h4 class="font-bold text-sm text-slate-100 truncate">${a.nombre_obra || 'Sin Título'}</h4>
+                                <p class="text-xs text-slate-400 truncate">${a.autor || 'Desconocido'}</p>
                             </div>
                         </div>
                     </div>
                 `;
             }).join('');
-            lucide.createIcons();
         }
 
         function filterTasks() {}
         function filterArtworks() {}
 
+        // ============================================================
+        // STATUS HELPERS
+        // ============================================================
         function getStatusBadgeColor(estatus) {
             switch(estatus) {
                 case 'completado': return 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
@@ -668,7 +813,6 @@
                 default: return 'bg-zinc-800 text-slate-400 border border-zinc-700';
             }
         }
-
         function getStatusDotColor(estatus) {
             switch(estatus) {
                 case 'completado': return 'bg-emerald-400 shadow-lg shadow-emerald-400/50';
@@ -679,6 +823,9 @@
             }
         }
 
+        // ============================================================
+        // MOCK DATA
+        // ============================================================
         function getMockTasks() {
             return [
                 { asignacion: '1.1.1JD', estatus: 'en_curso', prioridad: 'alta', detalles: 'Revisión de planos estructurales', descripcion: 'Verificar especificaciones de cimentación.', fecha_limite: '2026-06-15' },
@@ -686,14 +833,362 @@
                 { asignacion: '2.1.1AL', estatus: 'en_revision', prioridad: 'baja', detalles: 'Entrega de catálogo de obras', descripcion: 'Compilación fotográfica.', fecha_limite: '2026-06-20' }
             ];
         }
-
         function getMockArtworks() {
             return [
-                { nombre_obra: 'Residencia Minimalista Sol', autor: 'Carlos Mendoza', ubicacion: 'Puebla, MX', estatus: 'Consolidación', tipo_moneda: 'MXN', precio_lista: 4500000, superficie: 320, adjuntos: [] },
-                { nombre_obra: 'Torre Corporativa Cenit', autor: 'Sofía Valdés', ubicacion: 'CDMX', estatus: 'Bodega', tipo_moneda: 'MXN', precio_lista: 12000000, superficie: 850, adjuntos: [] },
-                { nombre_obra: 'Pabellón Botánico', autor: 'Estudio Arquitectura', ubicacion: 'Monterrey', estatus: 'Vendida', tipo_moneda: 'MXN', precio_lista: 6800000, superficie: 410, adjuntos: [] }
+                { nombre_obra: 'Residencia Minimalista Sol', autor: 'Carlos Mendoza', ubicacion: 'Puebla, MX', estatus: 'Consolidación', adjuntos: [] },
+                { nombre_obra: 'Torre Corporativa Cenit', autor: 'Sofía Valdés', ubicacion: 'CDMX', estatus: 'Bodega', adjuntos: [] },
+                { nombre_obra: 'Pabellón Botánico', autor: 'Estudio Arquitectura', ubicacion: 'Monterrey', estatus: 'Vendida', adjuntos: [] },
+                { nombre_obra: 'Casa del Bosque', autor: 'Grupo Z', ubicacion: 'Valle de Bravo', estatus: 'Consolidación', adjuntos: [] }
             ];
         }
+
+        // ============================================================
+        // TASK CREATION FLOW
+        // ============================================================
+        function openAddTaskModal() {
+            // Limpiar estado anterior
+            taskFlow.authenticatedUser = null;
+            taskFlow.selectedProyecto = null;
+            taskFlow.selectedSubproyecto = null;
+            taskFlow.selectedResponsable = null;
+            taskFlow.step = 'login';
+
+            // Mostrar modal de login
+            openLoginModal();
+        }
+
+        // ---------- LOGIN MODAL ----------
+        function openLoginModal() {
+            const modal = document.getElementById('login-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            lucide.createIcons();
+            // Cargar lista de usuarios (directores)
+            loadDirectorsList();
+        }
+
+        function closeLoginModal() {
+            document.getElementById('login-modal').classList.add('hidden');
+            document.getElementById('login-modal').classList.remove('flex');
+        }
+
+        function loadDirectorsList() {
+            const container = document.getElementById('login-users-list');
+            // Asegurar que tenemos responsables cargados
+            if (appData.responsables.length === 0) {
+                container.innerHTML = `<div class="text-center text-slate-500 text-xs py-4">Cargando usuarios...</div>`;
+                fetchProyectosYSubproyectos().then(() => {
+                    renderDirectorsList();
+                });
+            } else {
+                renderDirectorsList();
+            }
+        }
+
+        function renderDirectorsList() {
+            const container = document.getElementById('login-users-list');
+            const directors = appData.responsables.filter(r =>
+                r.rol && (r.rol.toLowerCase() === 'director' || r.rol.toLowerCase() === 'dirección')
+            );
+
+            if (directors.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-slate-500 text-xs py-4">
+                        <p>No hay usuarios con rol Director.</p>
+                        <p class="mt-2 text-[10px] text-slate-600">Solo los Directores pueden crear tareas.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = directors.map(d => `
+                <button onclick="selectDirector('${d.id}', '${d.nombre}', '${d.rol}')"
+                        class="flex items-center gap-3 p-3 rounded-xl bg-zinc-800/50 hover:bg-zinc-800 border border-zinc-700/50 hover:border-indigo-500/50 transition w-full text-left">
+                    <div class="w-10 h-10 rounded-full bg-indigo-600/30 flex items-center justify-center text-indigo-400 font-bold text-sm">
+                        ${d.nombre ? d.nombre.charAt(0).toUpperCase() : '?'}
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-slate-200">${d.nombre || 'Sin nombre'}</p>
+                        <p class="text-[10px] text-slate-400">${d.email || 'Sin email'} • ${d.rol || 'Director'}</p>
+                    </div>
+                    <span class="ml-auto text-xs px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-400">Director</span>
+                </button>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function selectDirector(id, nombre, rol) {
+            taskFlow.authenticatedUser = { id, nombre, rol };
+            closeLoginModal();
+            // Abrir modal de selección de proyecto
+            openSelectProjectModal();
+        }
+
+        // ---------- SELECT PROJECT MODAL ----------
+        function openSelectProjectModal() {
+            const modal = document.getElementById('select-project-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            lucide.createIcons();
+
+            // Mostrar usuario autenticado
+            if (taskFlow.authenticatedUser) {
+                document.getElementById('auth-user-display').textContent =
+                    `${taskFlow.authenticatedUser.nombre} (${taskFlow.authenticatedUser.rol})`;
+            }
+
+            // Cargar proyectos
+            populateProjectSelect();
+
+            // Cargar responsables
+            populateResponsibleSelect();
+
+            // Resetear campos
+            document.getElementById('subproject-select').disabled = true;
+            document.getElementById('subproject-select').innerHTML = '<option value="">Primero selecciona un proyecto</option>';
+            document.getElementById('new-task-details').value = '';
+            document.getElementById('new-task-description').value = '';
+            document.getElementById('new-task-priority').value = 'media';
+
+            // Fecha límite por defecto: +7 días
+            const today = new Date();
+            const weekLater = new Date(today);
+            weekLater.setDate(today.getDate() + 7);
+            document.getElementById('new-task-deadline').value = weekLater.toISOString().split('T')[0];
+        }
+
+        function closeSelectProjectModal() {
+            document.getElementById('select-project-modal').classList.add('hidden');
+            document.getElementById('select-project-modal').classList.remove('flex');
+        }
+
+        function populateProjectSelect() {
+            const select = document.getElementById('project-select');
+            // Asegurar que tenemos proyectos
+            if (appData.proyectos.length === 0) {
+                select.innerHTML = `<option value="">Cargando proyectos...</option>`;
+                fetchProyectosYSubproyectos().then(() => {
+                    populateProjectSelect();
+                });
+                return;
+            }
+
+            select.innerHTML = '<option value="">Selecciona un proyecto...</option>';
+            appData.proyectos.forEach(p => {
+                const option = document.createElement('option');
+                option.value = p.id;
+                option.textContent = `${p.asignacion || ''} - ${p.nombre}`;
+                select.appendChild(option);
+            });
+
+            // Event listener para cargar subproyectos
+            select.onchange = function() {
+                const projectId = this.value;
+                if (projectId) {
+                    populateSubprojectSelect(projectId);
+                } else {
+                    document.getElementById('subproject-select').disabled = true;
+                    document.getElementById('subproject-select').innerHTML = '<option value="">Primero selecciona un proyecto</option>';
+                }
+            };
+        }
+
+        function populateSubprojectSelect(projectId) {
+            const select = document.getElementById('subproject-select');
+            const subproyectos = appData.subproyectos.filter(sp => sp.id_proyecto === projectId);
+
+            if (subproyectos.length === 0) {
+                select.innerHTML = '<option value="">No hay subproyectos disponibles</option>';
+                select.disabled = true;
+                return;
+            }
+
+            select.disabled = false;
+            select.innerHTML = '<option value="">Selecciona un subproyecto...</option>';
+            subproyectos.forEach(sp => {
+                const option = document.createElement('option');
+                option.value = sp.id;
+                option.textContent = `${sp.asignacion || ''} - ${sp.nombre}`;
+                select.appendChild(option);
+            });
+        }
+
+        // ---------- POPULATE RESPONSABLES ----------
+        function populateResponsibleSelect() {
+            const select = document.getElementById('responsible-select');
+
+            if (appData.responsables.length === 0) {
+                select.innerHTML = `<option value="">Cargando responsables...</option>`;
+                fetchProyectosYSubproyectos().then(() => {
+                    populateResponsibleSelect();
+                });
+                return;
+            }
+
+            select.innerHTML = '<option value="">Selecciona un responsable...</option>';
+            // Ordenar: primero Directores, luego Supervisores, luego Responsables
+            const sorted = [...appData.responsables].sort((a, b) => {
+                const order = { 'director': 0, 'supervisor': 1, 'responsable': 2 };
+                const aOrder = a.rol ? (order[a.rol.toLowerCase()] ?? 3) : 3;
+                const bOrder = b.rol ? (order[b.rol.toLowerCase()] ?? 3) : 3;
+                return aOrder - bOrder;
+            });
+
+            sorted.forEach(r => {
+                const option = document.createElement('option');
+                option.value = r.id;
+                const rolBadge = r.rol ? ` [${r.rol}]` : '';
+                option.textContent = `${r.nombre || 'Sin nombre'}${rolBadge} - ${r.email || 'sin email'}`;
+                select.appendChild(option);
+            });
+
+            // Por defecto seleccionar al usuario autenticado si está en la lista
+            if (taskFlow.authenticatedUser) {
+                const authId = taskFlow.authenticatedUser.id;
+                for (let i = 0; i < select.options.length; i++) {
+                    if (select.options[i].value === authId) {
+                        select.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+        }
+
+        // ---------- CONFIRM ADD TASK ----------
+        async function confirmAddTask() {
+            const projectSelect = document.getElementById('project-select');
+            const subprojectSelect = document.getElementById('subproject-select');
+            const responsibleSelect = document.getElementById('responsible-select');
+            const details = document.getElementById('new-task-details').value.trim();
+            const description = document.getElementById('new-task-description').value.trim();
+            const priority = document.getElementById('new-task-priority').value;
+            const deadline = document.getElementById('new-task-deadline').value;
+
+            const projectId = projectSelect.value;
+            const subprojectId = subprojectSelect.value;
+            const responsableId = responsibleSelect.value;
+
+            // Validaciones
+            if (!projectId) {
+                alert('Por favor selecciona un proyecto.');
+                return;
+            }
+            if (!subprojectId) {
+                alert('Por favor selecciona un subproyecto.');
+                return;
+            }
+            if (!responsableId) {
+                alert('Por favor selecciona un responsable para asignar la tarea.');
+                return;
+            }
+            if (!details) {
+                alert('Por favor ingresa los detalles de la tarea.');
+                return;
+            }
+            if (!taskFlow.authenticatedUser) {
+                alert('No has iniciado sesión. Por favor intenta de nuevo.');
+                return;
+            }
+
+            // Generar ID único para la tarea
+            const taskId = 'T_' + Date.now().toString(36).toUpperCase();
+
+            // Preparar payload para el backend
+            const payload = {
+                action: 'tarea_add',
+                data: {
+                    id: taskId,
+                    id_subproyecto: subprojectId,
+                    id_responsable: responsableId,  // El responsable seleccionado
+                    prioridad: priority,
+                    estatus: 'pendiente',
+                    detalles: details,
+                    descripcion: description || '',
+                    fecha_limite: deadline || ''
+                }
+            };
+
+            try {
+                // Mostrar loading
+                const btn = document.querySelector('#select-project-modal .bg-indigo-600');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i data-lucide="loader-circle" class="w-4 h-4 animate-spin"></i> Creando...';
+                btn.disabled = true;
+
+                const response = await fetch(ENDPOINT_TASKS, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: {
+                        'Content-Type': 'application/json',
+                    },
+                    body: JSON.stringify(payload)
+                });
+
+                // Con no-cors no podemos leer la respuesta, pero asumimos éxito
+                // Refrescar datos
+                await fetchAllData();
+                renderDashboardWidgets();
+                renderTasksTable();
+
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                closeSelectProjectModal();
+
+                // Mostrar notificación de éxito
+                showNotification('Tarea creada exitosamente');
+
+            } catch (error) {
+                console.error('Error al crear tarea:', error);
+                alert('Error al crear la tarea. Por favor intenta de nuevo.');
+                const btn = document.querySelector('#select-project-modal .bg-indigo-600');
+                if (btn) {
+                    btn.innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i> Crear Tarea';
+                    btn.disabled = false;
+                    lucide.createIcons();
+                }
+            }
+        }
+
+        // ============================================================
+        // NOTIFICATION SYSTEM
+        // ============================================================
+        function showNotification(message) {
+            const existing = document.querySelector('.rtbrok-notification');
+            if (existing) existing.remove();
+
+            const div = document.createElement('div');
+            div.className = 'rtbrok-notification fixed bottom-4 left-1/2 -translate-x-1/2 bg-zinc-900 border border-indigo-600/30 rounded-2xl px-6 py-3 shadow-2xl z-[100] flex items-center gap-3';
+            div.innerHTML = `
+                <span class="text-indigo-400"><i data-lucide="check-circle" class="w-5 h-5"></i></span>
+                <span class="text-sm text-slate-200">${message}</span>
+            `;
+            document.body.appendChild(div);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                div.style.opacity = '0';
+                div.style.transition = 'opacity 0.3s';
+                setTimeout(() => div.remove(), 300);
+            }, 3000);
+        }
+
+        // ============================================================
+        // KEYBOARD SHORTCUTS
+        // ============================================================
+        document.addEventListener('keydown', function(e) {
+            // Ctrl + N para nueva tarea
+            if (e.ctrlKey && e.key === 'n') {
+                e.preventDefault();
+                openAddTaskModal();
+            }
+            // Escape para cerrar modales
+            if (e.key === 'Escape') {
+                closeLoginModal();
+                closeSelectProjectModal();
+                closeSettingsModal();
+            }
+        });
+
     </script>
 </body>
 </html>
