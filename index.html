@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Workspace</title>
+    <title>Workspace & Home Browser</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
@@ -19,55 +19,56 @@
         }
     </script>
     <style>
-        body { font-family: 'Inter', sans-serif; }
+        body { font-family: 'Inter', sans-serif; background-color: #000000; }
         ::-webkit-scrollbar { width: 6px; height: 6px; }
         ::-webkit-scrollbar-track { background: transparent; }
-        ::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.5); border-radius: 3px; }
-        ::-webkit-scrollbar-thumb:hover { background: rgba(156, 163, 175, 0.8); }
-        .modal-overlay { background: rgba(0,0,0,0.7); backdrop-filter: blur(4px); }
+        ::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.3); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(156, 163, 175, 0.6); }
+        .modal-overlay { background: rgba(0,0,0,0.8); backdrop-filter: blur(6px); }
         .modal-card { max-height: 90vh; overflow-y: auto; }
-        .user-card-selectable {
-            transition: all 0.15s ease;
-        }
-        .user-card-selectable:hover {
-            transform: translateY(-1px);
-            box-shadow: 0 4px 12px rgba(0,0,0,0.3);
-        }
-        .user-card-selectable.selected {
-            border-color: #6366f1 !important;
-            background: rgba(99, 102, 241, 0.15) !important;
-            box-shadow: 0 0 0 2px rgba(99, 102, 241, 0.3);
-        }
+        /* Hide scrollbar for edge-to-edge look if needed */
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
     </style>
 </head>
 <body class="h-full bg-black text-slate-100 flex flex-col overflow-hidden select-none">
 
     <!-- RTBROK Brand Top Left -->
-    <div class="absolute top-4 left-6 sm:left-12 z-30">
-        <h1 class="font-bold text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">R T B R O K</h1>
+    <div class="absolute top-4 left-6 sm:left-8 z-30">
+        <h1 class="font-bold text-base sm:text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">R T B R O K</h1>
     </div>
 
     <!-- Clock Top Right -->
-    <div class="absolute top-4 right-6 sm:right-12 z-30">
+    <div class="absolute top-4 right-6 sm:right-8 z-30">
         <p id="clock" class="text-xs text-slate-400 font-medium">00:00</p>
     </div>
 
-    <div class="relative z-10 flex flex-row items-center h-full w-full max-w-full sm:max-w-[960px] mx-auto px-4 sm:px-8 py-4 md:py-6 gap-6">
+    <!-- Navigation Arrows Overlay Wrapper -->
+    <div class="fixed inset-0 pointer-events-none z-30 hidden md:flex items-center justify-center">
+        <div class="w-full max-w-6xl px-4 xl:max-w-7xl flex justify-between">
+            <!-- Left Navigation Arrow -->
+            <button onclick="prevPage()" class="pointer-events-auto flex items-center justify-center w-11 h-11 rounded-2xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-slate-300 hover:text-white transition-all shadow-xl group shrink-0">
+                <i data-lucide="chevron-left" class="w-5 h-5 group-hover:-translate-x-0.5 transition-transform"></i>
+            </button>
+            
+            <!-- Right Navigation Arrow -->
+            <button onclick="nextPage()" class="pointer-events-auto flex items-center justify-center w-11 h-11 rounded-2xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-slate-300 hover:text-white transition-all shadow-xl group shrink-0">
+                <i data-lucide="chevron-right" class="w-5 h-5 group-hover:translate-x-0.5 transition-transform"></i>
+            </button>
+        </div>
+    </div>
 
-        <!-- Left Navigation Arrow -->
-        <button onclick="prevPage()" class="hidden md:flex absolute -left-16 items-center justify-center w-12 h-12 rounded-2xl bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-700/80 text-slate-300 hover:text-white transition-all shadow-xl group z-30 shrink-0">
-            <i data-lucide="chevron-left" class="w-6 h-6 group-hover:-translate-x-0.5 transition-transform"></i>
-        </button>
+    <div class="relative z-10 flex flex-col items-center h-full w-full py-4 md:py-6 gap-4 sm:gap-6">
 
-        <div id="app" class="relative z-10 flex flex-col h-full w-full flex-1 gap-6 overflow-hidden pt-8">
+        <div id="app" class="relative z-10 flex flex-col h-full w-full flex-1 gap-4 sm:gap-5 overflow-hidden pt-7 sm:pt-8">
 
-            <div class="w-full">
+            <div class="w-full max-w-4xl mx-auto px-4 sm:px-6">
                 <form id="search-form" onsubmit="handleSearch(event)" class="relative flex items-center w-full">
                     <span class="absolute left-4 text-slate-400"><i data-lucide="search" class="w-5 h-5"></i></span>
                     <input type="text" id="search-input" placeholder="Buscar en Google o filtrar módulos..."
-                        class="w-full bg-zinc-900/80 backdrop-blur-xl border border-zinc-700/60 rounded-2xl pl-12 pr-28 py-3.5 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-2xl">
+                        class="w-full bg-zinc-900 border border-zinc-800 rounded-2xl pl-12 pr-28 py-3 text-sm sm:text-base text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-xl">
                     <div class="absolute right-2 flex items-center gap-1">
-                        <select id="search-engine" class="bg-zinc-800 text-slate-300 text-xs rounded-xl px-2.5 py-2 focus:outline-none cursor-pointer border border-zinc-700">
+                        <select id="search-engine" class="bg-zinc-800 text-slate-300 text-xs rounded-xl px-2 py-1.5 focus:outline-none cursor-pointer border border-zinc-700">
                             <option value="google">Google</option>
                             <option value="duckduckgo">DuckDuckGo</option>
                             <option value="github">GitHub</option>
@@ -77,82 +78,88 @@
                 </form>
             </div>
 
-            <main class="flex-1 overflow-hidden relative flex flex-col">
-                <div class="flex-1 overflow-hidden relative">
+            <main class="flex-1 overflow-hidden relative flex flex-col w-full">
+                <div class="flex-1 overflow-hidden relative flex flex-col w-full">
 
-                    <div id="tab-dashboard" class="h-full overflow-y-auto pr-1 flex flex-col gap-6">
+                    <div id="tab-dashboard" class="h-full overflow-y-auto overflow-x-hidden flex flex-col pb-8 w-full">
 
-                        <!-- Top: Instagram-style Artworks Grid -->
-                        <section>
-                            <div id="top-artworks-grid" class="grid grid-cols-4 gap-1 sm:gap-2">
-                                <div class="aspect-square bg-zinc-900/80 animate-pulse rounded-md"></div>
-                                <div class="aspect-square bg-zinc-900/80 animate-pulse rounded-md"></div>
-                                <div class="aspect-square bg-zinc-900/80 animate-pulse rounded-md"></div>
-                                <div class="aspect-square bg-zinc-900/80 animate-pulse rounded-md"></div>
+                        <!-- Top: Instagram-style Edge-to-Edge Artworks Grid -->
+                        <section class="w-full mb-5 sm:mb-6 border-y border-zinc-900 bg-black">
+                            <!-- Removes max-width completely to bleed to the edges -->
+                            <div id="top-artworks-grid" class="grid grid-cols-4 gap-0.5 bg-zinc-950 w-full">
+                                <div class="aspect-square bg-zinc-900 animate-pulse"></div>
+                                <div class="aspect-square bg-zinc-900 animate-pulse"></div>
+                                <div class="aspect-square bg-zinc-900 animate-pulse"></div>
+                                <div class="aspect-square bg-zinc-900 animate-pulse"></div>
                             </div>
                         </section>
 
-                        <!-- Middle: Tasks Widget -->
-                        <div class="bg-zinc-900/60 backdrop-blur-xl border border-zinc-800/80 rounded-2xl p-5 flex flex-col h-[360px] shadow-xl">
-                            <div class="flex items-center justify-between mb-3">
-                                <div class="flex items-center gap-1 bg-zinc-950/60 p-1 rounded-1xl border border-zinc-800">
-                                    <button onclick="switchTaskWidgetTab('equipo')" id="widget-tab-equipo" class="px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition">Equipo</button>
-                                    <button onclick="switchTaskWidgetTab('yo')" id="widget-tab-yo" class="px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition">Yo</button>
+                        <!-- Stem of the T: Constrained Content Wrapper -->
+                        <div class="w-full max-w-4xl mx-auto px-4 sm:px-6 flex flex-col gap-5">
+                            
+                            <!-- Middle: Tasks Widget -->
+                            <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 sm:p-5 flex flex-col h-[320px] sm:h-[350px] shadow-xl">
+                                <div class="flex items-center justify-between mb-3">
+                                    <div class="flex items-center gap-1 bg-black p-1 rounded-xl border border-zinc-800">
+                                        <button onclick="switchTaskWidgetTab('equipo')" id="widget-tab-equipo" class="px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition">Equipo</button>
+                                        <button onclick="switchTaskWidgetTab('yo')" id="widget-tab-yo" class="px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition">Yo</button>
+                                    </div>
+                                    <div class="flex items-center gap-2">
+                                        <span id="widget-title" class="font-semibold text-sm text-slate-200">Equipo</span>
+                                        <button onclick="openAddTaskModal()" id="btn-add-task-equipo" class="p-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 hover:text-indigo-300 transition" title="Añadir tarea">
+                                            <i data-lucide="plus" class="w-4 h-4"></i>
+                                        </button>
+                                    </div>
                                 </div>
-                                <div class="flex items-center gap-2">
-                                    <span id="widget-title" class="font-semibold text-sm text-slate-200">Equipo</span>
-                                    <button onclick="openAddTaskModal()" id="btn-add-task-equipo" class="p-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 hover:text-indigo-300 transition" title="Añadir tarea">
-                                        <i data-lucide="plus" class="w-4 h-4"></i>
-                                    </button>
-                                </div>
-                            </div>
 
-                            <!-- Equipo Tab Content -->
-                            <div id="widget-tasks-equipo-pane" class="flex-1 overflow-y-auto pr-1 flex flex-col bg-zinc-950/40 rounded-xl border border-zinc-800/60 divide-y divide-zinc-800/60">
-                                <div class="p-4 space-y-3 animate-pulse">
-                                    <div class="flex items-center justify-between">
-                                        <div class="flex items-center gap-3">
-                                            <div class="w-2 h-2 rounded-full bg-zinc-700"></div>
-                                            <div class="space-y-1.5">
-                                                <div class="h-3 w-36 bg-zinc-800 rounded"></div>
-                                                <div class="h-2 w-20 bg-zinc-800/60 rounded"></div>
+                                <!-- Equipo Tab Content -->
+                                <div id="widget-tasks-equipo-pane" class="flex-1 overflow-y-auto pr-1 flex flex-col bg-black rounded-xl border border-zinc-800 divide-y divide-zinc-800/80">
+                                    <div class="p-4 space-y-3 animate-pulse">
+                                        <div class="flex items-center justify-between">
+                                            <div class="flex items-center gap-3">
+                                                <div class="w-2 h-2 rounded-full bg-zinc-800"></div>
+                                                <div class="space-y-1.5">
+                                                    <div class="h-3 w-36 bg-zinc-800 rounded"></div>
+                                                    <div class="h-2 w-20 bg-zinc-800/60 rounded"></div>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
                                 </div>
+
+                                <!-- Yo Tab Content -->
+                                <div id="widget-tasks-yo-pane" class="flex-1 overflow-y-auto pr-1 hidden flex-col bg-black rounded-xl border border-zinc-800">
+                                    <div class="p-2 border-b border-zinc-800 flex gap-2">
+                                        <input type="text" id="new-local-task-input" placeholder="Nueva tarea personal..." class="flex-1 bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+                                        <button onclick="addLocalTask()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition">Añadir</button>
+                                    </div>
+                                    <div id="widget-tasks-yo-list" class="flex-1 overflow-y-auto divide-y divide-zinc-800/80">
+                                        <!-- Populated dynamically -->
+                                    </div>
+                                </div>
                             </div>
 
-                            <!-- Yo Tab Content -->
-                            <div id="widget-tasks-yo-pane" class="flex-1 overflow-y-auto pr-1 hidden flex-col bg-zinc-950/40 rounded-xl border border-zinc-800/60">
-                                <div class="p-2 border-b border-zinc-800/60 flex gap-2">
-                                    <input type="text" id="new-local-task-input" placeholder="Nueva tarea personal..." class="flex-1 bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500">
-                                    <button onclick="addLocalTask()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition">Añadir</button>
-                                </div>
-                                <div id="widget-tasks-yo-list" class="flex-1 overflow-y-auto divide-y divide-zinc-800/60">
+                            <!-- Bottom: Shortcuts Grid -->
+                            <section class="pb-6">
+                                <div id="shortcuts-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
                                     <!-- Populated dynamically -->
                                 </div>
-                            </div>
-                        </div>
+                            </section>
 
-                        <!-- Bottom: Shortcuts Grid -->
-                        <section class="pb-6">
-                            <div id="shortcuts-grid" class="grid grid-cols-4 gap-4">
-                                <!-- Populated dynamically -->
-                            </div>
-                        </section>
+                        </div>
                     </div>
 
-                    <div id="tab-tasks" class="h-full hidden flex-col gap-4">
-                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-zinc-900/60 backdrop-blur-xl border border-zinc-800/80 rounded-2xl p-4 shadow-xl">
+                    <div id="tab-tasks" class="w-full max-w-4xl mx-auto px-4 sm:px-6 h-full hidden flex-col gap-4">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-zinc-900 border border-zinc-800 rounded-2xl p-4 shadow-xl">
                             <div class="flex items-center gap-3">
                                 <div class="p-2.5 bg-cyan-500/10 text-cyan-400 rounded-xl border border-cyan-500/20"><i data-lucide="check-square" class="w-5 h-5"></i></div>
                                 <div>
-                                    <h2 class="font-bold text-base">Gestión de Tareas (CodeB Backend)</h2>
+                                    <h2 class="font-bold text-sm sm:text-base">Gestión de Tareas (CodeB Backend)</h2>
                                     <p class="text-xs text-slate-400">Origen: <span class="font-mono text-cyan-400">script.google.com/.../exec</span></p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2 w-full sm:w-auto">
-                                <input type="text" id="task-filter-input" oninput="filterTasks()" placeholder="Filtrar tareas..." class="bg-zinc-950/80 border border-zinc-700/60 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 w-full sm:w-48">
+                                <input type="text" id="task-filter-input" oninput="filterTasks()" placeholder="Filtrar tareas..." class="bg-black border border-zinc-800 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 w-full sm:w-48">
                                 <select id="task-status-filter" onchange="filterTasks()" class="bg-zinc-800 border border-zinc-700 text-xs rounded-xl px-3 py-2 text-slate-200 focus:outline-none">
                                     <option value="all">Todos los estatus</option>
                                     <option value="pendiente">Pendiente</option>
@@ -164,7 +171,7 @@
                             </div>
                         </div>
 
-                        <div class="flex-1 bg-zinc-900/60 backdrop-blur-xl border border-zinc-800/80 rounded-2xl overflow-hidden flex flex-col shadow-xl">
+                        <div class="flex-1 bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden flex flex-col shadow-xl">
                             <div class="overflow-y-auto flex-1 p-4">
                                 <div id="tasks-table-container" class="space-y-3">
                                     <!-- Populated dynamically -->
@@ -173,17 +180,17 @@
                         </div>
                     </div>
 
-                    <div id="tab-artworks" class="h-full hidden flex-col gap-4">
-                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-zinc-900/60 backdrop-blur-xl border border-zinc-800/80 rounded-2xl p-4 shadow-xl">
+                    <div id="tab-artworks" class="w-full max-w-4xl mx-auto px-4 sm:px-6 h-full hidden flex-col gap-4">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-zinc-900 border border-zinc-800 rounded-2xl p-4 shadow-xl">
                             <div class="flex items-center gap-3">
                                 <div class="p-2.5 bg-purple-500/10 text-purple-400 rounded-xl border border-purple-500/20"><i data-lucide="image" class="w-5 h-5"></i></div>
                                 <div>
-                                    <h2 class="font-bold text-base">Registros de Obra y Galería (CodeA)</h2>
+                                    <h2 class="font-bold text-sm sm:text-base">Registros de Obra y Galería (CodeA)</h2>
                                     <p class="text-xs text-slate-400">Origen: <span class="font-mono text-purple-400">script.google.com/.../exec</span></p>
                                 </div>
                             </div>
                             <div class="flex items-center gap-2 w-full sm:w-auto">
-                                <input type="text" id="artwork-filter-input" oninput="filterArtworks()" placeholder="Buscar..." class="bg-zinc-950/80 border border-zinc-700/60 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-purple-500 w-full sm:w-64">
+                                <input type="text" id="artwork-filter-input" oninput="filterArtworks()" placeholder="Buscar..." class="bg-black border border-zinc-800 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-purple-500 w-full sm:w-64">
                                 <select id="artwork-status-filter" onchange="filterArtworks()" class="bg-zinc-800 border border-zinc-700 text-xs rounded-xl px-3 py-2 text-slate-200 focus:outline-none">
                                     <option value="all">Todos los estatus</option>
                                     <option value="Consolidación">Consolidación</option>
@@ -193,7 +200,7 @@
                             </div>
                         </div>
 
-                        <div class="flex-1 bg-zinc-900/60 backdrop-blur-xl border border-zinc-800/80 rounded-2xl overflow-hidden flex flex-col shadow-xl">
+                        <div class="flex-1 bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden flex flex-col shadow-xl">
                             <div class="overflow-y-auto flex-1 p-4">
                                 <div id="artworks-grid-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
                                     <!-- Populated dynamically -->
@@ -204,27 +211,22 @@
                 </div>
 
                 <!-- 3-Dot Pagination Indicator Bar -->
-                <div class="flex items-center justify-center gap-3 pt-2 pb-1">
+                <div class="flex items-center justify-center gap-3 pt-2 pb-1 w-full max-w-4xl mx-auto px-4 sm:px-6">
                     <button onclick="switchTab('dashboard')" id="dot-dashboard" class="w-6 h-3 rounded-full bg-indigo-500 transition-all shadow-md cursor-pointer" title="Dashboard"></button>
-                    <button onclick="switchTab('tasks')" id="dot-tasks" class="w-3 h-3 rounded-full bg-zinc-700 hover:bg-zinc-600 transition-all shadow-md cursor-pointer" title="Tareas"></button>
-                    <button onclick="switchTab('artworks')" id="dot-artworks" class="w-3 h-3 rounded-full bg-zinc-700 hover:bg-zinc-600 transition-all shadow-md cursor-pointer" title="Obras"></button>
+                    <button onclick="switchTab('tasks')" id="dot-tasks" class="w-3 h-3 rounded-full bg-zinc-800 hover:bg-zinc-700 transition-all shadow-md cursor-pointer" title="Tareas"></button>
+                    <button onclick="switchTab('artworks')" id="dot-artworks" class="w-3 h-3 rounded-full bg-zinc-800 hover:bg-zinc-700 transition-all shadow-md cursor-pointer" title="Obras"></button>
                 </div>
 
             </main>
         </div>
-
-        <!-- Right Navigation Arrow -->
-        <button onclick="nextPage()" class="hidden md:flex absolute -right-16 items-center justify-center w-12 h-12 rounded-2xl bg-zinc-900/80 hover:bg-zinc-800 border border-zinc-700/80 text-slate-300 hover:text-white transition-all shadow-xl group z-30 shrink-0">
-            <i data-lucide="chevron-right" class="w-6 h-6 group-hover:translate-x-0.5 transition-transform"></i>
-        </button>
 
     </div>
 
     <!-- ============================================================ -->
     <!-- MODAL: Login / Selección de Usuario (Director) -->
     <!-- ============================================================ -->
-    <div id="login-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-zinc-900 border border-zinc-700 rounded-3xl w-full max-w-md p-6 shadow-2xl flex flex-col gap-5 modal-card">
+    <div id="login-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl w-full max-w-md p-6 shadow-2xl flex flex-col gap-5 modal-card">
             <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
                 <h3 class="font-bold text-base text-slate-100 flex items-center gap-2">
                     <i data-lucide="user-check" class="w-4 h-4 text-indigo-400"></i> Iniciar Sesión
@@ -233,7 +235,7 @@
             </div>
             <div class="flex flex-col gap-4">
                 <p class="text-xs text-slate-400">Selecciona un usuario con rol <span class="text-indigo-400 font-semibold">Director</span> para crear tareas.</p>
-                <div id="login-users-list" class="flex flex-col gap-2 max-h-64 overflow-y-auto">
+                <div id="login-users-list" class="flex flex-col gap-2 max-h-64 overflow-y-auto pr-1">
                     <!-- Populated dynamically -->
                     <div class="text-center text-slate-500 text-xs py-4">Cargando usuarios...</div>
                 </div>
@@ -247,8 +249,8 @@
     <!-- ============================================================ -->
     <!-- MODAL: Seleccionar Proyecto, Subproyecto y Responsable -->
     <!-- ============================================================ -->
-    <div id="select-project-modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-zinc-900 border border-zinc-700 rounded-3xl w-full max-w-lg p-6 shadow-2xl flex flex-col gap-5 modal-card">
+    <div id="select-project-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl w-full max-w-lg p-6 shadow-2xl flex flex-col gap-5 modal-card">
             <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
                 <h3 class="font-bold text-base text-slate-100 flex items-center gap-2">
                     <i data-lucide="folder-tree" class="w-4 h-4 text-cyan-400"></i> Nueva Tarea
@@ -338,13 +340,12 @@
         const tabsOrder = ['dashboard', 'tasks', 'artworks'];
         let currentTabIdx = 0;
 
-        // Estado para el flujo de creación de tareas
         let taskFlow = {
-            authenticatedUser: null, // { id, nombre, rol }
+            authenticatedUser: null,
             selectedProyecto: null,
             selectedSubproyecto: null,
             selectedResponsable: null,
-            step: 'login' // 'login' | 'select-project'
+            step: 'login'
         };
 
         let defaultShortcuts = [
@@ -390,7 +391,6 @@
             renderLocalTasks();
             lucide.createIcons();
 
-            // Cargar proyectos, subproyectos y responsables para el modal
             fetchProyectosYSubproyectos();
 
             if (!isCacheValid() || !hasCache) {
@@ -400,9 +400,6 @@
             }
         };
 
-        // ============================================================
-        // FETCH PROYECTOS Y SUBPROYECTOS
-        // ============================================================
         async function fetchProyectosYSubproyectos() {
             try {
                 const res = await fetch(ENDPOINT_TASKS);
@@ -418,9 +415,6 @@
             }
         }
 
-        // ============================================================
-        // CLOCK
-        // ============================================================
         function initClock() {
             setInterval(() => {
                 const now = new Date();
@@ -432,9 +426,6 @@
             }, 1000);
         }
 
-        // ============================================================
-        // TAB NAVIGATION
-        // ============================================================
         function switchTab(tabName) {
             currentTabIdx = tabsOrder.indexOf(tabName);
             if (currentTabIdx === -1) currentTabIdx = 0;
@@ -446,7 +437,7 @@
                     if(dot) dot.className = 'w-6 h-3 rounded-full bg-indigo-500 transition-all shadow-md cursor-pointer';
                 } else {
                     el.classList.replace('flex', 'hidden');
-                    if(dot) dot.className = 'w-3 h-3 rounded-full bg-zinc-700 hover:bg-zinc-600 transition-all shadow-md cursor-pointer';
+                    if(dot) dot.className = 'w-3 h-3 rounded-full bg-zinc-800 hover:bg-zinc-700 transition-all shadow-md cursor-pointer';
                 }
             });
             lucide.createIcons();
@@ -479,9 +470,6 @@
         function nextPage() { switchTab(tabsOrder[(currentTabIdx + 1) % tabsOrder.length]); }
         function prevPage() { switchTab(tabsOrder[(currentTabIdx - 1 + tabsOrder.length) % tabsOrder.length]); }
 
-        // ============================================================
-        // SEARCH
-        // ============================================================
         function handleSearch(e) {
             e.preventDefault();
             const query = document.getElementById('search-input').value.trim();
@@ -493,9 +481,6 @@
             window.open(url, '_blank');
         }
 
-        // ============================================================
-        // IMAGE RESOLVER
-        // ============================================================
         function resolveImageUrl(adjuntos, fallbackName) {
             if (Array.isArray(adjuntos) && adjuntos.length > 0) {
                 const validAdj = adjuntos.find(a => a.url);
@@ -508,12 +493,9 @@
                     return rawUrl;
                 }
             }
-            return `https://placehold.co/400x400/27272a/a1a1aa?text=${encodeURIComponent(fallbackName || 'Obra')}`;
+            return `https://placehold.co/400x400/18181b/71717a?text=${encodeURIComponent(fallbackName || 'Obra')}`;
         }
 
-        // ============================================================
-        // FETCH ALL DATA
-        // ============================================================
         async function fetchAllData() {
             try {
                 try {
@@ -545,37 +527,31 @@
             } catch (e) { console.error('Error:', e); }
         }
 
-        // ============================================================
-        // RENDER SHORTCUTS
-        // ============================================================
         function renderShortcuts() {
             const grid = document.getElementById('shortcuts-grid');
             grid.innerHTML = defaultShortcuts.map(s => `
-                <a href="${s.url}" target="_blank" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-zinc-900/60 hover:bg-zinc-800/80 border border-zinc-800/80 hover:border-zinc-700 transition-all group hover:-translate-y-1 shadow-lg">
-                    <div class="w-12 h-12 rounded-xl bg-gradient-to-tr ${s.color} flex items-center justify-center text-white shadow-md mb-2 group-hover:scale-110 transition-transform">
-                        <i data-lucide="${s.icon}" class="w-6 h-6"></i>
+                <a href="${s.url}" target="_blank" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 transition-all group hover:-translate-y-0.5 shadow-lg">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-tr ${s.color} flex items-center justify-center text-white shadow-md mb-2 group-hover:scale-105 transition-transform">
+                        <i data-lucide="${s.icon}" class="w-5 h-5 sm:w-6 sm:h-6"></i>
                     </div>
                     <span class="text-xs font-medium text-slate-300 truncate w-full text-center">${s.name}</span>
                 </a>
             `).join('');
         }
 
-        // ============================================================
-        // RENDER DASHBOARD WIDGETS
-        // ============================================================
         function renderDashboardWidgets() {
             const topGrid = document.getElementById('top-artworks-grid');
             const recentArtworks = appData.artworks.slice(0, 4);
             if (recentArtworks.length === 0) {
-                topGrid.innerHTML = `<div class="col-span-4 text-center text-slate-500 text-xs py-8">No hay obras recientes</div>`;
+                topGrid.innerHTML = `<div class="col-span-4 text-center text-slate-500 text-xs py-8 bg-zinc-900">No hay obras recientes</div>`;
             } else {
                 topGrid.innerHTML = recentArtworks.map(a => {
                     const imgUrl = resolveImageUrl(a.adjuntos, a.nombre_obra);
                     return `
-                        <div class="aspect-square bg-zinc-800 overflow-hidden relative group rounded-lg shadow-sm border border-zinc-800/50">
+                        <div class="aspect-square bg-zinc-900 overflow-hidden relative group cursor-pointer border-r border-zinc-950 last:border-r-0">
                             <img src="${imgUrl}" alt="${a.nombre_obra || 'Obra'}"
-                                 onerror="this.onerror=null; this.src='https://placehold.co/400x400/27272a/a1a1aa?text=Obra';"
-                                 class="w-full h-full object-cover group-hover:scale-105 transition duration-500 cursor-pointer">
+                                 onerror="this.onerror=null; this.src='https://placehold.co/400x400/18181b/71717a?text=Obra';"
+                                 class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                         </div>
                     `;
                 }).join('');
@@ -587,7 +563,7 @@
                 tasksList.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">No hay tareas disponibles.</p>`;
             } else {
                 let html = recentTasks.map(t => `
-                    <div class="flex items-center justify-between p-3 hover:bg-zinc-900/40 transition">
+                    <div class="flex items-center justify-between p-3 hover:bg-zinc-900/60 transition">
                         <div class="flex items-center gap-3 overflow-hidden">
                             <span class="w-2 h-2 rounded-full ${getStatusDotColor(t.estatus)}"></span>
                             <div class="truncate">
@@ -599,7 +575,7 @@
                     </div>
                 `).join('');
                 html += `
-                    <div class="p-3 text-center bg-zinc-900/20 hover:bg-zinc-900/60 transition cursor-pointer mt-auto" onclick="switchTab('tasks')">
+                    <div class="p-3 text-center bg-zinc-900/40 hover:bg-zinc-900 transition cursor-pointer mt-auto" onclick="switchTab('tasks')">
                         <button class="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center justify-center gap-1.5 w-full">
                             <span>Ver todas las tareas</span>
                             <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
@@ -610,9 +586,6 @@
             }
         }
 
-        // ============================================================
-        // LOCAL TASKS (Tab "Yo")
-        // ============================================================
         function addLocalTask() {
             const input = document.getElementById('new-local-task-input');
             const text = input.value.trim();
@@ -642,7 +615,7 @@
                 return;
             }
             container.innerHTML = localTasks.map(t => `
-                <div class="flex items-center justify-between p-3 hover:bg-zinc-900/40 transition">
+                <div class="flex items-center justify-between p-3 hover:bg-zinc-900/60 transition">
                     <div class="flex items-center gap-3 overflow-hidden cursor-pointer" onclick="toggleLocalTask(${t.id})">
                         <input type="checkbox" ${t.completed ? 'checked' : ''} class="rounded border-zinc-700 bg-zinc-900 text-indigo-600 focus:ring-0 cursor-pointer">
                         <span class="text-xs text-slate-200 truncate ${t.completed ? 'line-through text-slate-500' : ''}">${t.text}</span>
@@ -653,9 +626,6 @@
             lucide.createIcons();
         }
 
-        // ============================================================
-        // RENDER TASKS TABLE
-        // ============================================================
         function renderTasksTable() {
             const container = document.getElementById('tasks-table-container');
             if (appData.tasks.length === 0) {
@@ -663,7 +633,7 @@
                 return;
             }
             container.innerHTML = appData.tasks.map(t => `
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-xl bg-zinc-950/60 border border-zinc-800/80 hover:border-zinc-700 transition">
+                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-xl bg-black border border-zinc-800 hover:border-zinc-700 transition">
                     <div class="flex items-start gap-3">
                         <div class="p-2 rounded-lg bg-cyan-500/10 text-cyan-400 mt-0.5"><i data-lucide="check-circle" class="w-4 h-4"></i></div>
                         <div>
@@ -682,9 +652,6 @@
             `).join('');
         }
 
-        // ============================================================
-        // RENDER ARTWORKS GRID
-        // ============================================================
         function renderArtworksGrid() {
             const container = document.getElementById('artworks-grid-container');
             if (appData.artworks.length === 0) {
@@ -695,7 +662,7 @@
                 const imgUrl = resolveImageUrl(a.adjuntos, a.nombre_obra);
                 const adjCount = Array.isArray(a.adjuntos) ? a.adjuntos.length : 0;
                 return `
-                    <div class="bg-zinc-950/60 border border-zinc-800/80 rounded-2xl overflow-hidden flex flex-col group hover:border-zinc-700 transition shadow-lg">
+                    <div class="bg-black border border-zinc-800 rounded-2xl overflow-hidden flex flex-col group hover:border-zinc-700 transition shadow-lg">
                         <div class="h-40 bg-zinc-900 relative overflow-hidden flex items-center justify-center">
                             <img src="${imgUrl}" alt="Obra" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
                             <div class="absolute top-2 right-2 bg-zinc-900/90 backdrop-blur px-2 py-0.5 rounded text-[10px] text-slate-200 border border-zinc-700">${a.estatus || 'Consolidación'}</div>
@@ -715,9 +682,6 @@
         function filterTasks() {}
         function filterArtworks() {}
 
-        // ============================================================
-        // STATUS HELPERS
-        // ============================================================
         function getStatusBadgeColor(estatus) {
             switch(estatus) {
                 case 'completado': return 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
@@ -737,9 +701,6 @@
             }
         }
 
-        // ============================================================
-        // MOCK DATA
-        // ============================================================
         function getMockTasks() {
             return [
                 { asignacion: '1.1.1JD', estatus: 'en_curso', prioridad: 'alta', detalles: 'Revisión de planos estructurales', descripcion: 'Verificar especificaciones de cimentación.', fecha_limite: '2026-06-15' },
@@ -756,9 +717,6 @@
             ];
         }
 
-        // ============================================================
-        // TASK CREATION FLOW
-        // ============================================================
         function openAddTaskModal() {
             taskFlow.authenticatedUser = null;
             taskFlow.selectedProyecto = null;
@@ -811,7 +769,7 @@
 
             container.innerHTML = directors.map(d => `
                 <button onclick="selectDirector('${d.id}', '${d.nombre}', '${d.rol}')"
-                        class="flex items-center gap-3 p-3 rounded-xl bg-zinc-800/50 hover:bg-zinc-800 border border-zinc-700/50 hover:border-indigo-500/50 transition w-full text-left">
+                        class="flex items-center gap-3 p-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-indigo-500/50 transition w-full text-left">
                     <div class="w-10 h-10 rounded-full bg-indigo-600/30 flex items-center justify-center text-indigo-400 font-bold text-sm">
                         ${d.nombre ? d.nombre.charAt(0).toUpperCase() : '?'}
                     </div>
@@ -1003,7 +961,6 @@
                 btn.disabled = false;
                 closeSelectProjectModal();
                 showNotification('Tarea creada exitosamente');
-
             } catch (error) {
                 console.error('Error al crear tarea:', error);
                 alert('Error al crear la tarea. Por favor intenta de nuevo.');
@@ -1046,7 +1003,6 @@
                 closeSelectProjectModal();
             }
         });
-
     </script>
 </body>
 </html>
