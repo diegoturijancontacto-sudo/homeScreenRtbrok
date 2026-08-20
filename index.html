@@ -29,8 +29,6 @@
         .modal-card { max-height: 90vh; overflow-y: auto; }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
-        .chat-message-user { align-self: flex-end; background: #1e293b; border-radius: 16px 16px 4px 16px; }
-        .chat-message-other { align-self: flex-start; background: #18181b; border-radius: 16px 16px 16px 4px; }
     </style>
 </head>
 <body class="h-full bg-black text-slate-100 flex flex-col overflow-hidden select-none">
@@ -61,7 +59,7 @@
 
         <div id="app" class="relative z-10 flex flex-col h-full w-full flex-1 gap-4 sm:gap-5 overflow-hidden pt-7 sm:pt-8">
 
-            <div class="w-full max-w-4xl mx-auto px-4 sm:px-6">
+            <div class="w-full max-w-6xl mx-auto px-4 sm:px-6">
                 <form id="search-form" onsubmit="handleSearch(event)" class="relative flex items-center w-full">
                     <span class="absolute left-4 text-slate-400"><i data-lucide="search" class="w-5 h-5"></i></span>
                     <input type="text" id="search-input" placeholder="Buscar en Google o filtrar módulos..."
@@ -93,13 +91,13 @@
                         </section>
 
                         <!-- Stem of the T: Constrained Content Wrapper -->
-                        <div class="w-full max-w-4xl mx-auto px-4 sm:px-6 flex flex-col gap-5">
+                        <div class="w-full max-w-6xl mx-auto px-4 sm:px-6 flex flex-col gap-5">
 
-                            <!-- Middle: Tasks Widget + Side Panel -->
-                            <div class="flex flex-col lg:flex-row gap-4">
+                            <!-- Middle Grid: Tasks Widget (Left) + Chat & Performance Panel (Right) -->
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
 
-                                <!-- Tasks Widget (70% width on large screens) -->
-                                <div class="flex-1 lg:w-[70%] bg-zinc-900 border border-zinc-800 rounded-2xl p-4 sm:p-5 flex flex-col h-[420px] sm:h-[450px] shadow-xl">
+                                <!-- Left: Tasks Widget -->
+                                <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 sm:p-5 flex flex-col h-[380px] sm:h-[420px] shadow-xl">
                                     <div class="flex items-center justify-between mb-3">
                                         <div class="flex items-center gap-1 bg-black p-1 rounded-xl border border-zinc-800">
                                             <button onclick="switchTaskWidgetTab('equipo')" id="widget-tab-equipo" class="px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition">Equipo</button>
@@ -140,44 +138,45 @@
                                     </div>
                                 </div>
 
-                                <!-- Side Panel: Chat + Rendimiento (30% width on large screens) -->
-                                <div class="lg:w-[30%] bg-zinc-900 border border-zinc-800 rounded-2xl flex flex-col shadow-xl h-[420px] sm:h-[450px]">
-                                    <!-- Tabs: Chat | Rendimiento -->
-                                    <div class="flex border-b border-zinc-800 shrink-0">
-                                        <button onclick="switchSidePanelTab('chat')" id="side-tab-chat" class="flex-1 py-2 text-xs font-semibold bg-indigo-600 text-white transition rounded-tl-2xl flex items-center justify-center gap-2">
-                                            <i data-lucide="message-circle" class="w-3.5 h-3.5"></i> Chat
-                                        </button>
-                                        <button onclick="switchSidePanelTab('rendimiento')" id="side-tab-rendimiento" class="flex-1 py-2 text-xs font-medium text-slate-400 hover:text-white transition rounded-tr-2xl flex items-center justify-center gap-2">
-                                            <i data-lucide="pie-chart" class="w-3.5 h-3.5"></i> Rendimiento
-                                        </button>
+                                <!-- Right: Chat & Rendimiento Panel -->
+                                <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 sm:p-5 flex flex-col h-[380px] sm:h-[420px] shadow-xl">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center gap-1 bg-black p-1 rounded-xl border border-zinc-800">
+                                            <button onclick="switchSidePanelTab('chat')" id="side-tab-chat" class="px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition flex items-center gap-1.5">
+                                                <i data-lucide="message-square" class="w-3.5 h-3.5"></i> Chat
+                                            </button>
+                                            <button onclick="switchSidePanelTab('rendimiento')" id="side-tab-rendimiento" class="px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition flex items-center gap-1.5">
+                                                <i data-lucide="pie-chart" class="w-3.5 h-3.5"></i> Rendimiento
+                                            </button>
+                                        </div>
+                                        <div id="chat-sender-indicator" class="text-[11px] text-slate-400 flex items-center gap-1.5 bg-black px-2.5 py-1 rounded-xl border border-zinc-800">
+                                            <span>Enviando como:</span>
+                                            <span id="current-sender-name" class="font-semibold text-indigo-400">Seleccionar</span>
+                                            <button onclick="openChatSenderModal()" class="text-indigo-400 hover:underline text-[10px] ml-1">(Cambiar)</button>
+                                        </div>
                                     </div>
 
-                                    <!-- Panel Content -->
-                                    <div class="flex-1 overflow-hidden relative">
-
-                                        <!-- Chat Panel -->
-                                        <div id="side-panel-chat" class="absolute inset-0 flex flex-col p-3">
-                                            <div id="chat-messages" class="flex-1 overflow-y-auto flex flex-col gap-1.5 mb-2 pr-1">
-                                                <div class="text-center text-[10px] text-slate-500 py-2">Cargando mensajes...</div>
-                                            </div>
-                                            <div class="flex gap-2 shrink-0">
-                                                <input type="text" id="chat-input" placeholder="Escribe un mensaje..." class="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500">
-                                                <button onclick="sendChatMessage()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded-xl text-xs font-medium transition shrink-0">
-                                                    <i data-lucide="send" class="w-4 h-4"></i>
-                                                </button>
-                                            </div>
+                                    <!-- Chat Tab Pane -->
+                                    <div id="side-chat-pane" class="flex-1 flex flex-col bg-black rounded-xl border border-zinc-800 overflow-hidden">
+                                        <div id="chat-messages-container" class="flex-1 overflow-y-auto p-3 space-y-3">
+                                            <div class="text-center text-slate-500 text-xs py-10">Cargando mensajes...</div>
                                         </div>
-
-                                        <!-- Rendimiento Panel -->
-                                        <div id="side-panel-rendimiento" class="absolute inset-0 hidden flex-col p-3">
-                                            <div class="flex-1 flex items-center justify-center">
-                                                <canvas id="performance-chart" class="w-full h-full max-h-[300px]"></canvas>
-                                            </div>
-                                            <div class="text-center text-[10px] text-slate-500 mt-1">Tareas completadas por responsable</div>
+                                        <div class="p-2.5 border-t border-zinc-800 bg-zinc-900/50 flex gap-2">
+                                            <input type="text" id="chat-input" onkeydown="if(event.key==='Enter') sendChatMessage()" placeholder="Escribe un mensaje al equipo..." class="flex-1 bg-black border border-zinc-700 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+                                            <button onclick="sendChatMessage()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-medium transition shadow flex items-center justify-center">
+                                                <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                                            </button>
                                         </div>
+                                    </div>
 
+                                    <!-- Rendimiento Tab Pane -->
+                                    <div id="side-rendimiento-pane" class="flex-1 hidden flex-col bg-black rounded-xl border border-zinc-800 p-3 items-center justify-center relative">
+                                        <div class="w-full h-full flex items-center justify-center relative">
+                                            <canvas id="performanceChart"></canvas>
+                                        </div>
                                     </div>
                                 </div>
+
                             </div>
 
                             <!-- Bottom: Shortcuts Grid -->
@@ -264,24 +263,39 @@
     </div>
 
     <!-- ============================================================ -->
-    <!-- MODAL: Seleccionar usuario para chat -->
+    <!-- MODAL: Seleccionar Remitente de Chat (Isabel, Santiago, Diego, José Manuel) -->
     <!-- ============================================================ -->
-    <div id="chat-user-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl w-full max-w-sm p-6 shadow-2xl flex flex-col gap-5 modal-card">
+    <div id="chat-sender-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl w-full max-w-md p-6 shadow-2xl flex flex-col gap-5 modal-card">
             <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
                 <h3 class="font-bold text-base text-slate-100 flex items-center gap-2">
-                    <i data-lucide="user" class="w-4 h-4 text-indigo-400"></i> Seleccionar usuario
+                    <i data-lucide="user-check" class="w-4 h-4 text-indigo-400"></i> Seleccionar Remitente
                 </h3>
-                <button onclick="closeChatUserModal()" class="text-slate-400 hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
+                <button onclick="closeChatSenderModal()" class="text-slate-400 hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
-            <div class="flex flex-col gap-2">
-                <p class="text-xs text-slate-400">Elige un usuario para enviar el mensaje:</p>
-                <div id="chat-users-list" class="flex flex-col gap-2">
-                    <!-- Populated dynamically -->
+            <div class="flex flex-col gap-3">
+                <p class="text-xs text-slate-400">¿Quién va a enviar el mensaje en el chat de equipo?</p>
+                <div class="grid grid-cols-2 gap-2.5">
+                    <button onclick="setChatSender('Isabel')" class="p-3.5 rounded-xl bg-black border border-zinc-800 hover:border-indigo-500 text-slate-200 font-medium text-xs flex items-center gap-2.5 transition group">
+                        <div class="w-8 h-8 rounded-full bg-indigo-600/30 flex items-center justify-center text-indigo-400 font-bold text-xs group-hover:scale-105 transition">I</div>
+                        <span>Isabel</span>
+                    </button>
+                    <button onclick="setChatSender('Santiago')" class="p-3.5 rounded-xl bg-black border border-zinc-800 hover:border-indigo-500 text-slate-200 font-medium text-xs flex items-center gap-2.5 transition group">
+                        <div class="w-8 h-8 rounded-full bg-purple-600/30 flex items-center justify-center text-purple-400 font-bold text-xs group-hover:scale-105 transition">S</div>
+                        <span>Santiago</span>
+                    </button>
+                    <button onclick="setChatSender('Diego')" class="p-3.5 rounded-xl bg-black border border-zinc-800 hover:border-indigo-500 text-slate-200 font-medium text-xs flex items-center gap-2.5 transition group">
+                        <div class="w-8 h-8 rounded-full bg-cyan-600/30 flex items-center justify-center text-cyan-400 font-bold text-xs group-hover:scale-105 transition">D</div>
+                        <span>Diego</span>
+                    </button>
+                    <button onclick="setChatSender('José Manuel')" class="p-3.5 rounded-xl bg-black border border-zinc-800 hover:border-indigo-500 text-slate-200 font-medium text-xs flex items-center gap-2.5 transition group">
+                        <div class="w-8 h-8 rounded-full bg-emerald-600/30 flex items-center justify-center text-emerald-400 font-bold text-xs group-hover:scale-105 transition">JM</div>
+                        <span>José Manuel</span>
+                    </button>
                 </div>
             </div>
-            <div class="flex items-center justify-end gap-2 pt-3 border-t border-zinc-800">
-                <button onclick="closeChatUserModal()" class="px-4 py-2 rounded-xl text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-slate-300 transition">Cancelar</button>
+            <div class="flex items-center justify-end pt-3 border-t border-zinc-800">
+                <button onclick="closeChatSenderModal()" class="px-4 py-2 rounded-xl text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-slate-300 transition">Cancelar</button>
             </div>
         </div>
     </div>
@@ -300,7 +314,6 @@
             <div class="flex flex-col gap-4">
                 <p class="text-xs text-slate-400">Selecciona un usuario con rol <span class="text-indigo-400 font-semibold">Director</span> para crear tareas.</p>
                 <div id="login-users-list" class="flex flex-col gap-2 max-h-64 overflow-y-auto pr-1">
-                    <!-- Populated dynamically -->
                     <div class="text-center text-slate-500 text-xs py-4">Cargando usuarios...</div>
                 </div>
             </div>
@@ -322,7 +335,6 @@
                 <button onclick="closeSelectProjectModal()" class="text-slate-400 hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
             <div class="flex flex-col gap-4">
-                <!-- Usuario autenticado -->
                 <div class="flex items-center gap-2 p-2 bg-indigo-600/10 rounded-xl border border-indigo-600/20">
                     <i data-lucide="user" class="w-4 h-4 text-indigo-400"></i>
                     <span class="text-xs text-slate-300">Creando como: <span id="auth-user-display" class="font-semibold text-indigo-400">-</span></span>
@@ -386,7 +398,6 @@
         const ENDPOINT_ARTWORKS = 'https://script.google.com/macros/s/AKfycbxyBzZ7duM3pKtobXHj8A2NgFpIarP5WPS71TKTH2uFMOXXL8rzo68-blixF8kgCwvl8w/exec';
         const ENDPOINT_CHAT = 'https://script.google.com/macros/s/AKfycbzU6YqBsWekqjP-SOV1_LCV_GQnO1ZX9Gl0Th-U2dwTx2yJe0x1MmmnovRwT0qAYui6/exec';
 
-        const CHAT_USERS = ['Isabel', 'Santiago', 'Diego', 'José Manuel'];
         const CACHE_KEY_TASKS = 'rtbrok_cache_tasks';
         const CACHE_KEY_ARTWORKS = 'rtbrok_cache_artworks';
         const CACHE_KEY_TIMESTAMP = 'rtbrok_cache_timestamp';
@@ -398,11 +409,15 @@
             proyectos: [],
             subproyectos: [],
             responsables: [],
+            messages: [],
             loading: false,
             error: null
         };
 
         let localTasks = JSON.parse(localStorage.getItem('rtbrok_local_tasks') || '[]');
+        let currentChatSender = localStorage.getItem('rtbrok_chat_sender') || null;
+        let performanceChartInstance = null;
+
         const tabsOrder = ['dashboard', 'tasks', 'artworks'];
         let currentTabIdx = 0;
 
@@ -413,14 +428,6 @@
             selectedResponsable: null,
             step: 'login'
         };
-
-        let chatFlow = {
-            pendingMessage: null,
-            selectedUser: null
-        };
-
-        let performanceChartInstance = null;
-        let chatPollingInterval = null;
 
         let defaultShortcuts = [
             { name: 'Instagram', url: 'https://www.instagram.com', icon: 'instagram', color: 'from-pink-500 to-purple-600' },
@@ -458,6 +465,7 @@
         window.onload = function() {
             initClock();
             renderShortcuts();
+            updateChatSenderUI();
             const hasCache = loadFromCache();
             renderDashboardWidgets();
             renderTasksTable();
@@ -466,17 +474,14 @@
             lucide.createIcons();
 
             fetchProyectosYSubproyectos();
+            fetchChatMessages();
+            setInterval(fetchChatMessages, 8000); // Polling chat every 8s
 
             if (!isCacheValid() || !hasCache) {
                 fetchAllData();
             } else {
                 setInterval(() => { if (!isCacheValid()) fetchAllData(); }, 30000);
             }
-
-            // Load chat messages
-            loadChatMessages();
-            // Start polling for new messages every 5 seconds
-            chatPollingInterval = setInterval(loadChatMessages, 5000);
         };
 
         async function fetchProyectosYSubproyectos() {
@@ -486,11 +491,32 @@
                 appData.proyectos = data.proyectos || [];
                 appData.subproyectos = data.subproyectos || [];
                 appData.responsables = data.responsables || [];
+                renderPerformanceChart();
             } catch (e) {
                 console.error('Error fetching proyectos:', e);
                 appData.proyectos = [];
                 appData.subproyectos = [];
                 appData.responsables = [];
+            }
+        }
+
+        async function fetchChatMessages() {
+            try {
+                const res = await fetch(`${ENDPOINT_CHAT}?action=getMessages`);
+                const messages = await res.json();
+                if (Array.isArray(messages)) {
+                    appData.messages = messages;
+                    renderChatMessages();
+                }
+            } catch(e) {
+                // Fallback simulation if cross-origin or no direct GET handler
+                if (!appData.messages.length) {
+                    appData.messages = [
+                        { timestamp: new Date().toISOString(), user: 'sistema', message: 'Hola equipo, bienvenidos al panel de chat.' },
+                        { timestamp: new Date().toISOString(), user: 'sistema', message: 'Revisando los pendientes de obra.' }
+                    ];
+                    renderChatMessages();
+                }
             }
         }
 
@@ -547,25 +573,194 @@
         }
 
         function switchSidePanelTab(tab) {
-            const chatBtn = document.getElementById('side-tab-chat');
-            const rendBtn = document.getElementById('side-tab-rendimiento');
-            const chatPanel = document.getElementById('side-panel-chat');
-            const rendPanel = document.getElementById('side-panel-rendimiento');
+            const btnChat = document.getElementById('side-tab-chat');
+            const btnPerf = document.getElementById('side-tab-rendimiento');
+            const paneChat = document.getElementById('side-chat-pane');
+            const panePerf = document.getElementById('side-rendimiento-pane');
+            const senderIndicator = document.getElementById('chat-sender-indicator');
 
             if (tab === 'chat') {
-                chatBtn.className = 'flex-1 py-2 text-xs font-semibold bg-indigo-600 text-white transition rounded-tl-2xl flex items-center justify-center gap-2';
-                rendBtn.className = 'flex-1 py-2 text-xs font-medium text-slate-400 hover:text-white transition rounded-tr-2xl flex items-center justify-center gap-2';
-                chatPanel.classList.remove('hidden');
-                rendPanel.classList.add('hidden');
+                btnChat.className = 'px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition flex items-center gap-1.5';
+                btnPerf.className = 'px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition flex items-center gap-1.5';
+                paneChat.classList.replace('hidden', 'flex');
+                panePerf.classList.replace('flex', 'hidden');
+                senderIndicator.classList.remove('hidden');
             } else {
-                rendBtn.className = 'flex-1 py-2 text-xs font-semibold bg-indigo-600 text-white transition rounded-tr-2xl flex items-center justify-center gap-2';
-                chatBtn.className = 'flex-1 py-2 text-xs font-medium text-slate-400 hover:text-white transition rounded-tl-2xl flex items-center justify-center gap-2';
-                rendPanel.classList.remove('hidden');
-                chatPanel.classList.add('hidden');
-                // Render chart when switching to rendimiento tab
-                setTimeout(renderPerformanceChart, 100);
+                btnPerf.className = 'px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition flex items-center gap-1.5';
+                btnChat.className = 'px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition flex items-center gap-1.5';
+                panePerf.classList.replace('hidden', 'flex');
+                paneChat.classList.replace('flex', 'hidden');
+                senderIndicator.classList.add('hidden');
+                renderPerformanceChart();
             }
             lucide.createIcons();
+        }
+
+        function updateChatSenderUI() {
+            const span = document.getElementById('current-sender-name');
+            if (currentChatSender) {
+                span.textContent = currentChatSender;
+                span.className = 'font-semibold text-indigo-400';
+            } else {
+                span.textContent = 'Seleccionar';
+                span.className = 'font-semibold text-amber-400';
+            }
+        }
+
+        function openChatSenderModal() {
+            const modal = document.getElementById('chat-sender-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            lucide.createIcons();
+        }
+
+        function closeChatSenderModal() {
+            document.getElementById('chat-sender-modal').classList.add('hidden');
+            document.getElementById('chat-sender-modal').classList.remove('flex');
+        }
+
+        function setChatSender(name) {
+            currentChatSender = name;
+            localStorage.setItem('rtbrok_chat_sender', name);
+            updateChatSenderUI();
+            closeChatSenderModal();
+            showNotification(`Remitente seleccionado: ${name}`);
+        }
+
+        async function sendChatMessage() {
+            if (!currentChatSender) {
+                openChatSenderModal();
+                return;
+            }
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            input.value = '';
+            
+            // Optimistic UI append
+            appData.messages.push({
+                timestamp: new Date().toISOString(),
+                user: currentChatSender,
+                message: message
+            });
+            renderChatMessages();
+
+            try {
+                await fetch(ENDPOINT_CHAT, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user: currentChatSender, message: message })
+                });
+            } catch (e) {
+                console.error('Error sending chat message:', e);
+            }
+        }
+
+        function renderChatMessages() {
+            const container = document.getElementById('chat-messages-container');
+            if (!appData.messages || appData.messages.length === 0) {
+                container.innerHTML = `<div class="text-center text-slate-500 text-xs py-10">No hay mensajes en el chat.</div>`;
+                return;
+            }
+
+            container.innerHTML = appData.messages.map(m => {
+                const isMe = currentChatSender && m.user === currentChatSender;
+                const timeStr = m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+                return `
+                    <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} gap-1">
+                        <div class="flex items-center gap-1.5 text-[10px] text-slate-400 px-1">
+                            <span class="font-bold text-slate-300">${m.user || 'Desconocido'}</span>
+                            <span>${timeStr}</span>
+                        </div>
+                        <div class="max-w-[85%] px-3 py-2 rounded-2xl text-xs ${isMe ? 'bg-indigo-600 text-white rounded-tr-sm' : 'bg-zinc-900 border border-zinc-800 text-slate-200 rounded-tl-sm'}">
+                            ${m.message || ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function renderPerformanceChart() {
+            const ctx = document.getElementById('performanceChart');
+            if (!ctx) return;
+
+            // Calculate completed tasks per responsible
+            let stats = {};
+            // Initialize known responsables
+            appData.responsables.forEach(r => {
+                stats[r.id] = { name: r.nombre, completed: 0 };
+            });
+
+            appData.tasks.forEach(t => {
+                if (t.estatus && t.estatus.toLowerCase() === 'completado') {
+                    const respId = t.id_responsable;
+                    if (respId) {
+                        if (!stats[respId]) {
+                            stats[respId] = { name: getResponsableNameById(respId), completed: 0 };
+                        }
+                        stats[respId].completed += 1;
+                    }
+                }
+            });
+
+            const labels = [];
+            const dataCounts = [];
+            const backgroundColors = ['#6366f1', '#a855f7', '#06b6d4', '#10b981', '#f59e0b', '#ec4899', '#3b82f6'];
+
+            Object.values(stats).forEach((item, idx) => {
+                if (item.completed > 0 || appData.responsables.length <= 6) {
+                    labels.push(item.name);
+                    dataCounts.push(item.completed);
+                }
+            });
+
+            if (dataCounts.every(c => c === 0)) {
+                // If no completed tasks yet, show placeholder distribution
+                labels.push('Isabel', 'Santiago', 'Diego', 'José Manuel');
+                dataCounts.push(1, 1, 1, 1);
+            }
+
+            if (performanceChartInstance) {
+                performanceChartInstance.destroy();
+            }
+
+            performanceChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: dataCounts,
+                        backgroundColor: backgroundColors.slice(0, labels.length),
+                        borderWidth: 2,
+                        borderColor: '#000000'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#94a3b8',
+                                boxWidth: 12,
+                                font: { size: 10 }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Tareas Completadas por Responsable',
+                            color: '#f1f5f9',
+                            font: { size: 12, weight: 'bold' },
+                            padding: { bottom: 10 }
+                        }
+                    },
+                    cutout: '65%'
+                }
+            });
         }
 
         function nextPage() { switchTab(tabsOrder[(currentTabIdx + 1) % tabsOrder.length]); }
@@ -701,197 +896,6 @@
                 lucide.createIcons();
             }
         }
-
-        // ============================================================
-        // CHAT FUNCTIONS
-        // ============================================================
-
-        async function loadChatMessages() {
-            try {
-                const res = await fetch(ENDPOINT_CHAT + '?action=getMessages');
-                const messages = await res.json();
-                const container = document.getElementById('chat-messages');
-                
-                if (!messages || messages.length === 0) {
-                    container.innerHTML = `<div class="text-center text-[10px] text-slate-500 py-4">No hay mensajes aún. ¡Envía el primero!</div>`;
-                    return;
-                }
-
-                let html = '';
-                const currentUser = chatFlow.selectedUser || '';
-                messages.forEach(msg => {
-                    const isUser = msg.user === currentUser;
-                    const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
-                    html += `
-                        <div class="max-w-[85%] ${isUser ? 'chat-message-user' : 'chat-message-other'} px-3 py-2">
-                            <div class="flex items-center gap-2 mb-0.5">
-                                <span class="text-[10px] font-semibold ${isUser ? 'text-indigo-400' : 'text-cyan-400'}">${msg.user}</span>
-                                <span class="text-[8px] text-slate-500">${time}</span>
-                            </div>
-                            <p class="text-xs text-slate-200 break-words">${msg.message}</p>
-                        </div>
-                    `;
-                });
-                container.innerHTML = html;
-                container.scrollTop = container.scrollHeight;
-            } catch (e) {
-                console.error('Error loading chat messages:', e);
-            }
-        }
-
-        function openChatUserModal() {
-            const modal = document.getElementById('chat-user-modal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            lucide.createIcons();
-
-            const container = document.getElementById('chat-users-list');
-            container.innerHTML = CHAT_USERS.map(user => `
-                <button onclick="selectChatUser('${user}')"
-                        class="flex items-center gap-3 p-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-indigo-500/50 transition w-full text-left">
-                    <div class="w-10 h-10 rounded-full bg-indigo-600/30 flex items-center justify-center text-indigo-400 font-bold text-sm">
-                        ${user.charAt(0).toUpperCase()}
-                    </div>
-                    <div>
-                        <p class="text-sm font-medium text-slate-200">${user}</p>
-                    </div>
-                    ${chatFlow.selectedUser === user ? `<span class="ml-auto text-xs px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-400">Seleccionado</span>` : ''}
-                </button>
-            `).join('');
-        }
-
-        function closeChatUserModal() {
-            document.getElementById('chat-user-modal').classList.add('hidden');
-            document.getElementById('chat-user-modal').classList.remove('flex');
-        }
-
-        function selectChatUser(user) {
-            chatFlow.selectedUser = user;
-            closeChatUserModal();
-            // If there's a pending message, send it
-            if (chatFlow.pendingMessage) {
-                const message = chatFlow.pendingMessage;
-                chatFlow.pendingMessage = null;
-                sendChatMessageToServer(message, user);
-            }
-            // Reload messages to show correct alignment
-            loadChatMessages();
-        }
-
-        function sendChatMessage() {
-            const input = document.getElementById('chat-input');
-            const message = input.value.trim();
-            if (!message) return;
-
-            if (!chatFlow.selectedUser) {
-                chatFlow.pendingMessage = message;
-                input.value = '';
-                openChatUserModal();
-                return;
-            }
-
-            input.value = '';
-            sendChatMessageToServer(message, chatFlow.selectedUser);
-        }
-
-        async function sendChatMessageToServer(message, user) {
-            try {
-                await fetch(ENDPOINT_CHAT, {
-                    method: 'POST',
-                    mode: 'no-cors',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ user: user, message: message })
-                });
-                // Wait a bit for the server to process, then reload
-                setTimeout(loadChatMessages, 500);
-            } catch (e) {
-                console.error('Error sending message:', e);
-            }
-        }
-
-        // ============================================================
-        // PERFORMANCE CHART
-        // ============================================================
-
-        function renderPerformanceChart() {
-            const canvas = document.getElementById('performance-chart');
-            if (!canvas) return;
-
-            const ctx = canvas.getContext('2d');
-
-            // Destroy previous chart instance if exists
-            if (performanceChartInstance) {
-                performanceChartInstance.destroy();
-                performanceChartInstance = null;
-            }
-
-            // Count completed tasks per responsable
-            const completedTasks = appData.tasks.filter(t => t.estatus === 'completado');
-            const responsableCount = {};
-
-            completedTasks.forEach(t => {
-                const name = getResponsableNameById(t.id_responsable);
-                responsableCount[name] = (responsableCount[name] || 0) + 1;
-            });
-
-            const labels = Object.keys(responsableCount);
-            const data = Object.values(responsableCount);
-
-            // If no data, show message
-            if (labels.length === 0) {
-                canvas.parentElement.innerHTML = `
-                    <div class="text-center text-slate-500 text-xs py-8">
-                        <i data-lucide="pie-chart" class="w-8 h-8 mx-auto mb-2 text-slate-700"></i>
-                        <p>No hay tareas completadas aún</p>
-                    </div>
-                `;
-                lucide.createIcons();
-                return;
-            }
-
-            const colors = [
-                'rgba(99, 102, 241, 0.8)',
-                'rgba(34, 211, 238, 0.8)',
-                'rgba(244, 63, 94, 0.8)',
-                'rgba(52, 211, 153, 0.8)',
-                'rgba(251, 191, 36, 0.8)',
-                'rgba(168, 85, 247, 0.8)'
-            ];
-
-            performanceChartInstance = new Chart(ctx, {
-                type: 'doughnut',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        data: data,
-                        backgroundColor: colors.slice(0, labels.length),
-                        borderColor: '#18181b',
-                        borderWidth: 2
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    maintainAspectRatio: false,
-                    plugins: {
-                        legend: {
-                            position: 'bottom',
-                            labels: {
-                                color: '#94a3b8',
-                                font: { size: 9, family: 'Inter' },
-                                padding: 8,
-                                boxWidth: 10,
-                                boxHeight: 10
-                            }
-                        }
-                    },
-                    cutout: '65%'
-                }
-            });
-        }
-
-        // ============================================================
-        // TASKS FUNCTIONS
-        // ============================================================
 
         function addLocalTask() {
             const input = document.getElementById('new-local-task-input');
@@ -1029,10 +1033,6 @@
                 { nombre_obra: 'Casa del Bosque', autor: 'Grupo Z', ubicacion: 'Valle de Bravo', estatus: 'Consolidación', adjuntos: [] }
             ];
         }
-
-        // ============================================================
-        // TASK CREATION FLOW
-        // ============================================================
 
         function openAddTaskModal() {
             taskFlow.authenticatedUser = null;
@@ -1273,6 +1273,7 @@
                 await fetchAllData();
                 renderDashboardWidgets();
                 renderTasksTable();
+                renderPerformanceChart();
 
                 btn.innerHTML = originalText;
                 btn.disabled = false;
@@ -1318,13 +1319,10 @@
             if (e.key === 'Escape') {
                 closeLoginModal();
                 closeSelectProjectModal();
-                closeChatUserModal();
-            }
-            if (e.key === 'Enter' && document.activeElement?.id === 'chat-input') {
-                e.preventDefault();
-                sendChatMessage();
+                closeChatSenderModal();
             }
         });
     </script>
 </body>
 </html>
+
