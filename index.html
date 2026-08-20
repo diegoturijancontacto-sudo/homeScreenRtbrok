@@ -6,6 +6,7 @@
     <title>Workspace & Home Browser</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="icon" type="image/png" href="./icon.png">
     <script>
@@ -26,9 +27,10 @@
         ::-webkit-scrollbar-thumb:hover { background: rgba(156, 163, 175, 0.6); }
         .modal-overlay { background: rgba(0,0,0,0.8); backdrop-filter: blur(6px); }
         .modal-card { max-height: 90vh; overflow-y: auto; }
-        /* Hide scrollbar for edge-to-edge look if needed */
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .chat-message-user { align-self: flex-end; background: #1e293b; border-radius: 16px 16px 4px 16px; }
+        .chat-message-other { align-self: flex-start; background: #18181b; border-radius: 16px 16px 16px 4px; }
     </style>
 </head>
 <body class="h-full bg-black text-slate-100 flex flex-col overflow-hidden select-none">
@@ -46,12 +48,9 @@
     <!-- Navigation Arrows Overlay Wrapper -->
     <div class="fixed inset-0 pointer-events-none z-30 hidden md:flex items-center justify-center">
         <div class="w-full max-w-6xl px-4 xl:max-w-7xl flex justify-between">
-            <!-- Left Navigation Arrow -->
             <button onclick="prevPage()" class="pointer-events-auto flex items-center justify-center w-11 h-11 rounded-2xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-slate-300 hover:text-white transition-all shadow-xl group shrink-0">
                 <i data-lucide="chevron-left" class="w-5 h-5 group-hover:-translate-x-0.5 transition-transform"></i>
             </button>
-            
-            <!-- Right Navigation Arrow -->
             <button onclick="nextPage()" class="pointer-events-auto flex items-center justify-center w-11 h-11 rounded-2xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-slate-300 hover:text-white transition-all shadow-xl group shrink-0">
                 <i data-lucide="chevron-right" class="w-5 h-5 group-hover:translate-x-0.5 transition-transform"></i>
             </button>
@@ -85,7 +84,6 @@
 
                         <!-- Top: Instagram-style Edge-to-Edge Artworks Grid -->
                         <section class="w-full mb-5 sm:mb-6 border-y border-zinc-900 bg-black">
-                            <!-- Removes max-width completely to bleed to the edges -->
                             <div id="top-artworks-grid" class="grid grid-cols-4 gap-0.5 bg-zinc-950 w-full">
                                 <div class="aspect-square bg-zinc-900 animate-pulse"></div>
                                 <div class="aspect-square bg-zinc-900 animate-pulse"></div>
@@ -96,45 +94,88 @@
 
                         <!-- Stem of the T: Constrained Content Wrapper -->
                         <div class="w-full max-w-4xl mx-auto px-4 sm:px-6 flex flex-col gap-5">
-                            
-                            <!-- Middle: Tasks Widget -->
-                            <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 sm:p-5 flex flex-col h-[320px] sm:h-[350px] shadow-xl">
-                                <div class="flex items-center justify-between mb-3">
-                                    <div class="flex items-center gap-1 bg-black p-1 rounded-xl border border-zinc-800">
-                                        <button onclick="switchTaskWidgetTab('equipo')" id="widget-tab-equipo" class="px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition">Equipo</button>
-                                        <button onclick="switchTaskWidgetTab('yo')" id="widget-tab-yo" class="px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition">Yo</button>
-                                    </div>
-                                    <div class="flex items-center gap-2">
-                                        <span id="widget-title" class="font-semibold text-sm text-slate-200">Equipo</span>
-                                        <button onclick="openAddTaskModal()" id="btn-add-task-equipo" class="p-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 hover:text-indigo-300 transition" title="Añadir tarea">
-                                            <i data-lucide="plus" class="w-4 h-4"></i>
-                                        </button>
-                                    </div>
-                                </div>
 
-                                <!-- Equipo Tab Content -->
-                                <div id="widget-tasks-equipo-pane" class="flex-1 overflow-y-auto pr-1 flex flex-col bg-black rounded-xl border border-zinc-800 divide-y divide-zinc-800/80">
-                                    <div class="p-4 space-y-3 animate-pulse">
-                                        <div class="flex items-center justify-between">
-                                            <div class="flex items-center gap-3">
-                                                <div class="w-2 h-2 rounded-full bg-zinc-800"></div>
-                                                <div class="space-y-1.5">
-                                                    <div class="h-3 w-36 bg-zinc-800 rounded"></div>
-                                                    <div class="h-2 w-20 bg-zinc-800/60 rounded"></div>
+                            <!-- Middle: Tasks Widget + Side Panel -->
+                            <div class="flex flex-col lg:flex-row gap-4">
+
+                                <!-- Tasks Widget (70% width on large screens) -->
+                                <div class="flex-1 lg:w-[70%] bg-zinc-900 border border-zinc-800 rounded-2xl p-4 sm:p-5 flex flex-col h-[420px] sm:h-[450px] shadow-xl">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center gap-1 bg-black p-1 rounded-xl border border-zinc-800">
+                                            <button onclick="switchTaskWidgetTab('equipo')" id="widget-tab-equipo" class="px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition">Equipo</button>
+                                            <button onclick="switchTaskWidgetTab('yo')" id="widget-tab-yo" class="px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition">Yo</button>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <span id="widget-title" class="font-semibold text-sm text-slate-200">Equipo</span>
+                                            <button onclick="openAddTaskModal()" id="btn-add-task-equipo" class="p-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 hover:text-indigo-300 transition" title="Añadir tarea">
+                                                <i data-lucide="plus" class="w-4 h-4"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Equipo Tab Content -->
+                                    <div id="widget-tasks-equipo-pane" class="flex-1 overflow-y-auto pr-1 flex flex-col bg-black rounded-xl border border-zinc-800 divide-y divide-zinc-800/80">
+                                        <div class="p-4 space-y-3 animate-pulse">
+                                            <div class="flex items-center justify-between">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-2 h-2 rounded-full bg-zinc-800"></div>
+                                                    <div class="space-y-1.5">
+                                                        <div class="h-3 w-36 bg-zinc-800 rounded"></div>
+                                                        <div class="h-2 w-20 bg-zinc-800/60 rounded"></div>
+                                                    </div>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
+
+                                    <!-- Yo Tab Content -->
+                                    <div id="widget-tasks-yo-pane" class="flex-1 overflow-y-auto pr-1 hidden flex-col bg-black rounded-xl border border-zinc-800">
+                                        <div class="p-2 border-b border-zinc-800 flex gap-2">
+                                            <input type="text" id="new-local-task-input" placeholder="Nueva tarea personal..." class="flex-1 bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+                                            <button onclick="addLocalTask()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition">Añadir</button>
+                                        </div>
+                                        <div id="widget-tasks-yo-list" class="flex-1 overflow-y-auto divide-y divide-zinc-800/80">
+                                            <!-- Populated dynamically -->
+                                        </div>
+                                    </div>
                                 </div>
 
-                                <!-- Yo Tab Content -->
-                                <div id="widget-tasks-yo-pane" class="flex-1 overflow-y-auto pr-1 hidden flex-col bg-black rounded-xl border border-zinc-800">
-                                    <div class="p-2 border-b border-zinc-800 flex gap-2">
-                                        <input type="text" id="new-local-task-input" placeholder="Nueva tarea personal..." class="flex-1 bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500">
-                                        <button onclick="addLocalTask()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition">Añadir</button>
+                                <!-- Side Panel: Chat + Rendimiento (30% width on large screens) -->
+                                <div class="lg:w-[30%] bg-zinc-900 border border-zinc-800 rounded-2xl flex flex-col shadow-xl h-[420px] sm:h-[450px]">
+                                    <!-- Tabs: Chat | Rendimiento -->
+                                    <div class="flex border-b border-zinc-800 shrink-0">
+                                        <button onclick="switchSidePanelTab('chat')" id="side-tab-chat" class="flex-1 py-2 text-xs font-semibold bg-indigo-600 text-white transition rounded-tl-2xl flex items-center justify-center gap-2">
+                                            <i data-lucide="message-circle" class="w-3.5 h-3.5"></i> Chat
+                                        </button>
+                                        <button onclick="switchSidePanelTab('rendimiento')" id="side-tab-rendimiento" class="flex-1 py-2 text-xs font-medium text-slate-400 hover:text-white transition rounded-tr-2xl flex items-center justify-center gap-2">
+                                            <i data-lucide="pie-chart" class="w-3.5 h-3.5"></i> Rendimiento
+                                        </button>
                                     </div>
-                                    <div id="widget-tasks-yo-list" class="flex-1 overflow-y-auto divide-y divide-zinc-800/80">
-                                        <!-- Populated dynamically -->
+
+                                    <!-- Panel Content -->
+                                    <div class="flex-1 overflow-hidden relative">
+
+                                        <!-- Chat Panel -->
+                                        <div id="side-panel-chat" class="absolute inset-0 flex flex-col p-3">
+                                            <div id="chat-messages" class="flex-1 overflow-y-auto flex flex-col gap-1.5 mb-2 pr-1">
+                                                <div class="text-center text-[10px] text-slate-500 py-2">Cargando mensajes...</div>
+                                            </div>
+                                            <div class="flex gap-2 shrink-0">
+                                                <input type="text" id="chat-input" placeholder="Escribe un mensaje..." class="flex-1 bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+                                                <button onclick="sendChatMessage()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-2 rounded-xl text-xs font-medium transition shrink-0">
+                                                    <i data-lucide="send" class="w-4 h-4"></i>
+                                                </button>
+                                            </div>
+                                        </div>
+
+                                        <!-- Rendimiento Panel -->
+                                        <div id="side-panel-rendimiento" class="absolute inset-0 hidden flex-col p-3">
+                                            <div class="flex-1 flex items-center justify-center">
+                                                <canvas id="performance-chart" class="w-full h-full max-h-[300px]"></canvas>
+                                            </div>
+                                            <div class="text-center text-[10px] text-slate-500 mt-1">Tareas completadas por responsable</div>
+                                        </div>
+
                                     </div>
                                 </div>
                             </div>
@@ -220,6 +261,29 @@
             </main>
         </div>
 
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- MODAL: Seleccionar usuario para chat -->
+    <!-- ============================================================ -->
+    <div id="chat-user-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl w-full max-w-sm p-6 shadow-2xl flex flex-col gap-5 modal-card">
+            <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+                <h3 class="font-bold text-base text-slate-100 flex items-center gap-2">
+                    <i data-lucide="user" class="w-4 h-4 text-indigo-400"></i> Seleccionar usuario
+                </h3>
+                <button onclick="closeChatUserModal()" class="text-slate-400 hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="flex flex-col gap-2">
+                <p class="text-xs text-slate-400">Elige un usuario para enviar el mensaje:</p>
+                <div id="chat-users-list" class="flex flex-col gap-2">
+                    <!-- Populated dynamically -->
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-2 pt-3 border-t border-zinc-800">
+                <button onclick="closeChatUserModal()" class="px-4 py-2 rounded-xl text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-slate-300 transition">Cancelar</button>
+            </div>
+        </div>
     </div>
 
     <!-- ============================================================ -->
@@ -320,7 +384,9 @@
     <script>
         const ENDPOINT_TASKS = 'https://script.google.com/macros/s/AKfycbxmPBIboe_Evn45ZHjtkjydbmlPRMuSax_sEiTc2iN8cqqi2i4-Pf_lOd6875cQXEd_yg/exec';
         const ENDPOINT_ARTWORKS = 'https://script.google.com/macros/s/AKfycbxyBzZ7duM3pKtobXHj8A2NgFpIarP5WPS71TKTH2uFMOXXL8rzo68-blixF8kgCwvl8w/exec';
+        const ENDPOINT_CHAT = 'https://script.google.com/macros/s/AKfycbzU6YqBsWekqjP-SOV1_LCV_GQnO1ZX9Gl0Th-U2dwTx2yJe0x1MmmnovRwT0qAYui6/exec';
 
+        const CHAT_USERS = ['Isabel', 'Santiago', 'Diego', 'José Manuel'];
         const CACHE_KEY_TASKS = 'rtbrok_cache_tasks';
         const CACHE_KEY_ARTWORKS = 'rtbrok_cache_artworks';
         const CACHE_KEY_TIMESTAMP = 'rtbrok_cache_timestamp';
@@ -347,6 +413,14 @@
             selectedResponsable: null,
             step: 'login'
         };
+
+        let chatFlow = {
+            pendingMessage: null,
+            selectedUser: null
+        };
+
+        let performanceChartInstance = null;
+        let chatPollingInterval = null;
 
         let defaultShortcuts = [
             { name: 'Instagram', url: 'https://www.instagram.com', icon: 'instagram', color: 'from-pink-500 to-purple-600' },
@@ -398,6 +472,11 @@
             } else {
                 setInterval(() => { if (!isCacheValid()) fetchAllData(); }, 30000);
             }
+
+            // Load chat messages
+            loadChatMessages();
+            // Start polling for new messages every 5 seconds
+            chatPollingInterval = setInterval(loadChatMessages, 5000);
         };
 
         async function fetchProyectosYSubproyectos() {
@@ -467,6 +546,28 @@
             }
         }
 
+        function switchSidePanelTab(tab) {
+            const chatBtn = document.getElementById('side-tab-chat');
+            const rendBtn = document.getElementById('side-tab-rendimiento');
+            const chatPanel = document.getElementById('side-panel-chat');
+            const rendPanel = document.getElementById('side-panel-rendimiento');
+
+            if (tab === 'chat') {
+                chatBtn.className = 'flex-1 py-2 text-xs font-semibold bg-indigo-600 text-white transition rounded-tl-2xl flex items-center justify-center gap-2';
+                rendBtn.className = 'flex-1 py-2 text-xs font-medium text-slate-400 hover:text-white transition rounded-tr-2xl flex items-center justify-center gap-2';
+                chatPanel.classList.remove('hidden');
+                rendPanel.classList.add('hidden');
+            } else {
+                rendBtn.className = 'flex-1 py-2 text-xs font-semibold bg-indigo-600 text-white transition rounded-tr-2xl flex items-center justify-center gap-2';
+                chatBtn.className = 'flex-1 py-2 text-xs font-medium text-slate-400 hover:text-white transition rounded-tl-2xl flex items-center justify-center gap-2';
+                rendPanel.classList.remove('hidden');
+                chatPanel.classList.add('hidden');
+                // Render chart when switching to rendimiento tab
+                setTimeout(renderPerformanceChart, 100);
+            }
+            lucide.createIcons();
+        }
+
         function nextPage() { switchTab(tabsOrder[(currentTabIdx + 1) % tabsOrder.length]); }
         function prevPage() { switchTab(tabsOrder[(currentTabIdx - 1 + tabsOrder.length) % tabsOrder.length]); }
 
@@ -523,8 +624,15 @@
                 renderDashboardWidgets();
                 renderTasksTable();
                 renderArtworksGrid();
+                renderPerformanceChart();
                 lucide.createIcons();
             } catch (e) { console.error('Error:', e); }
+        }
+
+        function getResponsableNameById(responsableId) {
+            if (!responsableId) return 'Sin asignar';
+            const responsable = appData.responsables.find(r => r.id === responsableId);
+            return responsable ? responsable.nombre : 'Desconocido';
         }
 
         function renderShortcuts() {
@@ -562,18 +670,25 @@
             if (recentTasks.length === 0) {
                 tasksList.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">No hay tareas disponibles.</p>`;
             } else {
-                let html = recentTasks.map(t => `
-                    <div class="flex items-center justify-between p-3 hover:bg-zinc-900/60 transition">
-                        <div class="flex items-center gap-3 overflow-hidden">
-                            <span class="w-2 h-2 rounded-full ${getStatusDotColor(t.estatus)}"></span>
-                            <div class="truncate">
-                                <p class="text-xs font-medium text-slate-200 truncate">${t.detalles || t.descripcion || 'Sin descripción'}</p>
-                                <p class="text-[10px] text-slate-500 font-mono">${t.asignacion || 'S/A'}</p>
+                let html = recentTasks.map(t => {
+                    const responsableName = getResponsableNameById(t.id_responsable);
+                    return `
+                        <div class="flex items-center justify-between p-3 hover:bg-zinc-900/60 transition">
+                            <div class="flex items-center gap-3 overflow-hidden">
+                                <span class="w-2 h-2 rounded-full ${getStatusDotColor(t.estatus)}"></span>
+                                <div class="truncate">
+                                    <p class="text-xs font-medium text-slate-200 truncate">${t.detalles || t.descripcion || 'Sin descripción'}</p>
+                                    <p class="text-[10px] text-slate-400 font-mono">
+                                        ${t.asignacion || 'S/A'} 
+                                        <span class="text-slate-500">·</span> 
+                                        <span class="text-slate-300">${responsableName}</span>
+                                    </p>
+                                </div>
                             </div>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full ${getStatusBadgeColor(t.estatus)}">${t.estatus || 'pendiente'}</span>
                         </div>
-                        <span class="text-[10px] px-2 py-0.5 rounded-full ${getStatusBadgeColor(t.estatus)}">${t.estatus || 'pendiente'}</span>
-                    </div>
-                `).join('');
+                    `;
+                }).join('');
                 html += `
                     <div class="p-3 text-center bg-zinc-900/40 hover:bg-zinc-900 transition cursor-pointer mt-auto" onclick="switchTab('tasks')">
                         <button class="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center justify-center gap-1.5 w-full">
@@ -583,8 +698,200 @@
                     </div>
                 `;
                 tasksList.innerHTML = html;
+                lucide.createIcons();
             }
         }
+
+        // ============================================================
+        // CHAT FUNCTIONS
+        // ============================================================
+
+        async function loadChatMessages() {
+            try {
+                const res = await fetch(ENDPOINT_CHAT + '?action=getMessages');
+                const messages = await res.json();
+                const container = document.getElementById('chat-messages');
+                
+                if (!messages || messages.length === 0) {
+                    container.innerHTML = `<div class="text-center text-[10px] text-slate-500 py-4">No hay mensajes aún. ¡Envía el primero!</div>`;
+                    return;
+                }
+
+                let html = '';
+                const currentUser = chatFlow.selectedUser || '';
+                messages.forEach(msg => {
+                    const isUser = msg.user === currentUser;
+                    const time = msg.timestamp ? new Date(msg.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+                    html += `
+                        <div class="max-w-[85%] ${isUser ? 'chat-message-user' : 'chat-message-other'} px-3 py-2">
+                            <div class="flex items-center gap-2 mb-0.5">
+                                <span class="text-[10px] font-semibold ${isUser ? 'text-indigo-400' : 'text-cyan-400'}">${msg.user}</span>
+                                <span class="text-[8px] text-slate-500">${time}</span>
+                            </div>
+                            <p class="text-xs text-slate-200 break-words">${msg.message}</p>
+                        </div>
+                    `;
+                });
+                container.innerHTML = html;
+                container.scrollTop = container.scrollHeight;
+            } catch (e) {
+                console.error('Error loading chat messages:', e);
+            }
+        }
+
+        function openChatUserModal() {
+            const modal = document.getElementById('chat-user-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            lucide.createIcons();
+
+            const container = document.getElementById('chat-users-list');
+            container.innerHTML = CHAT_USERS.map(user => `
+                <button onclick="selectChatUser('${user}')"
+                        class="flex items-center gap-3 p-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-indigo-500/50 transition w-full text-left">
+                    <div class="w-10 h-10 rounded-full bg-indigo-600/30 flex items-center justify-center text-indigo-400 font-bold text-sm">
+                        ${user.charAt(0).toUpperCase()}
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-slate-200">${user}</p>
+                    </div>
+                    ${chatFlow.selectedUser === user ? `<span class="ml-auto text-xs px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-400">Seleccionado</span>` : ''}
+                </button>
+            `).join('');
+        }
+
+        function closeChatUserModal() {
+            document.getElementById('chat-user-modal').classList.add('hidden');
+            document.getElementById('chat-user-modal').classList.remove('flex');
+        }
+
+        function selectChatUser(user) {
+            chatFlow.selectedUser = user;
+            closeChatUserModal();
+            // If there's a pending message, send it
+            if (chatFlow.pendingMessage) {
+                const message = chatFlow.pendingMessage;
+                chatFlow.pendingMessage = null;
+                sendChatMessageToServer(message, user);
+            }
+            // Reload messages to show correct alignment
+            loadChatMessages();
+        }
+
+        function sendChatMessage() {
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            if (!chatFlow.selectedUser) {
+                chatFlow.pendingMessage = message;
+                input.value = '';
+                openChatUserModal();
+                return;
+            }
+
+            input.value = '';
+            sendChatMessageToServer(message, chatFlow.selectedUser);
+        }
+
+        async function sendChatMessageToServer(message, user) {
+            try {
+                await fetch(ENDPOINT_CHAT, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user: user, message: message })
+                });
+                // Wait a bit for the server to process, then reload
+                setTimeout(loadChatMessages, 500);
+            } catch (e) {
+                console.error('Error sending message:', e);
+            }
+        }
+
+        // ============================================================
+        // PERFORMANCE CHART
+        // ============================================================
+
+        function renderPerformanceChart() {
+            const canvas = document.getElementById('performance-chart');
+            if (!canvas) return;
+
+            const ctx = canvas.getContext('2d');
+
+            // Destroy previous chart instance if exists
+            if (performanceChartInstance) {
+                performanceChartInstance.destroy();
+                performanceChartInstance = null;
+            }
+
+            // Count completed tasks per responsable
+            const completedTasks = appData.tasks.filter(t => t.estatus === 'completado');
+            const responsableCount = {};
+
+            completedTasks.forEach(t => {
+                const name = getResponsableNameById(t.id_responsable);
+                responsableCount[name] = (responsableCount[name] || 0) + 1;
+            });
+
+            const labels = Object.keys(responsableCount);
+            const data = Object.values(responsableCount);
+
+            // If no data, show message
+            if (labels.length === 0) {
+                canvas.parentElement.innerHTML = `
+                    <div class="text-center text-slate-500 text-xs py-8">
+                        <i data-lucide="pie-chart" class="w-8 h-8 mx-auto mb-2 text-slate-700"></i>
+                        <p>No hay tareas completadas aún</p>
+                    </div>
+                `;
+                lucide.createIcons();
+                return;
+            }
+
+            const colors = [
+                'rgba(99, 102, 241, 0.8)',
+                'rgba(34, 211, 238, 0.8)',
+                'rgba(244, 63, 94, 0.8)',
+                'rgba(52, 211, 153, 0.8)',
+                'rgba(251, 191, 36, 0.8)',
+                'rgba(168, 85, 247, 0.8)'
+            ];
+
+            performanceChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: data,
+                        backgroundColor: colors.slice(0, labels.length),
+                        borderColor: '#18181b',
+                        borderWidth: 2
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#94a3b8',
+                                font: { size: 9, family: 'Inter' },
+                                padding: 8,
+                                boxWidth: 10,
+                                boxHeight: 10
+                            }
+                        }
+                    },
+                    cutout: '65%'
+                }
+            });
+        }
+
+        // ============================================================
+        // TASKS FUNCTIONS
+        // ============================================================
 
         function addLocalTask() {
             const input = document.getElementById('new-local-task-input');
@@ -632,24 +939,29 @@
                 container.innerHTML = `<p class="text-sm text-slate-500 text-center py-10">No se encontraron tareas.</p>`;
                 return;
             }
-            container.innerHTML = appData.tasks.map(t => `
-                <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-xl bg-black border border-zinc-800 hover:border-zinc-700 transition">
-                    <div class="flex items-start gap-3">
-                        <div class="p-2 rounded-lg bg-cyan-500/10 text-cyan-400 mt-0.5"><i data-lucide="check-circle" class="w-4 h-4"></i></div>
-                        <div>
-                            <div class="flex items-center gap-2">
-                                <span class="font-mono text-xs text-cyan-400 font-bold">${t.asignacion || 'S/A'}</span>
-                                <span class="text-xs px-2 py-0.5 rounded-full ${getStatusBadgeColor(t.estatus)}">${t.estatus || 'pendiente'}</span>
+            container.innerHTML = appData.tasks.map(t => {
+                const responsableName = getResponsableNameById(t.id_responsable);
+                return `
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-xl bg-black border border-zinc-800 hover:border-zinc-700 transition">
+                        <div class="flex items-start gap-3">
+                            <div class="p-2 rounded-lg bg-cyan-500/10 text-cyan-400 mt-0.5"><i data-lucide="check-circle" class="w-4 h-4"></i></div>
+                            <div>
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <span class="font-mono text-xs text-cyan-400 font-bold">${t.asignacion || 'S/A'}</span>
+                                    <span class="text-[10px] text-slate-400">Responsable: <span class="text-slate-300">${responsableName}</span></span>
+                                    <span class="text-xs px-2 py-0.5 rounded-full ${getStatusBadgeColor(t.estatus)}">${t.estatus || 'pendiente'}</span>
+                                </div>
+                                <h4 class="text-sm font-semibold text-slate-100 mt-1">${t.detalles || 'Sin detalles'}</h4>
+                                <p class="text-xs text-slate-400 mt-0.5">${t.descripcion || ''}</p>
                             </div>
-                            <h4 class="text-sm font-semibold text-slate-100 mt-1">${t.detalles || 'Sin detalles'}</h4>
-                            <p class="text-xs text-slate-400 mt-0.5">${t.descripcion || ''}</p>
+                        </div>
+                        <div class="flex items-center gap-4 text-xs text-slate-400 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-2 sm:pt-0 border-zinc-800">
+                            <span>Límite: <strong class="text-slate-200">${t.fecha_limite || 'N/A'}</strong></span>
                         </div>
                     </div>
-                    <div class="flex items-center gap-4 text-xs text-slate-400 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-2 sm:pt-0 border-zinc-800">
-                        <span>Límite: <strong class="text-slate-200">${t.fecha_limite || 'N/A'}</strong></span>
-                    </div>
-                </div>
-            `).join('');
+                `;
+            }).join('');
+            lucide.createIcons();
         }
 
         function renderArtworksGrid() {
@@ -677,6 +989,7 @@
                     </div>
                 `;
             }).join('');
+            lucide.createIcons();
         }
 
         function filterTasks() {}
@@ -716,6 +1029,10 @@
                 { nombre_obra: 'Casa del Bosque', autor: 'Grupo Z', ubicacion: 'Valle de Bravo', estatus: 'Consolidación', adjuntos: [] }
             ];
         }
+
+        // ============================================================
+        // TASK CREATION FLOW
+        // ============================================================
 
         function openAddTaskModal() {
             taskFlow.authenticatedUser = null;
@@ -1001,6 +1318,11 @@
             if (e.key === 'Escape') {
                 closeLoginModal();
                 closeSelectProjectModal();
+                closeChatUserModal();
+            }
+            if (e.key === 'Enter' && document.activeElement?.id === 'chat-input') {
+                e.preventDefault();
+                sendChatMessage();
             }
         });
     </script>
