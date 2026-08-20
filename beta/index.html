@@ -1,0 +1,1327 @@
+<!DOCTYPE html>
+<html lang="es" class="h-full">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Workspace & Home Browser</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="icon" type="image/png" href="./icon.png">
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: { sans: ['Inter', 'sans-serif'] },
+                }
+            }
+        }
+    </script>
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #000000; }
+        ::-webkit-scrollbar { width: 6px; height: 6px; }
+        ::-webkit-scrollbar-track { background: transparent; }
+        ::-webkit-scrollbar-thumb { background: rgba(156, 163, 175, 0.3); border-radius: 3px; }
+        ::-webkit-scrollbar-thumb:hover { background: rgba(156, 163, 175, 0.6); }
+        .modal-overlay { background: rgba(0,0,0,0.8); backdrop-filter: blur(6px); }
+        .modal-card { max-height: 90vh; overflow-y: auto; }
+        .hide-scrollbar::-webkit-scrollbar { display: none; }
+        .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+    </style>
+</head>
+<body class="h-full bg-black text-slate-100 flex flex-col overflow-hidden select-none">
+
+    <!-- RTBROK Brand Top Left -->
+    <div class="absolute top-4 left-6 sm:left-8 z-30">
+        <h1 class="font-bold text-base sm:text-lg tracking-tight bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">R T B R O K</h1>
+    </div>
+
+    <!-- Clock Top Right -->
+    <div class="absolute top-4 right-6 sm:right-8 z-30">
+        <p id="clock" class="text-xs text-slate-400 font-medium">00:00</p>
+    </div>
+
+    <!-- Navigation Arrows Overlay Wrapper -->
+    <div class="fixed inset-0 pointer-events-none z-30 hidden md:flex items-center justify-center">
+        <div class="w-full max-w-6xl px-4 xl:max-w-7xl flex justify-between">
+            <button onclick="prevPage()" class="pointer-events-auto flex items-center justify-center w-11 h-11 rounded-2xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-slate-300 hover:text-white transition-all shadow-xl group shrink-0">
+                <i data-lucide="chevron-left" class="w-5 h-5 group-hover:-translate-x-0.5 transition-transform"></i>
+            </button>
+            <button onclick="nextPage()" class="pointer-events-auto flex items-center justify-center w-11 h-11 rounded-2xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 text-slate-300 hover:text-white transition-all shadow-xl group shrink-0">
+                <i data-lucide="chevron-right" class="w-5 h-5 group-hover:translate-x-0.5 transition-transform"></i>
+            </button>
+        </div>
+    </div>
+
+    <div class="relative z-10 flex flex-col items-center h-full w-full py-4 md:py-6 gap-4 sm:gap-6">
+
+        <div id="app" class="relative z-10 flex flex-col h-full w-full flex-1 gap-4 sm:gap-5 overflow-hidden pt-7 sm:pt-8">
+
+            <div class="w-full max-w-6xl mx-auto px-4 sm:px-6">
+                <form id="search-form" onsubmit="handleSearch(event)" class="relative flex items-center w-full">
+                    <span class="absolute left-4 text-slate-400"><i data-lucide="search" class="w-5 h-5"></i></span>
+                    <input type="text" id="search-input" placeholder="Buscar en Google o filtrar módulos..."
+                        class="w-full bg-zinc-900 border border-zinc-800 rounded-2xl pl-12 pr-28 py-3 text-sm sm:text-base text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 focus:ring-2 focus:ring-indigo-500/20 transition-all shadow-xl">
+                    <div class="absolute right-2 flex items-center gap-1">
+                        <select id="search-engine" class="bg-zinc-800 text-slate-300 text-xs rounded-xl px-2 py-1.5 focus:outline-none cursor-pointer border border-zinc-700">
+                            <option value="google">Google</option>
+                            <option value="duckduckgo">DuckDuckGo</option>
+                            <option value="github">GitHub</option>
+                        </select>
+                        <button type="submit" class="bg-indigo-600 hover:bg-indigo-500 text-white p-2 rounded-xl text-xs font-medium transition shadow flex items-center justify-center"><i data-lucide="arrow-right" class="w-4 h-4"></i></button>
+                    </div>
+                </form>
+            </div>
+
+            <main class="flex-1 overflow-hidden relative flex flex-col w-full">
+                <div class="flex-1 overflow-hidden relative flex flex-col w-full">
+
+                    <div id="tab-dashboard" class="h-full overflow-y-auto overflow-x-hidden flex flex-col pb-8 w-full">
+
+                        <!-- Top: Instagram-style Edge-to-Edge Artworks Grid -->
+                        <section class="w-full mb-5 sm:mb-6 border-y border-zinc-900 bg-black">
+                            <div id="top-artworks-grid" class="grid grid-cols-4 gap-0.5 bg-zinc-950 w-full">
+                                <div class="aspect-square bg-zinc-900 animate-pulse"></div>
+                                <div class="aspect-square bg-zinc-900 animate-pulse"></div>
+                                <div class="aspect-square bg-zinc-900 animate-pulse"></div>
+                                <div class="aspect-square bg-zinc-900 animate-pulse"></div>
+                            </div>
+                        </section>
+
+                        <!-- Stem of the T: Constrained Content Wrapper -->
+                        <div class="w-full max-w-6xl mx-auto px-4 sm:px-6 flex flex-col gap-5">
+
+                            <!-- Middle Grid: Tasks Widget (Left) + Chat & Performance Panel (Right) -->
+                            <div class="grid grid-cols-1 lg:grid-cols-2 gap-5">
+
+                                <!-- Left: Tasks Widget -->
+                                <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 sm:p-5 flex flex-col h-[380px] sm:h-[420px] shadow-xl">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center gap-1 bg-black p-1 rounded-xl border border-zinc-800">
+                                            <button onclick="switchTaskWidgetTab('equipo')" id="widget-tab-equipo" class="px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition">Equipo</button>
+                                            <button onclick="switchTaskWidgetTab('yo')" id="widget-tab-yo" class="px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition">Yo</button>
+                                        </div>
+                                        <div class="flex items-center gap-2">
+                                            <span id="widget-title" class="font-semibold text-sm text-slate-200">Equipo</span>
+                                            <button onclick="openAddTaskModal()" id="btn-add-task-equipo" class="p-1.5 rounded-lg bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 hover:text-indigo-300 transition" title="Añadir tarea">
+                                                <i data-lucide="plus" class="w-4 h-4"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Equipo Tab Content -->
+                                    <div id="widget-tasks-equipo-pane" class="flex-1 overflow-y-auto pr-1 flex flex-col bg-black rounded-xl border border-zinc-800 divide-y divide-zinc-800/80">
+                                        <div class="p-4 space-y-3 animate-pulse">
+                                            <div class="flex items-center justify-between">
+                                                <div class="flex items-center gap-3">
+                                                    <div class="w-2 h-2 rounded-full bg-zinc-800"></div>
+                                                    <div class="space-y-1.5">
+                                                        <div class="h-3 w-36 bg-zinc-800 rounded"></div>
+                                                        <div class="h-2 w-20 bg-zinc-800/60 rounded"></div>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <!-- Yo Tab Content -->
+                                    <div id="widget-tasks-yo-pane" class="flex-1 overflow-y-auto pr-1 hidden flex-col bg-black rounded-xl border border-zinc-800">
+                                        <div class="p-2 border-b border-zinc-800 flex gap-2">
+                                            <input type="text" id="new-local-task-input" placeholder="Nueva tarea personal..." class="flex-1 bg-zinc-900 border border-zinc-700 rounded-lg px-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+                                            <button onclick="addLocalTask()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 rounded-lg text-xs font-medium transition">Añadir</button>
+                                        </div>
+                                        <div id="widget-tasks-yo-list" class="flex-1 overflow-y-auto divide-y divide-zinc-800/80">
+                                            <!-- Populated dynamically -->
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Right: Chat & Rendimiento Panel -->
+                                <div class="bg-zinc-900 border border-zinc-800 rounded-2xl p-4 sm:p-5 flex flex-col h-[380px] sm:h-[420px] shadow-xl">
+                                    <div class="flex items-center justify-between mb-3">
+                                        <div class="flex items-center gap-1 bg-black p-1 rounded-xl border border-zinc-800">
+                                            <button onclick="switchSidePanelTab('chat')" id="side-tab-chat" class="px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition flex items-center gap-1.5">
+                                                <i data-lucide="message-square" class="w-3.5 h-3.5"></i> Chat
+                                            </button>
+                                            <button onclick="switchSidePanelTab('rendimiento')" id="side-tab-rendimiento" class="px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition flex items-center gap-1.5">
+                                                <i data-lucide="pie-chart" class="w-3.5 h-3.5"></i> Rendimiento
+                                            </button>
+                                        </div>
+                                        <div id="chat-sender-indicator" class="text-[11px] text-slate-400 flex items-center gap-1.5 bg-black px-2.5 py-1 rounded-xl border border-zinc-800">
+                                            <span>Enviando como:</span>
+                                            <span id="current-sender-name" class="font-semibold text-indigo-400">Seleccionar</span>
+                                            <button onclick="openChatSenderModal()" class="text-indigo-400 hover:underline text-[10px] ml-1">(Cambiar)</button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Chat Tab Pane -->
+                                    <div id="side-chat-pane" class="flex-1 flex flex-col bg-black rounded-xl border border-zinc-800 overflow-hidden">
+                                        <div id="chat-messages-container" class="flex-1 overflow-y-auto p-3 space-y-3">
+                                            <div class="text-center text-slate-500 text-xs py-10">Cargando mensajes...</div>
+                                        </div>
+                                        <div class="p-2.5 border-t border-zinc-800 bg-zinc-900/50 flex gap-2">
+                                            <input type="text" id="chat-input" onkeydown="if(event.key==='Enter') sendChatMessage()" placeholder="Escribe un mensaje al equipo..." class="flex-1 bg-black border border-zinc-700 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+                                            <button onclick="sendChatMessage()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-xl text-xs font-medium transition shadow flex items-center justify-center">
+                                                <i data-lucide="send" class="w-3.5 h-3.5"></i>
+                                            </button>
+                                        </div>
+                                    </div>
+
+                                    <!-- Rendimiento Tab Pane -->
+                                    <div id="side-rendimiento-pane" class="flex-1 hidden flex-col bg-black rounded-xl border border-zinc-800 p-3 items-center justify-center relative">
+                                        <div class="w-full h-full flex items-center justify-center relative">
+                                            <canvas id="performanceChart"></canvas>
+                                        </div>
+                                    </div>
+                                </div>
+
+                            </div>
+
+                            <!-- Bottom: Shortcuts Grid -->
+                            <section class="pb-6">
+                                <div id="shortcuts-grid" class="grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-4">
+                                    <!-- Populated dynamically -->
+                                </div>
+                            </section>
+
+                        </div>
+                    </div>
+
+                    <div id="tab-tasks" class="w-full max-w-4xl mx-auto px-4 sm:px-6 h-full hidden flex-col gap-4">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-zinc-900 border border-zinc-800 rounded-2xl p-4 shadow-xl">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2.5 bg-cyan-500/10 text-cyan-400 rounded-xl border border-cyan-500/20"><i data-lucide="check-square" class="w-5 h-5"></i></div>
+                                <div>
+                                    <h2 class="font-bold text-sm sm:text-base">Gestión de Tareas (CodeB Backend)</h2>
+                                    <p class="text-xs text-slate-400">Origen: <span class="font-mono text-cyan-400">script.google.com/.../exec</span></p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 w-full sm:w-auto">
+                                <input type="text" id="task-filter-input" oninput="filterTasks()" placeholder="Filtrar tareas..." class="bg-black border border-zinc-800 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-cyan-500 w-full sm:w-48">
+                                <select id="task-status-filter" onchange="filterTasks()" class="bg-zinc-800 border border-zinc-700 text-xs rounded-xl px-3 py-2 text-slate-200 focus:outline-none">
+                                    <option value="all">Todos los estatus</option>
+                                    <option value="pendiente">Pendiente</option>
+                                    <option value="en_curso">En Curso</option>
+                                    <option value="en_revision">En Revisión</option>
+                                    <option value="completado">Completado</option>
+                                    <option value="bloqueada">Bloqueada</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="flex-1 bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden flex flex-col shadow-xl">
+                            <div class="overflow-y-auto flex-1 p-4">
+                                <div id="tasks-table-container" class="space-y-3">
+                                    <!-- Populated dynamically -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div id="tab-artworks" class="w-full max-w-4xl mx-auto px-4 sm:px-6 h-full hidden flex-col gap-4">
+                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 bg-zinc-900 border border-zinc-800 rounded-2xl p-4 shadow-xl">
+                            <div class="flex items-center gap-3">
+                                <div class="p-2.5 bg-purple-500/10 text-purple-400 rounded-xl border border-purple-500/20"><i data-lucide="image" class="w-5 h-5"></i></div>
+                                <div>
+                                    <h2 class="font-bold text-sm sm:text-base">Registros de Obra y Galería (CodeA)</h2>
+                                    <p class="text-xs text-slate-400">Origen: <span class="font-mono text-purple-400">script.google.com/.../exec</span></p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 w-full sm:w-auto">
+                                <input type="text" id="artwork-filter-input" oninput="filterArtworks()" placeholder="Buscar..." class="bg-black border border-zinc-800 rounded-xl px-3 py-2 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-purple-500 w-full sm:w-64">
+                                <select id="artwork-status-filter" onchange="filterArtworks()" class="bg-zinc-800 border border-zinc-700 text-xs rounded-xl px-3 py-2 text-slate-200 focus:outline-none">
+                                    <option value="all">Todos los estatus</option>
+                                    <option value="Consolidación">Consolidación</option>
+                                    <option value="Bodega">Bodega</option>
+                                    <option value="Vendida">Vendida</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="flex-1 bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden flex flex-col shadow-xl">
+                            <div class="overflow-y-auto flex-1 p-4">
+                                <div id="artworks-grid-container" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+                                    <!-- Populated dynamically -->
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- 3-Dot Pagination Indicator Bar -->
+                <div class="flex items-center justify-center gap-3 pt-2 pb-1 w-full max-w-4xl mx-auto px-4 sm:px-6">
+                    <button onclick="switchTab('dashboard')" id="dot-dashboard" class="w-6 h-3 rounded-full bg-indigo-500 transition-all shadow-md cursor-pointer" title="Dashboard"></button>
+                    <button onclick="switchTab('tasks')" id="dot-tasks" class="w-3 h-3 rounded-full bg-zinc-800 hover:bg-zinc-700 transition-all shadow-md cursor-pointer" title="Tareas"></button>
+                    <button onclick="switchTab('artworks')" id="dot-artworks" class="w-3 h-3 rounded-full bg-zinc-800 hover:bg-zinc-700 transition-all shadow-md cursor-pointer" title="Obras"></button>
+                </div>
+
+            </main>
+        </div>
+
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- MODAL: Seleccionar Remitente de Chat (Isabel, Santiago, Diego, José Manuel) -->
+    <!-- ============================================================ -->
+    <div id="chat-sender-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl w-full max-w-md p-6 shadow-2xl flex flex-col gap-5 modal-card">
+            <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+                <h3 class="font-bold text-base text-slate-100 flex items-center gap-2">
+                    <i data-lucide="user-check" class="w-4 h-4 text-indigo-400"></i> Seleccionar Remitente
+                </h3>
+                <button onclick="closeChatSenderModal()" class="text-slate-400 hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="flex flex-col gap-3">
+                <p class="text-xs text-slate-400">¿Quién va a enviar el mensaje en el chat de equipo?</p>
+                <div class="grid grid-cols-2 gap-2.5">
+                    <button onclick="setChatSender('Isabel')" class="p-3.5 rounded-xl bg-black border border-zinc-800 hover:border-indigo-500 text-slate-200 font-medium text-xs flex items-center gap-2.5 transition group">
+                        <div class="w-8 h-8 rounded-full bg-indigo-600/30 flex items-center justify-center text-indigo-400 font-bold text-xs group-hover:scale-105 transition">I</div>
+                        <span>Isabel</span>
+                    </button>
+                    <button onclick="setChatSender('Santiago')" class="p-3.5 rounded-xl bg-black border border-zinc-800 hover:border-indigo-500 text-slate-200 font-medium text-xs flex items-center gap-2.5 transition group">
+                        <div class="w-8 h-8 rounded-full bg-purple-600/30 flex items-center justify-center text-purple-400 font-bold text-xs group-hover:scale-105 transition">S</div>
+                        <span>Santiago</span>
+                    </button>
+                    <button onclick="setChatSender('Diego')" class="p-3.5 rounded-xl bg-black border border-zinc-800 hover:border-indigo-500 text-slate-200 font-medium text-xs flex items-center gap-2.5 transition group">
+                        <div class="w-8 h-8 rounded-full bg-cyan-600/30 flex items-center justify-center text-cyan-400 font-bold text-xs group-hover:scale-105 transition">D</div>
+                        <span>Diego</span>
+                    </button>
+                    <button onclick="setChatSender('José Manuel')" class="p-3.5 rounded-xl bg-black border border-zinc-800 hover:border-indigo-500 text-slate-200 font-medium text-xs flex items-center gap-2.5 transition group">
+                        <div class="w-8 h-8 rounded-full bg-emerald-600/30 flex items-center justify-center text-emerald-400 font-bold text-xs group-hover:scale-105 transition">JM</div>
+                        <span>José Manuel</span>
+                    </button>
+                </div>
+            </div>
+            <div class="flex items-center justify-end pt-3 border-t border-zinc-800">
+                <button onclick="closeChatSenderModal()" class="px-4 py-2 rounded-xl text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-slate-300 transition">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- MODAL: Login / Selección de Usuario (Director) -->
+    <!-- ============================================================ -->
+    <div id="login-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl w-full max-w-md p-6 shadow-2xl flex flex-col gap-5 modal-card">
+            <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+                <h3 class="font-bold text-base text-slate-100 flex items-center gap-2">
+                    <i data-lucide="user-check" class="w-4 h-4 text-indigo-400"></i> Iniciar Sesión
+                </h3>
+                <button onclick="closeLoginModal()" class="text-slate-400 hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="flex flex-col gap-4">
+                <p class="text-xs text-slate-400">Selecciona un usuario con rol <span class="text-indigo-400 font-semibold">Director</span> para crear tareas.</p>
+                <div id="login-users-list" class="flex flex-col gap-2 max-h-64 overflow-y-auto pr-1">
+                    <div class="text-center text-slate-500 text-xs py-4">Cargando usuarios...</div>
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-2 pt-3 border-t border-zinc-800">
+                <button onclick="closeLoginModal()" class="px-4 py-2 rounded-xl text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-slate-300 transition">Cancelar</button>
+            </div>
+        </div>
+    </div>
+
+    <!-- ============================================================ -->
+    <!-- MODAL: Seleccionar Proyecto, Subproyecto y Responsable -->
+    <!-- ============================================================ -->
+    <div id="select-project-modal" class="fixed inset-0 bg-black/80 backdrop-blur-md z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-zinc-900 border border-zinc-800 rounded-3xl w-full max-w-lg p-6 shadow-2xl flex flex-col gap-5 modal-card">
+            <div class="flex items-center justify-between border-b border-zinc-800 pb-3">
+                <h3 class="font-bold text-base text-slate-100 flex items-center gap-2">
+                    <i data-lucide="folder-tree" class="w-4 h-4 text-cyan-400"></i> Nueva Tarea
+                </h3>
+                <button onclick="closeSelectProjectModal()" class="text-slate-400 hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="flex flex-col gap-4">
+                <div class="flex items-center gap-2 p-2 bg-indigo-600/10 rounded-xl border border-indigo-600/20">
+                    <i data-lucide="user" class="w-4 h-4 text-indigo-400"></i>
+                    <span class="text-xs text-slate-300">Creando como: <span id="auth-user-display" class="font-semibold text-indigo-400">-</span></span>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <label class="text-xs font-semibold text-slate-300">Proyecto</label>
+                    <select id="project-select" class="bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                        <option value="">Selecciona un proyecto...</option>
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <label class="text-xs font-semibold text-slate-300">Subproyecto</label>
+                    <select id="subproject-select" class="bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500" disabled>
+                        <option value="">Primero selecciona un proyecto</option>
+                    </select>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <label class="text-xs font-semibold text-slate-300">Asignar a (Responsable)</label>
+                    <select id="responsible-select" class="bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                        <option value="">Selecciona un responsable...</option>
+                    </select>
+                    <p class="text-[10px] text-slate-500">Puedes asignar la tarea a cualquier usuario del sistema</p>
+                </div>
+
+                <div class="flex flex-col gap-2">
+                    <label class="text-xs font-semibold text-slate-300">Detalles de la tarea</label>
+                    <input type="text" id="new-task-details" placeholder="Ej: Revisar documentación..." class="bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+                    <textarea id="new-task-description" placeholder="Descripción detallada..." class="bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 h-16 resize-none"></textarea>
+                </div>
+
+                <div class="grid grid-cols-2 gap-3">
+                    <div class="flex flex-col gap-2">
+                        <label class="text-xs font-semibold text-slate-300">Prioridad</label>
+                        <select id="new-task-priority" class="bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                            <option value="baja">Baja</option>
+                            <option value="media" selected>Media</option>
+                            <option value="alta">Alta</option>
+                            <option value="urgente">Urgente</option>
+                        </select>
+                    </div>
+                    <div class="flex flex-col gap-2">
+                        <label class="text-xs font-semibold text-slate-300">Fecha Límite</label>
+                        <input type="date" id="new-task-deadline" class="bg-zinc-800 border border-zinc-700 rounded-xl px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
+                    </div>
+                </div>
+            </div>
+            <div class="flex items-center justify-end gap-2 pt-3 border-t border-zinc-800">
+                <button onclick="closeSelectProjectModal()" class="px-4 py-2 rounded-xl text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-slate-300 transition">Cancelar</button>
+                <button onclick="confirmAddTask()" class="px-4 py-2 rounded-xl text-xs font-medium bg-indigo-600 hover:bg-indigo-500 text-white transition flex items-center gap-2">
+                    <i data-lucide="plus" class="w-4 h-4"></i> Crear Tarea
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const ENDPOINT_TASKS = 'https://script.google.com/macros/s/AKfycbxmPBIboe_Evn45ZHjtkjydbmlPRMuSax_sEiTc2iN8cqqi2i4-Pf_lOd6875cQXEd_yg/exec';
+        const ENDPOINT_ARTWORKS = 'https://script.google.com/macros/s/AKfycbxyBzZ7duM3pKtobXHj8A2NgFpIarP5WPS71TKTH2uFMOXXL8rzo68-blixF8kgCwvl8w/exec';
+        const ENDPOINT_CHAT = 'https://script.google.com/macros/s/AKfycbzU6YqBsWekqjP-SOV1_LCV_GQnO1ZX9Gl0Th-U2dwTx2yJe0x1MmmnovRwT0qAYui6/exec';
+
+        const CACHE_KEY_TASKS = 'rtbrok_cache_tasks';
+        const CACHE_KEY_ARTWORKS = 'rtbrok_cache_artworks';
+        const CACHE_KEY_TIMESTAMP = 'rtbrok_cache_timestamp';
+        const CACHE_DURATION = 5 * 60 * 1000;
+
+        let appData = {
+            tasks: [],
+            artworks: [],
+            proyectos: [],
+            subproyectos: [],
+            responsables: [],
+            messages: [],
+            loading: false,
+            error: null
+        };
+
+        let localTasks = JSON.parse(localStorage.getItem('rtbrok_local_tasks') || '[]');
+        let currentChatSender = localStorage.getItem('rtbrok_chat_sender') || null;
+        let performanceChartInstance = null;
+
+        const tabsOrder = ['dashboard', 'tasks', 'artworks'];
+        let currentTabIdx = 0;
+
+        let taskFlow = {
+            authenticatedUser: null,
+            selectedProyecto: null,
+            selectedSubproyecto: null,
+            selectedResponsable: null,
+            step: 'login'
+        };
+
+        let defaultShortcuts = [
+            { name: 'Instagram', url: 'https://www.instagram.com', icon: 'instagram', color: 'from-pink-500 to-purple-600' },
+            { name: 'Base de datos', url: 'https://diegoturijancontacto-sudo.github.io/Finanzas/mobile/', icon: 'database', color: 'from-zinc-700 to-zinc-900' },
+            { name: 'Drive', url: 'https://drive.google.com', icon: 'hard-drive', color: 'from-blue-600 to-cyan-700' },
+            { name: 'Catálogos', url: 'https://frontline-zeta-ecru.vercel.app/movil/', icon: 'book-open', color: 'from-violet-600 to-purple-800' }
+        ];
+
+        function getCachedData(key) {
+            try { return JSON.parse(localStorage.getItem(key)); } catch(e) { return null; }
+        }
+
+        function setCachedData(key, data) {
+            try { localStorage.setItem(key, JSON.stringify(data)); } catch(e) {}
+        }
+
+        function isCacheValid() {
+            const timestamp = localStorage.getItem(CACHE_KEY_TIMESTAMP);
+            if (!timestamp) return false;
+            return (Date.now() - parseInt(timestamp)) < CACHE_DURATION;
+        }
+
+        function updateCacheTimestamp() {
+            localStorage.setItem(CACHE_KEY_TIMESTAMP, Date.now().toString());
+        }
+
+        function loadFromCache() {
+            const cachedTasks = getCachedData(CACHE_KEY_TASKS);
+            const cachedArtworks = getCachedData(CACHE_KEY_ARTWORKS);
+            if (cachedTasks) appData.tasks = cachedTasks;
+            if (cachedArtworks) appData.artworks = cachedArtworks;
+            return cachedTasks !== null && cachedArtworks !== null;
+        }
+
+        window.onload = function() {
+            initClock();
+            renderShortcuts();
+            updateChatSenderUI();
+            const hasCache = loadFromCache();
+            renderDashboardWidgets();
+            renderTasksTable();
+            renderArtworksGrid();
+            renderLocalTasks();
+            lucide.createIcons();
+
+            fetchProyectosYSubproyectos();
+            fetchChatMessages();
+            setInterval(fetchChatMessages, 8000); // Polling chat every 8s
+
+            if (!isCacheValid() || !hasCache) {
+                fetchAllData();
+            } else {
+                setInterval(() => { if (!isCacheValid()) fetchAllData(); }, 30000);
+            }
+        };
+
+        async function fetchProyectosYSubproyectos() {
+            try {
+                const res = await fetch(ENDPOINT_TASKS);
+                const data = await res.json();
+                appData.proyectos = data.proyectos || [];
+                appData.subproyectos = data.subproyectos || [];
+                appData.responsables = data.responsables || [];
+                renderPerformanceChart();
+            } catch (e) {
+                console.error('Error fetching proyectos:', e);
+                appData.proyectos = [];
+                appData.subproyectos = [];
+                appData.responsables = [];
+            }
+        }
+
+        async function fetchChatMessages() {
+            try {
+                const res = await fetch(`${ENDPOINT_CHAT}?action=getMessages`);
+                const messages = await res.json();
+                if (Array.isArray(messages)) {
+                    appData.messages = messages;
+                    renderChatMessages();
+                }
+            } catch(e) {
+                // Fallback simulation if cross-origin or no direct GET handler
+                if (!appData.messages.length) {
+                    appData.messages = [
+                        { timestamp: new Date().toISOString(), user: 'sistema', message: 'Hola equipo, bienvenidos al panel de chat.' },
+                        { timestamp: new Date().toISOString(), user: 'sistema', message: 'Revisando los pendientes de obra.' }
+                    ];
+                    renderChatMessages();
+                }
+            }
+        }
+
+        function initClock() {
+            setInterval(() => {
+                const now = new Date();
+                let hours = now.getHours();
+                const minutes = String(now.getMinutes()).padStart(2, '0');
+                const ampm = hours >= 12 ? 'PM' : 'AM';
+                hours = hours % 12 || 12;
+                document.getElementById('clock').innerText = `${hours}:${minutes} ${ampm}`;
+            }, 1000);
+        }
+
+        function switchTab(tabName) {
+            currentTabIdx = tabsOrder.indexOf(tabName);
+            if (currentTabIdx === -1) currentTabIdx = 0;
+            tabsOrder.forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                const dot = document.getElementById(`dot-${t}`);
+                if (t === tabName) {
+                    el.classList.replace('hidden', 'flex');
+                    if(dot) dot.className = 'w-6 h-3 rounded-full bg-indigo-500 transition-all shadow-md cursor-pointer';
+                } else {
+                    el.classList.replace('flex', 'hidden');
+                    if(dot) dot.className = 'w-3 h-3 rounded-full bg-zinc-800 hover:bg-zinc-700 transition-all shadow-md cursor-pointer';
+                }
+            });
+            lucide.createIcons();
+        }
+
+        function switchTaskWidgetTab(tab) {
+            const btnEq = document.getElementById('widget-tab-equipo');
+            const btnYo = document.getElementById('widget-tab-yo');
+            const paneEq = document.getElementById('widget-tasks-equipo-pane');
+            const paneYo = document.getElementById('widget-tasks-yo-pane');
+            const title = document.getElementById('widget-title');
+
+            if (tab === 'equipo') {
+                btnEq.className = 'px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition';
+                btnYo.className = 'px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition';
+                paneEq.classList.replace('hidden', 'flex');
+                paneYo.classList.replace('flex', 'hidden');
+                title.textContent = 'Equipo';
+                document.getElementById('btn-add-task-equipo').classList.remove('hidden');
+            } else {
+                btnYo.className = 'px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition';
+                btnEq.className = 'px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition';
+                paneYo.classList.replace('hidden', 'flex');
+                paneEq.classList.replace('flex', 'hidden');
+                title.textContent = 'Personal';
+                document.getElementById('btn-add-task-equipo').classList.add('hidden');
+            }
+        }
+
+        function switchSidePanelTab(tab) {
+            const btnChat = document.getElementById('side-tab-chat');
+            const btnPerf = document.getElementById('side-tab-rendimiento');
+            const paneChat = document.getElementById('side-chat-pane');
+            const panePerf = document.getElementById('side-rendimiento-pane');
+            const senderIndicator = document.getElementById('chat-sender-indicator');
+
+            if (tab === 'chat') {
+                btnChat.className = 'px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition flex items-center gap-1.5';
+                btnPerf.className = 'px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition flex items-center gap-1.5';
+                paneChat.classList.replace('hidden', 'flex');
+                panePerf.classList.replace('flex', 'hidden');
+                senderIndicator.classList.remove('hidden');
+            } else {
+                btnPerf.className = 'px-3 py-1 rounded-lg text-xs font-semibold bg-indigo-600 text-white transition flex items-center gap-1.5';
+                btnChat.className = 'px-3 py-1 rounded-lg text-xs font-medium text-slate-400 hover:text-white transition flex items-center gap-1.5';
+                panePerf.classList.replace('hidden', 'flex');
+                paneChat.classList.replace('flex', 'hidden');
+                senderIndicator.classList.add('hidden');
+                renderPerformanceChart();
+            }
+            lucide.createIcons();
+        }
+
+        function updateChatSenderUI() {
+            const span = document.getElementById('current-sender-name');
+            if (currentChatSender) {
+                span.textContent = currentChatSender;
+                span.className = 'font-semibold text-indigo-400';
+            } else {
+                span.textContent = 'Seleccionar';
+                span.className = 'font-semibold text-amber-400';
+            }
+        }
+
+        function openChatSenderModal() {
+            const modal = document.getElementById('chat-sender-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            lucide.createIcons();
+        }
+
+        function closeChatSenderModal() {
+            document.getElementById('chat-sender-modal').classList.add('hidden');
+            document.getElementById('chat-sender-modal').classList.remove('flex');
+        }
+
+        function setChatSender(name) {
+            currentChatSender = name;
+            localStorage.setItem('rtbrok_chat_sender', name);
+            updateChatSenderUI();
+            closeChatSenderModal();
+            showNotification(`Remitente seleccionado: ${name}`);
+        }
+
+        async function sendChatMessage() {
+            if (!currentChatSender) {
+                openChatSenderModal();
+                return;
+            }
+            const input = document.getElementById('chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            input.value = '';
+            
+            // Optimistic UI append
+            appData.messages.push({
+                timestamp: new Date().toISOString(),
+                user: currentChatSender,
+                message: message
+            });
+            renderChatMessages();
+
+            try {
+                await fetch(ENDPOINT_CHAT, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ user: currentChatSender, message: message })
+                });
+            } catch (e) {
+                console.error('Error sending chat message:', e);
+            }
+        }
+
+        function renderChatMessages() {
+            const container = document.getElementById('chat-messages-container');
+            if (!appData.messages || appData.messages.length === 0) {
+                container.innerHTML = `<div class="text-center text-slate-500 text-xs py-10">No hay mensajes en el chat.</div>`;
+                return;
+            }
+
+            container.innerHTML = appData.messages.map(m => {
+                const isMe = currentChatSender && m.user === currentChatSender;
+                const timeStr = m.timestamp ? new Date(m.timestamp).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+                return `
+                    <div class="flex flex-col ${isMe ? 'items-end' : 'items-start'} gap-1">
+                        <div class="flex items-center gap-1.5 text-[10px] text-slate-400 px-1">
+                            <span class="font-bold text-slate-300">${m.user || 'Desconocido'}</span>
+                            <span>${timeStr}</span>
+                        </div>
+                        <div class="max-w-[85%] px-3 py-2 rounded-2xl text-xs ${isMe ? 'bg-indigo-600 text-white rounded-tr-sm' : 'bg-zinc-900 border border-zinc-800 text-slate-200 rounded-tl-sm'}">
+                            ${m.message || ''}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        function renderPerformanceChart() {
+            const ctx = document.getElementById('performanceChart');
+            if (!ctx) return;
+
+            // Calculate completed tasks per responsible
+            let stats = {};
+            // Initialize known responsables
+            appData.responsables.forEach(r => {
+                stats[r.id] = { name: r.nombre, completed: 0 };
+            });
+
+            appData.tasks.forEach(t => {
+                if (t.estatus && t.estatus.toLowerCase() === 'completado') {
+                    const respId = t.id_responsable;
+                    if (respId) {
+                        if (!stats[respId]) {
+                            stats[respId] = { name: getResponsableNameById(respId), completed: 0 };
+                        }
+                        stats[respId].completed += 1;
+                    }
+                }
+            });
+
+            const labels = [];
+            const dataCounts = [];
+            const backgroundColors = ['#6366f1', '#a855f7', '#06b6d4', '#10b981', '#f59e0b', '#ec4899', '#3b82f6'];
+
+            Object.values(stats).forEach((item, idx) => {
+                if (item.completed > 0 || appData.responsables.length <= 6) {
+                    labels.push(item.name);
+                    dataCounts.push(item.completed);
+                }
+            });
+
+            if (dataCounts.every(c => c === 0)) {
+                // If no completed tasks yet, show placeholder distribution
+                labels.push('Isabel', 'Santiago', 'Diego', 'José Manuel');
+                dataCounts.push(1, 1, 1, 1);
+            }
+
+            if (performanceChartInstance) {
+                performanceChartInstance.destroy();
+            }
+
+            performanceChartInstance = new Chart(ctx, {
+                type: 'doughnut',
+                data: {
+                    labels: labels,
+                    datasets: [{
+                        data: dataCounts,
+                        backgroundColor: backgroundColors.slice(0, labels.length),
+                        borderWidth: 2,
+                        borderColor: '#000000'
+                    }]
+                },
+                options: {
+                    responsive: true,
+                    maintainAspectRatio: false,
+                    plugins: {
+                        legend: {
+                            position: 'bottom',
+                            labels: {
+                                color: '#94a3b8',
+                                boxWidth: 12,
+                                font: { size: 10 }
+                            }
+                        },
+                        title: {
+                            display: true,
+                            text: 'Tareas Completadas por Responsable',
+                            color: '#f1f5f9',
+                            font: { size: 12, weight: 'bold' },
+                            padding: { bottom: 10 }
+                        }
+                    },
+                    cutout: '65%'
+                }
+            });
+        }
+
+        function nextPage() { switchTab(tabsOrder[(currentTabIdx + 1) % tabsOrder.length]); }
+        function prevPage() { switchTab(tabsOrder[(currentTabIdx - 1 + tabsOrder.length) % tabsOrder.length]); }
+
+        function handleSearch(e) {
+            e.preventDefault();
+            const query = document.getElementById('search-input').value.trim();
+            const engine = document.getElementById('search-engine').value;
+            if (!query) return;
+            let url = `https://www.google.com/search?q=${encodeURIComponent(query)}`;
+            if (engine === 'duckduckgo') url = `https://duckduckgo.com/?q=${encodeURIComponent(query)}`;
+            if (engine === 'github') url = `https://github.com/search?q=${encodeURIComponent(query)}`;
+            window.open(url, '_blank');
+        }
+
+        function resolveImageUrl(adjuntos, fallbackName) {
+            if (Array.isArray(adjuntos) && adjuntos.length > 0) {
+                const validAdj = adjuntos.find(a => a.url);
+                if (validAdj && validAdj.url) {
+                    let rawUrl = validAdj.url;
+                    if (rawUrl.includes('drive.google.com')) {
+                        const matchId = rawUrl.match(/\/d\/([a-zA-Z0-9_-]+)/) || rawUrl.match(/id=([a-zA-Z0-9_-]+)/);
+                        if (matchId && matchId[1]) return `https://lh3.googleusercontent.com/d/${matchId[1]}=w800`;
+                    }
+                    return rawUrl;
+                }
+            }
+            return `https://placehold.co/400x400/18181b/71717a?text=${encodeURIComponent(fallbackName || 'Obra')}`;
+        }
+
+        async function fetchAllData() {
+            try {
+                try {
+                    const resB = await fetch(ENDPOINT_TASKS);
+                    const dataB = await resB.json();
+                    appData.tasks = dataB.tareas || [];
+                    appData.proyectos = dataB.proyectos || [];
+                    appData.subproyectos = dataB.subproyectos || [];
+                    appData.responsables = dataB.responsables || [];
+                    setCachedData(CACHE_KEY_TASKS, appData.tasks);
+                } catch (err) {
+                    if (!appData.tasks.length) appData.tasks = getMockTasks();
+                }
+
+                try {
+                    const resA = await fetch(ENDPOINT_ARTWORKS);
+                    const dataA = await resA.json();
+                    appData.artworks = dataA.registrosObra || dataA.data || [];
+                    setCachedData(CACHE_KEY_ARTWORKS, appData.artworks);
+                } catch (err) {
+                    if (!appData.artworks.length) appData.artworks = getMockArtworks();
+                }
+
+                updateCacheTimestamp();
+                renderDashboardWidgets();
+                renderTasksTable();
+                renderArtworksGrid();
+                renderPerformanceChart();
+                lucide.createIcons();
+            } catch (e) { console.error('Error:', e); }
+        }
+
+        function getResponsableNameById(responsableId) {
+            if (!responsableId) return 'Sin asignar';
+            const responsable = appData.responsables.find(r => r.id === responsableId);
+            return responsable ? responsable.nombre : 'Desconocido';
+        }
+
+        function renderShortcuts() {
+            const grid = document.getElementById('shortcuts-grid');
+            grid.innerHTML = defaultShortcuts.map(s => `
+                <a href="${s.url}" target="_blank" class="flex flex-col items-center justify-center p-3 rounded-2xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-zinc-700 transition-all group hover:-translate-y-0.5 shadow-lg">
+                    <div class="w-10 h-10 sm:w-12 sm:h-12 rounded-xl bg-gradient-to-tr ${s.color} flex items-center justify-center text-white shadow-md mb-2 group-hover:scale-105 transition-transform">
+                        <i data-lucide="${s.icon}" class="w-5 h-5 sm:w-6 sm:h-6"></i>
+                    </div>
+                    <span class="text-xs font-medium text-slate-300 truncate w-full text-center">${s.name}</span>
+                </a>
+            `).join('');
+        }
+
+        function renderDashboardWidgets() {
+            const topGrid = document.getElementById('top-artworks-grid');
+            const recentArtworks = appData.artworks.slice(0, 4);
+            if (recentArtworks.length === 0) {
+                topGrid.innerHTML = `<div class="col-span-4 text-center text-slate-500 text-xs py-8 bg-zinc-900">No hay obras recientes</div>`;
+            } else {
+                topGrid.innerHTML = recentArtworks.map(a => {
+                    const imgUrl = resolveImageUrl(a.adjuntos, a.nombre_obra);
+                    return `
+                        <div class="aspect-square bg-zinc-900 overflow-hidden relative group cursor-pointer border-r border-zinc-950 last:border-r-0">
+                            <img src="${imgUrl}" alt="${a.nombre_obra || 'Obra'}"
+                                 onerror="this.onerror=null; this.src='https://placehold.co/400x400/18181b/71717a?text=Obra';"
+                                 class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                        </div>
+                    `;
+                }).join('');
+            }
+
+            const tasksList = document.getElementById('widget-tasks-equipo-pane');
+            const recentTasks = appData.tasks.slice(0, 5);
+            if (recentTasks.length === 0) {
+                tasksList.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">No hay tareas disponibles.</p>`;
+            } else {
+                let html = recentTasks.map(t => {
+                    const responsableName = getResponsableNameById(t.id_responsable);
+                    return `
+                        <div class="flex items-center justify-between p-3 hover:bg-zinc-900/60 transition">
+                            <div class="flex items-center gap-3 overflow-hidden">
+                                <span class="w-2 h-2 rounded-full ${getStatusDotColor(t.estatus)}"></span>
+                                <div class="truncate">
+                                    <p class="text-xs font-medium text-slate-200 truncate">${t.detalles || t.descripcion || 'Sin descripción'}</p>
+                                    <p class="text-[10px] text-slate-400 font-mono">
+                                        ${t.asignacion || 'S/A'} 
+                                        <span class="text-slate-500">·</span> 
+                                        <span class="text-slate-300">${responsableName}</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <span class="text-[10px] px-2 py-0.5 rounded-full ${getStatusBadgeColor(t.estatus)}">${t.estatus || 'pendiente'}</span>
+                        </div>
+                    `;
+                }).join('');
+                html += `
+                    <div class="p-3 text-center bg-zinc-900/40 hover:bg-zinc-900 transition cursor-pointer mt-auto" onclick="switchTab('tasks')">
+                        <button class="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center justify-center gap-1.5 w-full">
+                            <span>Ver todas las tareas</span>
+                            <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
+                        </button>
+                    </div>
+                `;
+                tasksList.innerHTML = html;
+                lucide.createIcons();
+            }
+        }
+
+        function addLocalTask() {
+            const input = document.getElementById('new-local-task-input');
+            const text = input.value.trim();
+            if (!text) return;
+            localTasks.push({ id: Date.now(), text, completed: false });
+            localStorage.setItem('rtbrok_local_tasks', JSON.stringify(localTasks));
+            input.value = '';
+            renderLocalTasks();
+        }
+
+        function toggleLocalTask(id) {
+            localTasks = localTasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
+            localStorage.setItem('rtbrok_local_tasks', JSON.stringify(localTasks));
+            renderLocalTasks();
+        }
+
+        function deleteLocalTask(id) {
+            localTasks = localTasks.filter(t => t.id !== id);
+            localStorage.setItem('rtbrok_local_tasks', JSON.stringify(localTasks));
+            renderLocalTasks();
+        }
+
+        function renderLocalTasks() {
+            const container = document.getElementById('widget-tasks-yo-list');
+            if (!localTasks || localTasks.length === 0) {
+                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">No tienes tareas personales. Añade una arriba.</p>`;
+                return;
+            }
+            container.innerHTML = localTasks.map(t => `
+                <div class="flex items-center justify-between p-3 hover:bg-zinc-900/60 transition">
+                    <div class="flex items-center gap-3 overflow-hidden cursor-pointer" onclick="toggleLocalTask(${t.id})">
+                        <input type="checkbox" ${t.completed ? 'checked' : ''} class="rounded border-zinc-700 bg-zinc-900 text-indigo-600 focus:ring-0 cursor-pointer">
+                        <span class="text-xs text-slate-200 truncate ${t.completed ? 'line-through text-slate-500' : ''}">${t.text}</span>
+                    </div>
+                    <button onclick="deleteLocalTask(${t.id})" class="text-slate-500 hover:text-rose-400 transition p-1"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function renderTasksTable() {
+            const container = document.getElementById('tasks-table-container');
+            if (appData.tasks.length === 0) {
+                container.innerHTML = `<p class="text-sm text-slate-500 text-center py-10">No se encontraron tareas.</p>`;
+                return;
+            }
+            container.innerHTML = appData.tasks.map(t => {
+                const responsableName = getResponsableNameById(t.id_responsable);
+                return `
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 rounded-xl bg-black border border-zinc-800 hover:border-zinc-700 transition">
+                        <div class="flex items-start gap-3">
+                            <div class="p-2 rounded-lg bg-cyan-500/10 text-cyan-400 mt-0.5"><i data-lucide="check-circle" class="w-4 h-4"></i></div>
+                            <div>
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <span class="font-mono text-xs text-cyan-400 font-bold">${t.asignacion || 'S/A'}</span>
+                                    <span class="text-[10px] text-slate-400">Responsable: <span class="text-slate-300">${responsableName}</span></span>
+                                    <span class="text-xs px-2 py-0.5 rounded-full ${getStatusBadgeColor(t.estatus)}">${t.estatus || 'pendiente'}</span>
+                                </div>
+                                <h4 class="text-sm font-semibold text-slate-100 mt-1">${t.detalles || 'Sin detalles'}</h4>
+                                <p class="text-xs text-slate-400 mt-0.5">${t.descripcion || ''}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4 text-xs text-slate-400 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-2 sm:pt-0 border-zinc-800">
+                            <span>Límite: <strong class="text-slate-200">${t.fecha_limite || 'N/A'}</strong></span>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function renderArtworksGrid() {
+            const container = document.getElementById('artworks-grid-container');
+            if (appData.artworks.length === 0) {
+                container.innerHTML = `<p class="text-sm text-slate-500 text-center col-span-full py-10">No se encontraron registros de obra.</p>`;
+                return;
+            }
+            container.innerHTML = appData.artworks.map(a => {
+                const imgUrl = resolveImageUrl(a.adjuntos, a.nombre_obra);
+                const adjCount = Array.isArray(a.adjuntos) ? a.adjuntos.length : 0;
+                return `
+                    <div class="bg-black border border-zinc-800 rounded-2xl overflow-hidden flex flex-col group hover:border-zinc-700 transition shadow-lg">
+                        <div class="h-40 bg-zinc-900 relative overflow-hidden flex items-center justify-center">
+                            <img src="${imgUrl}" alt="Obra" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <div class="absolute top-2 right-2 bg-zinc-900/90 backdrop-blur px-2 py-0.5 rounded text-[10px] text-slate-200 border border-zinc-700">${a.estatus || 'Consolidación'}</div>
+                            ${adjCount > 0 ? `<div class="absolute bottom-2 right-2 bg-indigo-600/90 backdrop-blur px-1.5 py-0.5 rounded text-[10px] text-white flex items-center gap-1"><i data-lucide="paperclip" class="w-3 h-3"></i> ${adjCount}</div>` : ''}
+                        </div>
+                        <div class="p-3 flex flex-col justify-between flex-1 gap-2">
+                            <div>
+                                <h4 class="font-bold text-sm text-slate-100 truncate">${a.nombre_obra || 'Sin Título'}</h4>
+                                <p class="text-xs text-slate-400 truncate">${a.autor || 'Desconocido'}</p>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        function filterTasks() {}
+        function filterArtworks() {}
+
+        function getStatusBadgeColor(estatus) {
+            switch(estatus) {
+                case 'completado': return 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+                case 'en_curso': return 'bg-blue-500/10 text-blue-400 border border-blue-500/20';
+                case 'en_revision': return 'bg-amber-500/10 text-amber-400 border border-amber-500/20';
+                case 'bloqueada': return 'bg-rose-500/10 text-rose-400 border border-rose-500/20';
+                default: return 'bg-zinc-800 text-slate-400 border border-zinc-700';
+            }
+        }
+        function getStatusDotColor(estatus) {
+            switch(estatus) {
+                case 'completado': return 'bg-emerald-400 shadow-lg shadow-emerald-400/50';
+                case 'en_curso': return 'bg-blue-400 shadow-lg shadow-blue-400/50';
+                case 'en_revision': return 'bg-amber-400 shadow-lg shadow-amber-400/50';
+                case 'bloqueada': return 'bg-rose-400 shadow-lg shadow-rose-400/50';
+                default: return 'bg-slate-400';
+            }
+        }
+
+        function getMockTasks() {
+            return [
+                { asignacion: '1.1.1JD', estatus: 'en_curso', prioridad: 'alta', detalles: 'Revisión de planos estructurales', descripcion: 'Verificar especificaciones de cimentación.', fecha_limite: '2026-06-15' },
+                { asignacion: '1.2.2MR', estatus: 'completado', prioridad: 'media', detalles: 'Aprobación de presupuesto inicial', descripcion: 'Validación con directiva.', fecha_limite: '2026-05-30' },
+                { asignacion: '2.1.1AL', estatus: 'en_revision', prioridad: 'baja', detalles: 'Entrega de catálogo de obras', descripcion: 'Compilación fotográfica.', fecha_limite: '2026-06-20' }
+            ];
+        }
+        function getMockArtworks() {
+            return [
+                { nombre_obra: 'Residencia Minimalista Sol', autor: 'Carlos Mendoza', ubicacion: 'Puebla, MX', estatus: 'Consolidación', adjuntos: [] },
+                { nombre_obra: 'Torre Corporativa Cenit', autor: 'Sofía Valdés', ubicacion: 'CDMX', estatus: 'Bodega', adjuntos: [] },
+                { nombre_obra: 'Pabellón Botánico', autor: 'Estudio Arquitectura', ubicacion: 'Monterrey', estatus: 'Vendida', adjuntos: [] },
+                { nombre_obra: 'Casa del Bosque', autor: 'Grupo Z', ubicacion: 'Valle de Bravo', estatus: 'Consolidación', adjuntos: [] }
+            ];
+        }
+
+        function openAddTaskModal() {
+            taskFlow.authenticatedUser = null;
+            taskFlow.selectedProyecto = null;
+            taskFlow.selectedSubproyecto = null;
+            taskFlow.selectedResponsable = null;
+            taskFlow.step = 'login';
+            openLoginModal();
+        }
+
+        function openLoginModal() {
+            const modal = document.getElementById('login-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            lucide.createIcons();
+            loadDirectorsList();
+        }
+
+        function closeLoginModal() {
+            document.getElementById('login-modal').classList.add('hidden');
+            document.getElementById('login-modal').classList.remove('flex');
+        }
+
+        function loadDirectorsList() {
+            const container = document.getElementById('login-users-list');
+            if (appData.responsables.length === 0) {
+                container.innerHTML = `<div class="text-center text-slate-500 text-xs py-4">Cargando usuarios...</div>`;
+                fetchProyectosYSubproyectos().then(() => {
+                    renderDirectorsList();
+                });
+            } else {
+                renderDirectorsList();
+            }
+        }
+
+        function renderDirectorsList() {
+            const container = document.getElementById('login-users-list');
+            const directors = appData.responsables.filter(r =>
+                r.rol && (r.rol.toLowerCase() === 'director' || r.rol.toLowerCase() === 'dirección')
+            );
+
+            if (directors.length === 0) {
+                container.innerHTML = `
+                    <div class="text-center text-slate-500 text-xs py-4">
+                        <p>No hay usuarios con rol Director.</p>
+                        <p class="mt-2 text-[10px] text-slate-600">Solo los Directores pueden crear tareas.</p>
+                    </div>
+                `;
+                return;
+            }
+
+            container.innerHTML = directors.map(d => `
+                <button onclick="selectDirector('${d.id}', '${d.nombre}', '${d.rol}')"
+                        class="flex items-center gap-3 p-3 rounded-xl bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-indigo-500/50 transition w-full text-left">
+                    <div class="w-10 h-10 rounded-full bg-indigo-600/30 flex items-center justify-center text-indigo-400 font-bold text-sm">
+                        ${d.nombre ? d.nombre.charAt(0).toUpperCase() : '?'}
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-slate-200">${d.nombre || 'Sin nombre'}</p>
+                        <p class="text-[10px] text-slate-400">${d.email || 'Sin email'} • ${d.rol || 'Director'}</p>
+                    </div>
+                    <span class="ml-auto text-xs px-2 py-0.5 rounded-full bg-indigo-500/20 text-indigo-400">Director</span>
+                </button>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        function selectDirector(id, nombre, rol) {
+            taskFlow.authenticatedUser = { id, nombre, rol };
+            closeLoginModal();
+            openSelectProjectModal();
+        }
+
+        function openSelectProjectModal() {
+            const modal = document.getElementById('select-project-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            lucide.createIcons();
+
+            if (taskFlow.authenticatedUser) {
+                document.getElementById('auth-user-display').textContent =
+                    `${taskFlow.authenticatedUser.nombre} (${taskFlow.authenticatedUser.rol})`;
+            }
+
+            populateProjectSelect();
+            populateResponsibleSelect();
+
+            document.getElementById('subproject-select').disabled = true;
+            document.getElementById('subproject-select').innerHTML = '<option value="">Primero selecciona un proyecto</option>';
+            document.getElementById('new-task-details').value = '';
+            document.getElementById('new-task-description').value = '';
+            document.getElementById('new-task-priority').value = 'media';
+
+            const today = new Date();
+            const weekLater = new Date(today);
+            weekLater.setDate(today.getDate() + 7);
+            document.getElementById('new-task-deadline').value = weekLater.toISOString().split('T')[0];
+        }
+
+        function closeSelectProjectModal() {
+            document.getElementById('select-project-modal').classList.add('hidden');
+            document.getElementById('select-project-modal').classList.remove('flex');
+        }
+
+        function populateProjectSelect() {
+            const select = document.getElementById('project-select');
+            if (appData.proyectos.length === 0) {
+                select.innerHTML = `<option value="">Cargando proyectos...</option>`;
+                fetchProyectosYSubproyectos().then(() => {
+                    populateProjectSelect();
+                });
+                return;
+            }
+
+            select.innerHTML = '<option value="">Selecciona un proyecto...</option>';
+            appData.proyectos.forEach(p => {
+                const option = document.createElement('option');
+                option.value = p.id;
+                option.textContent = `${p.asignacion || ''} - ${p.nombre}`;
+                select.appendChild(option);
+            });
+
+            select.onchange = function() {
+                const projectId = this.value;
+                if (projectId) {
+                    populateSubprojectSelect(projectId);
+                } else {
+                    document.getElementById('subproject-select').disabled = true;
+                    document.getElementById('subproject-select').innerHTML = '<option value="">Primero selecciona un proyecto</option>';
+                }
+            };
+        }
+
+        function populateSubprojectSelect(projectId) {
+            const select = document.getElementById('subproject-select');
+            const subproyectos = appData.subproyectos.filter(sp => sp.id_proyecto === projectId);
+
+            if (subproyectos.length === 0) {
+                select.innerHTML = '<option value="">No hay subproyectos disponibles</option>';
+                select.disabled = true;
+                return;
+            }
+
+            select.disabled = false;
+            select.innerHTML = '<option value="">Selecciona un subproyecto...</option>';
+            subproyectos.forEach(sp => {
+                const option = document.createElement('option');
+                option.value = sp.id;
+                option.textContent = `${sp.asignacion || ''} - ${sp.nombre}`;
+                select.appendChild(option);
+            });
+        }
+
+        function populateResponsibleSelect() {
+            const select = document.getElementById('responsible-select');
+            if (appData.responsables.length === 0) {
+                select.innerHTML = `<option value="">Cargando responsables...</option>`;
+                fetchProyectosYSubproyectos().then(() => {
+                    populateResponsibleSelect();
+                });
+                return;
+            }
+
+            select.innerHTML = '<option value="">Selecciona un responsable...</option>';
+            const sorted = [...appData.responsables].sort((a, b) => {
+                const order = { 'director': 0, 'supervisor': 1, 'responsable': 2 };
+                const aOrder = a.rol ? (order[a.rol.toLowerCase()] ?? 3) : 3;
+                const bOrder = b.rol ? (order[b.rol.toLowerCase()] ?? 3) : 3;
+                return aOrder - bOrder;
+            });
+
+            sorted.forEach(r => {
+                const option = document.createElement('option');
+                option.value = r.id;
+                const rolBadge = r.rol ? ` [${r.rol}]` : '';
+                option.textContent = `${r.nombre || 'Sin nombre'}${rolBadge} - ${r.email || 'sin email'}`;
+                select.appendChild(option);
+            });
+
+            if (taskFlow.authenticatedUser) {
+                const authId = taskFlow.authenticatedUser.id;
+                for (let i = 0; i < select.options.length; i++) {
+                    if (select.options[i].value === authId) {
+                        select.selectedIndex = i;
+                        break;
+                    }
+                }
+            }
+        }
+
+        async function confirmAddTask() {
+            const projectSelect = document.getElementById('project-select');
+            const subprojectSelect = document.getElementById('subproject-select');
+            const responsibleSelect = document.getElementById('responsible-select');
+            const details = document.getElementById('new-task-details').value.trim();
+            const description = document.getElementById('new-task-description').value.trim();
+            const priority = document.getElementById('new-task-priority').value;
+            const deadline = document.getElementById('new-task-deadline').value;
+
+            const projectId = projectSelect.value;
+            const subprojectId = subprojectSelect.value;
+            const responsableId = responsibleSelect.value;
+
+            if (!projectId) { alert('Por favor selecciona un proyecto.'); return; }
+            if (!subprojectId) { alert('Por favor selecciona un subproyecto.'); return; }
+            if (!responsableId) { alert('Por favor selecciona un responsable para asignar la tarea.'); return; }
+            if (!details) { alert('Por favor ingresa los detalles de la tarea.'); return; }
+            if (!taskFlow.authenticatedUser) { alert('No has iniciado sesión. Por favor intenta de nuevo.'); return; }
+
+            const taskId = 'T_' + Date.now().toString(36).toUpperCase();
+            const payload = {
+                action: 'tarea_add',
+                data: {
+                    id: taskId,
+                    id_subproyecto: subprojectId,
+                    id_responsable: responsableId,
+                    prioridad: priority,
+                    estatus: 'pendiente',
+                    detalles: details,
+                    descripcion: description || '',
+                    fecha_limite: deadline || ''
+                }
+            };
+
+            try {
+                const btn = document.querySelector('#select-project-modal .bg-indigo-600');
+                const originalText = btn.innerHTML;
+                btn.innerHTML = '<i data-lucide="loader-circle" class="w-4 h-4 animate-spin"></i> Creando...';
+                btn.disabled = true;
+
+                await fetch(ENDPOINT_TASKS, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify(payload)
+                });
+
+                await fetchAllData();
+                renderDashboardWidgets();
+                renderTasksTable();
+                renderPerformanceChart();
+
+                btn.innerHTML = originalText;
+                btn.disabled = false;
+                closeSelectProjectModal();
+                showNotification('Tarea creada exitosamente');
+            } catch (error) {
+                console.error('Error al crear tarea:', error);
+                alert('Error al crear la tarea. Por favor intenta de nuevo.');
+                const btn = document.querySelector('#select-project-modal .bg-indigo-600');
+                if (btn) {
+                    btn.innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i> Crear Tarea';
+                    btn.disabled = false;
+                    lucide.createIcons();
+                }
+            }
+        }
+
+        function showNotification(message) {
+            const existing = document.querySelector('.rtbrok-notification');
+            if (existing) existing.remove();
+
+            const div = document.createElement('div');
+            div.className = 'rtbrok-notification fixed bottom-4 left-1/2 -translate-x-1/2 bg-zinc-900 border border-indigo-600/30 rounded-2xl px-6 py-3 shadow-2xl z-[100] flex items-center gap-3';
+            div.innerHTML = `
+                <span class="text-indigo-400"><i data-lucide="check-circle" class="w-5 h-5"></i></span>
+                <span class="text-sm text-slate-200">${message}</span>
+            `;
+            document.body.appendChild(div);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                div.style.opacity = '0';
+                div.style.transition = 'opacity 0.3s';
+                setTimeout(() => div.remove(), 300);
+            }, 3000);
+        }
+
+        document.addEventListener('keydown', function(e) {
+            if (e.ctrlKey && e.key === 'n') {
+                e.preventDefault();
+                openAddTaskModal();
+            }
+            if (e.key === 'Escape') {
+                closeLoginModal();
+                closeSelectProjectModal();
+                closeChatSenderModal();
+            }
+        });
+    </script>
+</body>
+</html>
