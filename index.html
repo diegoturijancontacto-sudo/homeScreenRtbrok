@@ -274,28 +274,40 @@
                 <button onclick="closeChatSenderModal()" class="text-slate-400 hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
             <div class="flex flex-col gap-3">
-                <p class="text-xs text-slate-400">¿Quién va a enviar el mensaje en el chat de equipo?</p>
+                <p class="text-xs text-slate-400">¿Quién va a enviar el mensaje en el chat de equipo? Tu selección se guardará automáticamente en este dispositivo.</p>
                 <div class="grid grid-cols-2 gap-2.5">
-                    <button onclick="setChatSender('Isabel')" class="p-3.5 rounded-xl bg-black border border-zinc-800 hover:border-indigo-500 text-slate-200 font-medium text-xs flex items-center gap-2.5 transition group">
-                        <div class="w-8 h-8 rounded-full bg-indigo-600/30 flex items-center justify-center text-indigo-400 font-bold text-xs group-hover:scale-105 transition">I</div>
-                        <span>Isabel</span>
+                    <button id="btn-sender-Isabel" onclick="setChatSender('Isabel')" class="p-3.5 rounded-xl bg-black border border-zinc-800 hover:border-indigo-500 text-slate-200 font-medium text-xs flex items-center justify-between transition group">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-full bg-indigo-600/30 flex items-center justify-center text-indigo-400 font-bold text-xs group-hover:scale-105 transition">I</div>
+                            <span>Isabel</span>
+                        </div>
+                        <span class="active-badge text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-400 hidden font-semibold">Guardado</span>
                     </button>
-                    <button onclick="setChatSender('Santiago')" class="p-3.5 rounded-xl bg-black border border-zinc-800 hover:border-indigo-500 text-slate-200 font-medium text-xs flex items-center gap-2.5 transition group">
-                        <div class="w-8 h-8 rounded-full bg-purple-600/30 flex items-center justify-center text-purple-400 font-bold text-xs group-hover:scale-105 transition">S</div>
-                        <span>Santiago</span>
+                    <button id="btn-sender-Santiago" onclick="setChatSender('Santiago')" class="p-3.5 rounded-xl bg-black border border-zinc-800 hover:border-indigo-500 text-slate-200 font-medium text-xs flex items-center justify-between transition group">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-full bg-purple-600/30 flex items-center justify-center text-purple-400 font-bold text-xs group-hover:scale-105 transition">S</div>
+                            <span>Santiago</span>
+                        </div>
+                        <span class="active-badge text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-400 hidden font-semibold">Guardado</span>
                     </button>
-                    <button onclick="setChatSender('Diego')" class="p-3.5 rounded-xl bg-black border border-zinc-800 hover:border-indigo-500 text-slate-200 font-medium text-xs flex items-center gap-2.5 transition group">
-                        <div class="w-8 h-8 rounded-full bg-cyan-600/30 flex items-center justify-center text-cyan-400 font-bold text-xs group-hover:scale-105 transition">D</div>
-                        <span>Diego</span>
+                    <button id="btn-sender-Diego" onclick="setChatSender('Diego')" class="p-3.5 rounded-xl bg-black border border-zinc-800 hover:border-indigo-500 text-slate-200 font-medium text-xs flex items-center justify-between transition group">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-full bg-cyan-600/30 flex items-center justify-center text-cyan-400 font-bold text-xs group-hover:scale-105 transition">D</div>
+                            <span>Diego</span>
+                        </div>
+                        <span class="active-badge text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-400 hidden font-semibold">Guardado</span>
                     </button>
-                    <button onclick="setChatSender('José Manuel')" class="p-3.5 rounded-xl bg-black border border-zinc-800 hover:border-indigo-500 text-slate-200 font-medium text-xs flex items-center gap-2.5 transition group">
-                        <div class="w-8 h-8 rounded-full bg-emerald-600/30 flex items-center justify-center text-emerald-400 font-bold text-xs group-hover:scale-105 transition">JM</div>
-                        <span>José Manuel</span>
+                    <button id="btn-sender-JoseManuel" onclick="setChatSender('José Manuel')" class="p-3.5 rounded-xl bg-black border border-zinc-800 hover:border-indigo-500 text-slate-200 font-medium text-xs flex items-center justify-between transition group">
+                        <div class="flex items-center gap-2.5">
+                            <div class="w-8 h-8 rounded-full bg-emerald-600/30 flex items-center justify-center text-emerald-400 font-bold text-xs group-hover:scale-105 transition">JM</div>
+                            <span>José Manuel</span>
+                        </div>
+                        <span class="active-badge text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-400 hidden font-semibold">Guardado</span>
                     </button>
                 </div>
             </div>
             <div class="flex items-center justify-end pt-3 border-t border-zinc-800">
-                <button onclick="closeChatSenderModal()" class="px-4 py-2 rounded-xl text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-slate-300 transition">Cancelar</button>
+                <button onclick="closeChatSenderModal()" class="px-4 py-2 rounded-xl text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-slate-300 transition">Cerrar</button>
             </div>
         </div>
     </div>
@@ -465,7 +477,11 @@
         window.onload = function() {
             initClock();
             renderShortcuts();
+            
+            // Ensure local storage sender is retrieved and applied on page load
+            currentChatSender = localStorage.getItem('rtbrok_chat_sender') || null;
             updateChatSenderUI();
+
             const hasCache = loadFromCache();
             renderDashboardWidgets();
             renderTasksTable();
@@ -607,7 +623,32 @@
             }
         }
 
+        function highlightActiveSenderInModal() {
+            const senders = [
+                { id: 'btn-sender-Isabel', name: 'Isabel' },
+                { id: 'btn-sender-Santiago', name: 'Santiago' },
+                { id: 'btn-sender-Diego', name: 'Diego' },
+                { id: 'btn-sender-JoseManuel', name: 'José Manuel' }
+            ];
+
+            senders.forEach(item => {
+                const btn = document.getElementById(item.id);
+                if (!btn) return;
+                const badge = btn.querySelector('.active-badge');
+                if (currentChatSender === item.name) {
+                    btn.classList.add('border-indigo-500', 'bg-indigo-950/20');
+                    btn.classList.remove('border-zinc-800');
+                    if (badge) badge.classList.remove('hidden');
+                } else {
+                    btn.classList.remove('border-indigo-500', 'bg-indigo-950/20');
+                    btn.classList.add('border-zinc-800');
+                    if (badge) badge.classList.add('hidden');
+                }
+            });
+        }
+
         function openChatSenderModal() {
+            highlightActiveSenderInModal();
             const modal = document.getElementById('chat-sender-modal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -623,8 +664,9 @@
             currentChatSender = name;
             localStorage.setItem('rtbrok_chat_sender', name);
             updateChatSenderUI();
+            renderChatMessages();
             closeChatSenderModal();
-            showNotification(`Remitente seleccionado: ${name}`);
+            showNotification(`Remitente guardado: ${name}`);
         }
 
         async function sendChatMessage() {
@@ -637,7 +679,7 @@
             if (!message) return;
 
             input.value = '';
-            
+
             // Optimistic UI append
             appData.messages.push({
                 timestamp: new Date().toISOString(),
@@ -874,8 +916,8 @@
                                 <div class="truncate">
                                     <p class="text-xs font-medium text-slate-200 truncate">${t.detalles || t.descripcion || 'Sin descripción'}</p>
                                     <p class="text-[10px] text-slate-400 font-mono">
-                                        ${t.asignacion || 'S/A'} 
-                                        <span class="text-slate-500">·</span> 
+                                        ${t.asignacion || 'S/A'}
+                                        <span class="text-slate-500">·</span>
                                         <span class="text-slate-300">${responsableName}</span>
                                     </p>
                                 </div>
@@ -1325,4 +1367,3 @@
     </script>
 </body>
 </html>
-
