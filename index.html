@@ -274,40 +274,28 @@
                 <button onclick="closeChatSenderModal()" class="text-slate-400 hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
             <div class="flex flex-col gap-3">
-                <p class="text-xs text-slate-400">¿Quién va a enviar el mensaje en el chat de equipo? Tu selección se guardará automáticamente en este dispositivo.</p>
+                <p class="text-xs text-slate-400">¿Quién va a enviar el mensaje en el chat de equipo?</p>
                 <div class="grid grid-cols-2 gap-2.5">
-                    <button id="btn-sender-Isabel" onclick="setChatSender('Isabel')" class="p-3.5 rounded-xl bg-black border border-zinc-800 hover:border-indigo-500 text-slate-200 font-medium text-xs flex items-center justify-between transition group">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-8 h-8 rounded-full bg-indigo-600/30 flex items-center justify-center text-indigo-400 font-bold text-xs group-hover:scale-105 transition">I</div>
-                            <span>Isabel</span>
-                        </div>
-                        <span class="active-badge text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-400 hidden font-semibold">Guardado</span>
+                    <button onclick="setChatSender('Isabel')" class="p-3.5 rounded-xl bg-black border border-zinc-800 hover:border-indigo-500 text-slate-200 font-medium text-xs flex items-center gap-2.5 transition group">
+                        <div class="w-8 h-8 rounded-full bg-indigo-600/30 flex items-center justify-center text-indigo-400 font-bold text-xs group-hover:scale-105 transition">I</div>
+                        <span>Isabel</span>
                     </button>
-                    <button id="btn-sender-Santiago" onclick="setChatSender('Santiago')" class="p-3.5 rounded-xl bg-black border border-zinc-800 hover:border-indigo-500 text-slate-200 font-medium text-xs flex items-center justify-between transition group">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-8 h-8 rounded-full bg-purple-600/30 flex items-center justify-center text-purple-400 font-bold text-xs group-hover:scale-105 transition">S</div>
-                            <span>Santiago</span>
-                        </div>
-                        <span class="active-badge text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-400 hidden font-semibold">Guardado</span>
+                    <button onclick="setChatSender('Santiago')" class="p-3.5 rounded-xl bg-black border border-zinc-800 hover:border-indigo-500 text-slate-200 font-medium text-xs flex items-center gap-2.5 transition group">
+                        <div class="w-8 h-8 rounded-full bg-purple-600/30 flex items-center justify-center text-purple-400 font-bold text-xs group-hover:scale-105 transition">S</div>
+                        <span>Santiago</span>
                     </button>
-                    <button id="btn-sender-Diego" onclick="setChatSender('Diego')" class="p-3.5 rounded-xl bg-black border border-zinc-800 hover:border-indigo-500 text-slate-200 font-medium text-xs flex items-center justify-between transition group">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-8 h-8 rounded-full bg-cyan-600/30 flex items-center justify-center text-cyan-400 font-bold text-xs group-hover:scale-105 transition">D</div>
-                            <span>Diego</span>
-                        </div>
-                        <span class="active-badge text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-400 hidden font-semibold">Guardado</span>
+                    <button onclick="setChatSender('Diego')" class="p-3.5 rounded-xl bg-black border border-zinc-800 hover:border-indigo-500 text-slate-200 font-medium text-xs flex items-center gap-2.5 transition group">
+                        <div class="w-8 h-8 rounded-full bg-cyan-600/30 flex items-center justify-center text-cyan-400 font-bold text-xs group-hover:scale-105 transition">D</div>
+                        <span>Diego</span>
                     </button>
-                    <button id="btn-sender-JoseManuel" onclick="setChatSender('José Manuel')" class="p-3.5 rounded-xl bg-black border border-zinc-800 hover:border-indigo-500 text-slate-200 font-medium text-xs flex items-center justify-between transition group">
-                        <div class="flex items-center gap-2.5">
-                            <div class="w-8 h-8 rounded-full bg-emerald-600/30 flex items-center justify-center text-emerald-400 font-bold text-xs group-hover:scale-105 transition">JM</div>
-                            <span>José Manuel</span>
-                        </div>
-                        <span class="active-badge text-[10px] px-1.5 py-0.5 rounded bg-indigo-500/20 text-indigo-400 hidden font-semibold">Guardado</span>
+                    <button onclick="setChatSender('José Manuel')" class="p-3.5 rounded-xl bg-black border border-zinc-800 hover:border-indigo-500 text-slate-200 font-medium text-xs flex items-center gap-2.5 transition group">
+                        <div class="w-8 h-8 rounded-full bg-emerald-600/30 flex items-center justify-center text-emerald-400 font-bold text-xs group-hover:scale-105 transition">JM</div>
+                        <span>José Manuel</span>
                     </button>
                 </div>
             </div>
             <div class="flex items-center justify-end pt-3 border-t border-zinc-800">
-                <button onclick="closeChatSenderModal()" class="px-4 py-2 rounded-xl text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-slate-300 transition">Cerrar</button>
+                <button onclick="closeChatSenderModal()" class="px-4 py-2 rounded-xl text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-slate-300 transition">Cancelar</button>
             </div>
         </div>
     </div>
@@ -477,11 +465,7 @@
         window.onload = function() {
             initClock();
             renderShortcuts();
-            
-            // Ensure local storage sender is retrieved and applied on page load
-            currentChatSender = localStorage.getItem('rtbrok_chat_sender') || null;
             updateChatSenderUI();
-
             const hasCache = loadFromCache();
             renderDashboardWidgets();
             renderTasksTable();
@@ -525,7 +509,6 @@
                     renderChatMessages();
                 }
             } catch(e) {
-                // Fallback simulation if cross-origin or no direct GET handler
                 if (!appData.messages.length) {
                     appData.messages = [
                         { timestamp: new Date().toISOString(), user: 'sistema', message: 'Hola equipo, bienvenidos al panel de chat.' },
@@ -623,32 +606,7 @@
             }
         }
 
-        function highlightActiveSenderInModal() {
-            const senders = [
-                { id: 'btn-sender-Isabel', name: 'Isabel' },
-                { id: 'btn-sender-Santiago', name: 'Santiago' },
-                { id: 'btn-sender-Diego', name: 'Diego' },
-                { id: 'btn-sender-JoseManuel', name: 'José Manuel' }
-            ];
-
-            senders.forEach(item => {
-                const btn = document.getElementById(item.id);
-                if (!btn) return;
-                const badge = btn.querySelector('.active-badge');
-                if (currentChatSender === item.name) {
-                    btn.classList.add('border-indigo-500', 'bg-indigo-950/20');
-                    btn.classList.remove('border-zinc-800');
-                    if (badge) badge.classList.remove('hidden');
-                } else {
-                    btn.classList.remove('border-indigo-500', 'bg-indigo-950/20');
-                    btn.classList.add('border-zinc-800');
-                    if (badge) badge.classList.add('hidden');
-                }
-            });
-        }
-
         function openChatSenderModal() {
-            highlightActiveSenderInModal();
             const modal = document.getElementById('chat-sender-modal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -664,9 +622,8 @@
             currentChatSender = name;
             localStorage.setItem('rtbrok_chat_sender', name);
             updateChatSenderUI();
-            renderChatMessages();
             closeChatSenderModal();
-            showNotification(`Remitente guardado: ${name}`);
+            showNotification(`Remitente seleccionado: ${name}`);
         }
 
         async function sendChatMessage() {
@@ -680,7 +637,6 @@
 
             input.value = '';
 
-            // Optimistic UI append
             appData.messages.push({
                 timestamp: new Date().toISOString(),
                 user: currentChatSender,
@@ -729,9 +685,7 @@
             const ctx = document.getElementById('performanceChart');
             if (!ctx) return;
 
-            // Calculate completed tasks per responsible
             let stats = {};
-            // Initialize known responsables
             appData.responsables.forEach(r => {
                 stats[r.id] = { name: r.nombre, completed: 0 };
             });
@@ -752,7 +706,7 @@
             const dataCounts = [];
             const backgroundColors = ['#6366f1', '#a855f7', '#06b6d4', '#10b981', '#f59e0b', '#ec4899', '#3b82f6'];
 
-            Object.values(stats).forEach((item, idx) => {
+            Object.values(stats).forEach((item) => {
                 if (item.completed > 0 || appData.responsables.length <= 6) {
                     labels.push(item.name);
                     dataCounts.push(item.completed);
@@ -760,7 +714,6 @@
             });
 
             if (dataCounts.every(c => c === 0)) {
-                // If no completed tasks yet, show placeholder distribution
                 labels.push('Isabel', 'Santiago', 'Diego', 'José Manuel');
                 dataCounts.push(1, 1, 1, 1);
             }
@@ -903,11 +856,27 @@
             }
 
             const tasksList = document.getElementById('widget-tasks-equipo-pane');
-            const recentTasks = appData.tasks.slice(0, 5);
-            if (recentTasks.length === 0) {
-                tasksList.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">No hay tareas disponibles.</p>`;
+
+            // FILTRAR TAREAS: Excluir completadas y ordenar por fecha (más recientes primero)
+            const pendingTasks = appData.tasks
+                .filter(t => {
+                    const status = (t.estatus || '').toLowerCase();
+                    return status !== 'completado' && status !== 'completada';
+                })
+                // Ordenar por fecha de creación (asumiendo que existe un campo de fecha)
+                .sort((a, b) => {
+                    // Si hay una fecha de creación, usarla; si no, usar fecha_limite como fallback
+                    const dateA = a.fecha_creacion || a.fecha_limite || '';
+                    const dateB = b.fecha_creacion || b.fecha_limite || '';
+                    // Orden descendente (más reciente primero)
+                    return dateB.localeCompare(dateA);
+                })
+                .slice(0, 5);
+
+            if (pendingTasks.length === 0) {
+                tasksList.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">No hay tareas pendientes actuales.</p>`;
             } else {
-                let html = recentTasks.map(t => {
+                let html = pendingTasks.map(t => {
                     const responsableName = getResponsableNameById(t.id_responsable);
                     return `
                         <div class="flex items-center justify-between p-3 hover:bg-zinc-900/60 transition">
@@ -1346,11 +1315,11 @@
             document.body.appendChild(div);
             lucide.createIcons();
 
-            setTimeout(() => {
+(--setTimeout(() => {
                 div.style.opacity = '0';
                 div.style.transition = 'opacity 0.3s';
                 setTimeout(() => div.remove(), 300);
-            }, 3000);
+            }, 3000));
         }
 
         document.addEventListener('keydown', function(e) {
