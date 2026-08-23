@@ -27,6 +27,13 @@
         .modal-overlay { background: rgba(0,0,0,0.85); backdrop-filter: blur(8px); }
         .hide-scrollbar::-webkit-scrollbar { display: none; }
         .hide-scrollbar { -ms-overflow-style: none; scrollbar-width: none; }
+        .pending-message-indicator {
+            animation: pulse-border 1.5s ease-in-out infinite;
+        }
+        @keyframes pulse-border {
+            0%, 100% { border-color: rgba(251, 191, 36, 0.2); }
+            50% { border-color: rgba(251, 191, 36, 0.6); }
+        }
     </style>
 </head>
 <body class="h-full bg-black text-slate-100 flex overflow-hidden select-none">
@@ -178,7 +185,10 @@
                                         <h4 class="text-xs font-bold text-slate-100 flex items-center gap-1.5">
                                             RTBROK <span class="w-2 h-2 bg-emerald-500 inline-block"></span>
                                         </h4>
-                                        <p class="text-[10px] text-zinc-400">En línea</p>
+                                        <p class="text-[10px] text-zinc-400 flex items-center gap-1">
+                                            <span>Enviando como: </span>
+                                            <span id="chat-sender-display" class="text-indigo-400 font-medium">Sin seleccionar</span>
+                                        </p>
                                     </div>
                                 </div>
                                 <div class="flex items-center gap-2 text-zinc-400">
@@ -208,7 +218,7 @@
                             <span class="text-xs font-bold uppercase tracking-wider text-zinc-400">RENDIMIENTO GENERAL (Tareas completadas por responsable)</span>
                             <button onclick="switchTab('tasks')" class="text-xs text-zinc-400 hover:text-white transition">Ver más</button>
                         </div>
-                        
+
                         <!-- Segmented Bar Matching the requested style -->
                         <div id="general-performance-bar-container" class="flex flex-col gap-3">
                             <div id="general-performance-bar" class="w-full bg-zinc-900 h-4 flex overflow-hidden border border-zinc-800/80 rounded-sm">
@@ -277,7 +287,8 @@
         <div class="bg-zinc-950 border border-zinc-900 w-full max-w-md p-6 shadow-2xl flex flex-col gap-5">
             <div class="flex items-center justify-between border-b border-zinc-900 pb-4">
                 <h3 class="font-bold text-sm text-slate-100 flex items-center gap-2">
-                    <i data-lucide="user-check" class="w-4 h-4 text-white"></i> Seleccionar Remitente
+                    <i data-lucide="user-check" class="w-4 h-4 text-white"></i>
+                    Seleccionar Remitente <span class="text-amber-400 text-xs font-normal">(Requerido)</span>
                 </h3>
                 <button onclick="closeChatSenderModal()" class="text-zinc-500 hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
@@ -298,6 +309,12 @@
                     <div class="w-8 h-8 bg-zinc-800 flex items-center justify-center text-white font-bold text-xs">JM</div>
                     <span>José Manuel</span>
                 </button>
+            </div>
+            <div id="pending-message-container" class="hidden">
+                <div class="pending-message-indicator text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 p-2 rounded flex items-center gap-2">
+                    <i data-lucide="message-square" class="w-3 h-3"></i>
+                    <span id="pending-message-text">Mensaje pendiente de enviar</span>
+                </div>
             </div>
         </div>
     </div>
@@ -389,6 +406,7 @@
         const ENDPOINT_TASKS = 'https://script.google.com/macros/s/AKfycbxmPBIboe_Evn45ZHjtkjydbmlPRMuSax_sEiTc2iN8cqqi2i4-Pf_lOd6875cQXEd_yg/exec';
         const ENDPOINT_ARTWORKS = 'https://script.google.com/macros/s/AKfycbxyBzZ7duM3pKtobXHj8A2NgFpIarP5WPS71TKTH2uFMOXXL8rzo68-blixF8kgCwvl8w/exec';
         const ENDPOINT_CHAT = 'https://script.google.com/macros/s/AKfycbzU6YqBsWekqjP-SOV1_LCV_GQnO1ZX9Gl0Th-U2dwTx2yJe0x1MmmnovRwT0qAYui6/exec';
+        const CHAT_API_URL = 'https://bot-yy1q.onrender.com/send';
 
         let appData = {
             tasks: [],
@@ -400,7 +418,8 @@
         };
 
         let localTasks = JSON.parse(localStorage.getItem('rtbrok_local_tasks') || '[]');
-        let currentChatSender = localStorage.getItem('rtbrok_chat_sender') || 'RTBROK';
+        let currentChatSender = localStorage.getItem('rtbrok_chat_sender') || null;
+        let pendingChatMessage = null;
         let taskFlow = { authenticatedUser: null };
         const tabsOrder = ['dashboard', 'tasks', 'artworks'];
         let currentTabIdx = 0;
@@ -411,6 +430,11 @@
             fetchAllData();
             setInterval(fetchChatMessages, 8000);
             renderLocalTasks();
+
+            // Restaurar fecha actual
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            document.getElementById('current-date').textContent = now.toLocaleDateString('es-ES', options);
         };
 
         function initClock() {
@@ -596,11 +620,20 @@
 
         function renderChatMessages() {
             const container = document.getElementById('widget-chat-messages');
-            container.innerHTML = appData.messages.map(m => {
+            if (!container) return;
+
+            container.innerHTML = appData.messages.map((m, index) => {
                 const isMe = m.user === currentChatSender || m.user === 'RTBROK';
+                const isPending = m.sending === true;
+                const isError = m.error === true;
+
                 return `
                     <div class="flex flex-col ${isMe && m.user !== 'Galería S14' && m.user !== 'Coleccionista' ? 'items-end' : 'items-start'} gap-0.5 px-2">
-                        <div class="text-[9px] text-zinc-500 font-medium">${m.user}</div>
+                        <div class="text-[9px] text-zinc-500 font-medium flex items-center gap-1.5">
+                            ${m.user}
+                            ${isPending ? '<span class="text-amber-400 text-[8px] animate-pulse">● Enviando...</span>' : ''}
+                            ${isError ? '<span class="text-rose-400 text-[8px]">● Error</span>' : ''}
+                        </div>
                         <div class="max-w-[85%] px-3 py-2 text-xs ${isMe && m.user !== 'Galería S14' && m.user !== 'Coleccionista' ? 'bg-zinc-900 text-slate-100 border border-zinc-800' : 'bg-zinc-900/60 text-slate-300 border border-zinc-800/80'}">
                             ${m.message}
                         </div>
@@ -609,6 +642,175 @@
             }).join('');
             container.scrollTop = container.scrollHeight;
         }
+
+        // ============= CHAT FUNCTIONS =============
+
+        async function sendWidgetChatMessage() {
+            const input = document.getElementById('widget-chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            // Verificar si hay un remitente seleccionado
+            if (!currentChatSender) {
+                // Guardar el mensaje para enviarlo después de seleccionar el remitente
+                pendingChatMessage = message;
+                openChatSenderModal();
+                // Mostrar indicador en el input
+                input.placeholder = 'Selecciona un remitente primero...';
+                input.style.borderColor = 'rgba(251, 191, 36, 0.5)';
+                return;
+            }
+
+            // Limpiar estado del input
+            input.placeholder = 'Escribe un mensaje...';
+            input.style.borderColor = '';
+
+            // Formatear mensaje con el remitente
+            const formattedMessage = `[${currentChatSender}]: ${message}`;
+
+            // Enviar a la API
+            try {
+                const encodedMessage = encodeURIComponent(formattedMessage);
+                const url = `${CHAT_API_URL}?number=120363406622431210@g.us&message=${encodedMessage}`;
+
+                // Mostrar mensaje localmente mientras se envía
+                const tempMessage = {
+                    timestamp: new Date().toISOString(),
+                    user: currentChatSender,
+                    message: message,
+                    sending: true
+                };
+                appData.messages.push(tempMessage);
+                renderChatMessages();
+
+                // Enviar a la API
+                const response = await fetch(url, {
+                    method: 'GET',
+                    mode: 'no-cors'
+                });
+
+                // Limpiar input
+                input.value = '';
+
+                // Actualizar mensaje como enviado
+                const lastMessageIndex = appData.messages.length - 1;
+                if (appData.messages[lastMessageIndex] && appData.messages[lastMessageIndex].sending) {
+                    appData.messages[lastMessageIndex].sending = false;
+                    renderChatMessages();
+                }
+
+                // También guardar en el endpoint de chat si existe
+                try {
+                    const chatPayload = {
+                        action: 'sendMessage',
+                        user: currentChatSender,
+                        message: message
+                    };
+                    await fetch(ENDPOINT_CHAT, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(chatPayload)
+                    });
+                } catch (e) {
+                    console.log('Chat endpoint not available, message sent via API');
+                }
+
+            } catch (error) {
+                console.error('Error al enviar mensaje:', error);
+                // Mostrar error visual
+                const lastMessage = appData.messages[appData.messages.length - 1];
+                if (lastMessage) {
+                    lastMessage.error = true;
+                    lastMessage.sending = false;
+                    renderChatMessages();
+                }
+            }
+        }
+
+        function setChatSender(name) {
+            currentChatSender = name;
+            localStorage.setItem('rtbrok_chat_sender', name);
+            closeChatSenderModal();
+            updateChatSenderUI();
+
+            // Limpiar estado del input
+            const input = document.getElementById('widget-chat-input');
+            if (input) {
+                input.placeholder = 'Escribe un mensaje...';
+                input.style.borderColor = '';
+            }
+
+            // Si hay un mensaje pendiente, enviarlo automáticamente
+            if (pendingChatMessage) {
+                const message = pendingChatMessage;
+                pendingChatMessage = null;
+                // Limpiar el indicador de mensaje pendiente
+                const pendingContainer = document.getElementById('pending-message-container');
+                if (pendingContainer) {
+                    pendingContainer.classList.add('hidden');
+                }
+                // Esperar un momento para que se cierre el modal
+                setTimeout(() => {
+                    const input = document.getElementById('widget-chat-input');
+                    if (input) {
+                        input.value = message;
+                        sendWidgetChatMessage();
+                    }
+                }, 100);
+            }
+        }
+
+        function openChatSenderModal() {
+            const modal = document.getElementById('chat-sender-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            // Mostrar/ocultar mensaje pendiente
+            const pendingContainer = document.getElementById('pending-message-container');
+            const pendingText = document.getElementById('pending-message-text');
+
+            if (pendingChatMessage) {
+                pendingContainer.classList.remove('hidden');
+                pendingText.textContent = `"${pendingChatMessage.substring(0, 40)}${pendingChatMessage.length > 40 ? '...' : ''}"`;
+            } else {
+                pendingContainer.classList.add('hidden');
+            }
+
+            lucide.createIcons();
+        }
+
+        function closeChatSenderModal() {
+            document.getElementById('chat-sender-modal').classList.add('hidden');
+            document.getElementById('chat-sender-modal').classList.remove('flex');
+
+            // Si se cierra sin seleccionar remitente, restaurar el mensaje en el input
+            if (pendingChatMessage) {
+                const input = document.getElementById('widget-chat-input');
+                if (input && !input.value) {
+                    input.value = pendingChatMessage;
+                    input.placeholder = 'Selecciona un remitente...';
+                    input.style.borderColor = 'rgba(251, 191, 36, 0.5)';
+                    pendingChatMessage = null;
+                }
+            }
+
+            // Ocultar mensaje pendiente
+            const pendingContainer = document.getElementById('pending-message-container');
+            if (pendingContainer) {
+                pendingContainer.classList.add('hidden');
+            }
+        }
+
+        function updateChatSenderUI() {
+            const displayElement = document.getElementById('chat-sender-display');
+            if (displayElement) {
+                displayElement.textContent = currentChatSender || 'Sin seleccionar';
+                displayElement.className = currentChatSender ? 'text-indigo-400 font-medium' : 'text-amber-400 font-medium';
+            }
+        }
+
+        // ============= END CHAT FUNCTIONS =============
 
         function resolveImageUrl(adjuntos, fallbackName) {
             if (Array.isArray(adjuntos) && adjuntos.length > 0 && adjuntos[0].url) {
@@ -626,22 +828,19 @@
             const barContainer = document.getElementById('general-performance-bar');
             const legendContainer = document.getElementById('general-performance-legend');
 
-            // Calculate completed tasks per responsible
             const completedTasks = appData.tasks.filter(t => {
                 const st = (t.estatus || '').toLowerCase();
                 return st === 'completado' || st === 'completada';
             });
 
             const totalCompleted = completedTasks.length;
-            
-            // Map responsible counts
+
             const countsMap = {};
             completedTasks.forEach(t => {
                 const respName = getResponsableNameById(t.id_responsable);
                 countsMap[respName] = (countsMap[respName] || 0) + 1;
             });
 
-            // If no completed tasks in mock, provide some fallback distribution based on responsables or mock data
             let entries = Object.entries(countsMap);
             if (entries.length === 0) {
                 entries = [
@@ -726,9 +925,8 @@
                 lucide.createIcons();
             }
 
-            // ARTWORKS: Reordered so most recent appear at the top, and 6 columns layout
             const artworksGrid = document.getElementById('dashboard-artworks-grid');
-            let artworkItems = [...appData.artworks].reverse(); // Most recent at top
+            let artworkItems = [...appData.artworks].reverse();
             while (artworkItems.length < 18 && artworkItems.length > 0) {
                 artworkItems = artworkItems.concat([...appData.artworks].reverse());
             }
@@ -784,7 +982,7 @@
                 container.innerHTML = `<p class="text-sm text-slate-500 text-center col-span-full py-10">No se encontraron registros de obra.</p>`;
                 return;
             }
-            let artworkItems = [...appData.artworks].reverse(); // Most recent at top
+            let artworkItems = [...appData.artworks].reverse();
             while (artworkItems.length < 18 && artworkItems.length > 0) {
                 artworkItems = artworkItems.concat([...appData.artworks].reverse());
             }
@@ -820,32 +1018,55 @@
             return [
                 { nombre_obra: 'Residencia Minimalista', autor: 'Carlos Mendoza', ubicacion: 'Puebla, MX', estatus: 'Consolidación', adjuntos: [{ url: 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=500' }] },
                 { nombre_obra: 'Torre Corporativa', autor: 'Sofía Valdés', ubicacion: 'CDMX', estatus: 'Bodega', adjuntos: [{ url: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=500' }] },
-                { name_obra: 'Pabellón Botánico', autor: 'Estudio Arquitectura', ubicacion: 'Monterrey', estatus: 'Vendida', adjuntos: [{ url: 'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=500' }] },
+                { nombre_obra: 'Pabellón Botánico', autor: 'Estudio Arquitectura', ubicacion: 'Monterrey', estatus: 'Vendida', adjuntos: [{ url: 'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=500' }] },
                 { nombre_obra: 'Casa del Bosque', autor: 'Grupo Z', ubicacion: 'Valle de Bravo', estatus: 'Consolidación', adjuntos: [{ url: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=500' }] }
             ];
         }
 
         function openChatSenderModal() {
-            document.getElementById('chat-sender-modal').classList.remove('hidden');
-            document.getElementById('chat-sender-modal').classList.add('flex');
+            const modal = document.getElementById('chat-sender-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            const pendingContainer = document.getElementById('pending-message-container');
+            const pendingText = document.getElementById('pending-message-text');
+
+            if (pendingChatMessage) {
+                pendingContainer.classList.remove('hidden');
+                pendingText.textContent = `"${pendingChatMessage.substring(0, 40)}${pendingChatMessage.length > 40 ? '...' : ''}"`;
+            } else {
+                pendingContainer.classList.add('hidden');
+            }
+
             lucide.createIcons();
         }
+
         function closeChatSenderModal() {
             document.getElementById('chat-sender-modal').classList.add('hidden');
             document.getElementById('chat-sender-modal').classList.remove('flex');
+
+            if (pendingChatMessage) {
+                const input = document.getElementById('widget-chat-input');
+                if (input && !input.value) {
+                    input.value = pendingChatMessage;
+                    input.placeholder = 'Selecciona un remitente...';
+                    input.style.borderColor = 'rgba(251, 191, 36, 0.5)';
+                    pendingChatMessage = null;
+                }
+            }
+
+            const pendingContainer = document.getElementById('pending-message-container');
+            if (pendingContainer) {
+                pendingContainer.classList.add('hidden');
+            }
         }
-        function setChatSender(name) {
-            currentChatSender = name;
-            localStorage.setItem('rtbrok_chat_sender', name);
-            closeChatSenderModal();
-        }
-        function updateChatSenderUI() {}
 
         function openLoginModal() {
             document.getElementById('login-modal').classList.remove('hidden');
             document.getElementById('login-modal').classList.add('flex');
             loadDirectorsList();
         }
+
         function closeLoginModal() {
             document.getElementById('login-modal').classList.add('hidden');
             document.getElementById('login-modal').classList.remove('flex');
@@ -1120,6 +1341,11 @@
                 closeChatSenderModal();
             }
         });
+
+        // Función para abrir el modal de tareas (alias)
+        function openAddTaskModal() {
+            openSelectProjectModal();
+        }
     </script>
 </body>
 </html>
