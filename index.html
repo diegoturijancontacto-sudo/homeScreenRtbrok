@@ -4,12 +4,9 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RTBROK Workspace</title>
-    <script src="https://cdn.tailwindcss.com">
-    </script>
-    <script src="https://unpkg.com/lucide@latest">
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js">
-    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
@@ -55,8 +52,7 @@
             animation: pulse-border 1.5s ease-in-out infinite;
         }
         @keyframes pulse-border {
-            0%,
-            100% {
+            0%, 100% {
                 border-color: rgba(251, 191, 36, 0.2);
             }
             50% {
@@ -95,7 +91,7 @@
             </button>
 
             <!-- Drive -->
-            <a href="https://drive.google.com/drive/folders/1IKdpJc0ezb6ZwtUzXJm6I91WZIO3s7FS?usp=sharing" target="_blank" class="group flex flex-col items-center gap-1.5 text-zinc-400 hover:text-white transition">
+            <a href="https://drive.google.com" target="_blank" class="group flex flex-col items-center gap-1.5 text-zinc-400 hover:text-white transition">
                 <div class="w-11 h-11 bg-zinc-900/40 group-hover:bg-zinc-900 border border-transparent group-hover:border-zinc-800 flex items-center justify-center transition shadow-lg">
                     <i data-lucide="hard-drive" class="w-5 h-5"></i>
                 </div>
@@ -158,7 +154,7 @@
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
 
                         <!-- TAREAS WIDGET -->
-                        <section class="bg-zinc-950 border border-zinc-900 p-5 sm:p-6 flex flex-col h-[400px] shadow-2xl relative">
+                        <section class="bg-zinc-950 border border-zinc-900 p-5 sm:p-6 flex flex-col h-[420px] shadow-2xl relative">
                             <div class="flex items-center justify-between mb-4">
                                 <div class="flex items-center gap-1 bg-black p-1 border border-zinc-800">
                                     <button onclick="switchTaskWidgetTab('equipo')" id="widget-tab-equipo" class="px-3 py-1 text-xs font-semibold bg-indigo-600 text-white transition">Equipo</button>
@@ -205,7 +201,7 @@
                         </section>
 
                         <!-- CHAT WIDGET -->
-                        <section class="bg-zinc-950 border border-zinc-900 p-5 sm:p-6 flex flex-col h-[400px] shadow-2xl relative">
+                        <section class="bg-zinc-950 border border-zinc-900 p-5 sm:p-6 flex flex-col h-[420px] shadow-2xl relative">
                             <div class="flex items-center justify-between mb-3 pb-2 border-b border-zinc-900">
                                 <div class="flex items-center gap-3">
                                     <div class="w-8 h-8 bg-zinc-900 border border-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-300">RT</div>
@@ -239,26 +235,26 @@
 
                     </div>
 
-                    <!-- RENDIMIENTO GENERAL SECTION (Multi-segment completed tasks per responsible) -->
+                    <!-- RENDIMIENTO GENERAL SECTION -->
                     <section class="bg-zinc-950 border border-zinc-900 p-6 shadow-2xl flex flex-col gap-4">
                         <div class="flex items-center justify-between">
                             <span class="text-xs font-bold uppercase tracking-wider text-zinc-400">RENDIMIENTO GENERAL (Tareas completadas por responsable)</span>
                             <button onclick="switchTab('tasks')" class="text-xs text-zinc-400 hover:text-white transition">Ver más</button>
                         </div>
 
-                        <!-- Segmented Bar Matching the requested style -->
+                        <!-- Segmented Bar -->
                         <div id="general-performance-bar-container" class="flex flex-col gap-3">
                             <div id="general-performance-bar" class="w-full bg-zinc-900 h-4 flex overflow-hidden border border-zinc-800/80 rounded-sm">
-                                <!-- Populated dynamically with color segments -->
+                                <!-- Populated dynamically -->
                             </div>
                             <div id="general-performance-legend" class="flex flex-wrap items-center gap-4 pt-1 text-xs text-zinc-300">
-                                <!-- Populated dynamically with legend and percentages -->
+                                <!-- Populated dynamically -->
                             </div>
                         </div>
                     </section>
                 </div>
 
-                <!-- ARTWORKS GALLERY GRID (3 columns on mobile, 6 on larger screens) -->
+                <!-- ARTWORKS GALLERY GRID -->
                 <section class="w-full pb-10">
                     <div id="dashboard-artworks-grid" class="grid grid-cols-3 md:grid-cols-6 gap-0 w-full">
                         <!-- Populated dynamically -->
@@ -342,6 +338,24 @@
                     <i data-lucide="message-square" class="w-3 h-3"></i>
                     <span id="pending-message-text">Mensaje pendiente de enviar</span>
                 </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- MODAL: Identificar Responsable para Acción de Estado -->
+    <div id="action-login-modal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-zinc-950 border border-zinc-900 w-full max-w-md p-6 shadow-2xl flex flex-col gap-5">
+            <div class="flex items-center justify-between border-b border-zinc-900 pb-4">
+                <div>
+                    <h3 class="font-bold text-sm text-slate-100 flex items-center gap-2">
+                        <i data-lucide="user-check" class="w-4 h-4 text-indigo-400"></i> Identificar Responsable
+                    </h3>
+                    <p class="text-[11px] text-slate-400 mt-0.5">Selecciona tu usuario para confirmar la actualización</p>
+                </div>
+                <button onclick="closeActionLoginModal()" class="text-zinc-500 hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div id="action-users-list" class="flex flex-col gap-2 max-h-64 overflow-y-auto pr-1">
+                <div class="text-center text-zinc-500 text-xs py-4">Cargando responsables...</div>
             </div>
         </div>
     </div>
@@ -448,6 +462,7 @@
         let currentChatSender = localStorage.getItem('rtbrok_chat_sender') || null;
         let pendingChatMessage = null;
         let taskFlow = { authenticatedUser: null };
+        let pendingStatusChange = null; // Guarda { taskId, newStatus } para ejecutar post-login
         const tabsOrder = ['dashboard', 'tasks', 'artworks'];
         let currentTabIdx = 0;
 
@@ -457,6 +472,14 @@
             fetchAllData();
             setInterval(fetchChatMessages, 8000);
             renderLocalTasks();
+
+            // Restaurar sesión guardada de usuario si existe
+            const savedUser = sessionStorage.getItem('currentUser');
+            if (savedUser) {
+                try {
+                    taskFlow.authenticatedUser = JSON.parse(savedUser);
+                } catch(e){}
+            }
 
             // Restaurar fecha actual
             const now = new Date();
@@ -469,7 +492,6 @@
                 const now = new Date();
                 let hours = now.getHours();
                 const minutes = String(now.getMinutes()).padStart(2, '0');
-                const ampm = hours >= 12 ? 'PM' : 'AM';
                 hours = hours % 12 || 12;
                 document.getElementById('clock').innerText = `${hours}:${minutes}`;
             }, 1000);
@@ -543,19 +565,18 @@
         function renderLocalTasks() {
             const container = document.getElementById('widget-tasks-yo-list');
             if (!localTasks || localTasks.length === 0) {
-                container.innerHTML =
-                `<p class="text-xs text-slate-500 text-center py-6">No tienes tareas personales. Añade una arriba.</p>`;
+                container.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">No tienes tareas personales. Añade una arriba.</p>`;
                 return;
             }
             container.innerHTML = localTasks.map(t => `
-                    <div class="flex items-center justify-between p-3 hover:bg-zinc-900/60 transition">
-                        <div class="flex items-center gap-3 overflow-hidden cursor-pointer" onclick="toggleLocalTask(${t.id})">
-                            <input type="checkbox" ${t.completed ? 'checked' : ''} class="border-zinc-700 bg-zinc-900 text-indigo-600 focus:ring-0 cursor-pointer">
-                            <span class="text-xs text-slate-200 truncate ${t.completed ? 'line-through text-slate-500' : ''}">${t.text}</span>
-                        </div>
-                        <button onclick="deleteLocalTask(${t.id})" class="text-slate-500 hover:text-rose-400 transition p-1"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                <div class="flex items-center justify-between p-3 hover:bg-zinc-900/60 transition">
+                    <div class="flex items-center gap-3 overflow-hidden cursor-pointer" onclick="toggleLocalTask(${t.id})">
+                        <input type="checkbox" ${t.completed ? 'checked' : ''} class="border-zinc-700 bg-zinc-900 text-indigo-600 focus:ring-0 cursor-pointer">
+                        <span class="text-xs text-slate-200 truncate ${t.completed ? 'line-through text-slate-500' : ''}">${t.text}</span>
                     </div>
-                `).join('');
+                    <button onclick="deleteLocalTask(${t.id})" class="text-slate-500 hover:text-rose-400 transition p-1"><i data-lucide="trash-2" class="w-3.5 h-3.5"></i></button>
+                </div>
+            `).join('');
             lucide.createIcons();
         }
 
@@ -568,6 +589,7 @@
         function getStatusBadgeColor(estatus) {
             switch ((estatus || '').toLowerCase()) {
                 case 'completado':
+                case 'completada':
                     return 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
                 case 'en_curso':
                     return 'bg-blue-500/10 text-blue-400 border border-blue-500/20';
@@ -583,6 +605,7 @@
         function getStatusDotColor(estatus) {
             switch ((estatus || '').toLowerCase()) {
                 case 'completado':
+                case 'completada':
                     return 'bg-emerald-400 shadow-lg shadow-emerald-400/50';
                 case 'en_curso':
                     return 'bg-blue-400 shadow-lg shadow-blue-400/50';
@@ -593,6 +616,10 @@
                 default:
                     return 'bg-slate-400';
             }
+        }
+
+        function escapeHtml(str) {
+            return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         }
 
         async function fetchAllData() {
@@ -661,58 +688,139 @@
             const container = document.getElementById('widget-chat-messages');
             if (!container) return;
 
-            container.innerHTML = appData.messages.map((m, index) => {
+            container.innerHTML = appData.messages.map((m) => {
                 const isMe = m.user === currentChatSender || m.user === 'RTBROK';
                 const isPending = m.sending === true;
                 const isError = m.error === true;
 
                 return `
-                        <div class="flex flex-col ${isMe && m.user !== 'Galería S14' && m.user !== 'Coleccionista' ? 'items-end' : 'items-start'} gap-0.5 px-2">
-                            <div class="text-[9px] text-zinc-500 font-medium flex items-center gap-1.5">
-                                ${m.user}
-                                ${isPending ? '<span class="text-amber-400 text-[8px] animate-pulse">● Enviando...</span>' : ''}
-                                ${isError ? '<span class="text-rose-400 text-[8px]">● Error</span>' : ''}
-                            </div>
-                            <div class="max-w-[85%] px-3 py-2 text-xs ${isMe && m.user !== 'Galería S14' && m.user !== 'Coleccionista' ? 'bg-zinc-900 text-slate-100 border border-zinc-800' : 'bg-zinc-900/60 text-slate-300 border border-zinc-800/80'}">
-                                ${m.message}
-                            </div>
+                    <div class="flex flex-col ${isMe && m.user !== 'Galería S14' && m.user !== 'Coleccionista' ? 'items-end' : 'items-start'} gap-0.5 px-2">
+                        <div class="text-[9px] text-zinc-500 font-medium flex items-center gap-1.5">
+                            ${m.user}
+                            ${isPending ? '<span class="text-amber-400 text-[8px] animate-pulse">● Enviando...</span>' : ''}
+                            ${isError ? '<span class="text-rose-400 text-[8px]">● Error</span>' : ''}
                         </div>
-                    `;
+                        <div class="max-w-[85%] px-3 py-2 text-xs ${isMe && m.user !== 'Galería S14' && m.user !== 'Coleccionista' ? 'bg-zinc-900 text-slate-100 border border-zinc-800' : 'bg-zinc-900/60 text-slate-300 border border-zinc-800/80'}">
+                            ${m.message}
+                        </div>
+                    </div>
+                `;
             }).join('');
             container.scrollTop = container.scrollHeight;
         }
 
-        // ============= CHAT FUNCTIONS =============
+        function requestStatusChange(taskId, newStatus) {
+            pendingStatusChange = { taskId, newStatus };
+            if (!taskFlow.authenticatedUser) {
+                openActionLoginModal();
+            } else {
+                executeStatusChange(taskId, newStatus, taskFlow.authenticatedUser);
+            }
+        }
+
+        function openActionLoginModal() {
+            const container = document.getElementById('action-users-list');
+            if (!container) return;
+
+            if (appData.responsables.length === 0) {
+                container.innerHTML = `<div class="text-center text-zinc-500 text-xs py-4">Cargando responsables...</div>`;
+            } else {
+                container.innerHTML = appData.responsables.map(r => `
+                    <button onclick="selectUserForAction('${r.id}', '${r.nombre}', '${r.rol || 'responsable'}')"
+                            class="flex items-center gap-3 p-3 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-indigo-500/50 transition w-full text-left">
+                        <div class="w-9 h-9 bg-indigo-600/30 flex items-center justify-center text-indigo-400 font-bold text-xs">
+                            ${r.nombre ? r.nombre.charAt(0).toUpperCase() : '?'}
+                        </div>
+                        <div>
+                            <p class="text-xs font-medium text-slate-200">${r.nombre || 'Sin nombre'}</p>
+                            <p class="text-[10px] text-slate-400">${r.email || ''} ${r.rol ? '• ' + r.rol : ''}</p>
+                        </div>
+                        <span class="ml-auto text-[10px] px-2 py-0.5 bg-zinc-800 text-slate-300 font-medium uppercase">${r.rol || 'User'}</span>
+                    </button>
+                `).join('');
+            }
+
+            const modal = document.getElementById('action-login-modal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            lucide.createIcons();
+        }
+
+        function closeActionLoginModal() {
+            const modal = document.getElementById('action-login-modal');
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            pendingStatusChange = null;
+        }
+
+        function selectUserForAction(id, nombre, rol) {
+            taskFlow.authenticatedUser = { id, nombre, rol };
+            sessionStorage.setItem('currentUser', JSON.stringify({ id, name: nombre, role: rol }));
+
+            const authDisplay = document.getElementById('auth-user-display');
+            if (authDisplay) authDisplay.textContent = `${nombre} (${rol})`;
+
+            closeActionLoginModal();
+
+            if (pendingStatusChange) {
+                const { taskId, newStatus } = pendingStatusChange;
+                pendingStatusChange = null;
+                executeStatusChange(taskId, newStatus, taskFlow.authenticatedUser);
+            }
+        }
+
+        async function executeStatusChange(taskId, newStatus, user) {
+            const tarea = appData.tasks.find(t => t.id === taskId);
+            if (!tarea) return;
+
+            const oldStatus = tarea.estatus;
+            tarea.estatus = newStatus;
+
+            // Actualización inmediata en UI
+            renderDashboardWidgets();
+            renderTasksTable();
+            renderGeneralPerformanceBar();
+
+            showNotification(`Actualizado por ${user.nombre}: ${oldStatus || 'pendiente'} ➔ ${newStatus}`);
+
+            // Enviar actualización al servidor backend (Google Apps Script)
+            try {
+                await fetch(ENDPOINT_TASKS, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'tarea_update',
+                        data: tarea
+                    })
+                });
+            } catch (e) {
+                console.error('Error actualizando estado en servidor:', e);
+            }
+        }
 
         async function sendWidgetChatMessage() {
             const input = document.getElementById('widget-chat-input');
             const message = input.value.trim();
             if (!message) return;
 
-            // Verificar si hay un remitente seleccionado
             if (!currentChatSender) {
-                // Guardar el mensaje para enviarlo después de seleccionar el remitente
                 pendingChatMessage = message;
                 openChatSenderModal();
-                // Mostrar indicador en el input
                 input.placeholder = 'Selecciona un remitente primero...';
                 input.style.borderColor = 'rgba(251, 191, 36, 0.5)';
                 return;
             }
 
-            // Limpiar estado del input
             input.placeholder = 'Escribe un mensaje...';
             input.style.borderColor = '';
 
-            // Formatear mensaje con el remitente
             const formattedMessage = `[${currentChatSender}]: ${message}`;
 
-            // Enviar a la API
             try {
                 const encodedMessage = encodeURIComponent(formattedMessage);
                 const url = `${CHAT_API_URL}?number=120363406622431210@g.us&message=${encodedMessage}`;
 
-                // Mostrar mensaje localmente mientras se envía
                 const tempMessage = {
                     timestamp: new Date().toISOString(),
                     user: currentChatSender,
@@ -722,23 +830,19 @@
                 appData.messages.push(tempMessage);
                 renderChatMessages();
 
-                // Enviar a la API
-                const response = await fetch(url, {
+                await fetch(url, {
                     method: 'GET',
                     mode: 'no-cors'
                 });
 
-                // Limpiar input
                 input.value = '';
 
-                // Actualizar mensaje como enviado
                 const lastMessageIndex = appData.messages.length - 1;
                 if (appData.messages[lastMessageIndex] && appData.messages[lastMessageIndex].sending) {
                     appData.messages[lastMessageIndex].sending = false;
                     renderChatMessages();
                 }
 
-                // También guardar en el endpoint de chat si existe
                 try {
                     const chatPayload = {
                         action: 'sendMessage',
@@ -752,12 +856,11 @@
                         body: JSON.stringify(chatPayload)
                     });
                 } catch (e) {
-                    console.log('Chat endpoint not available, message sent via API');
+                    console.log('Mensaje enviado mediante API.');
                 }
 
             } catch (error) {
                 console.error('Error al enviar mensaje:', error);
-                // Mostrar error visual
                 const lastMessage = appData.messages[appData.messages.length - 1];
                 if (lastMessage) {
                     lastMessage.error = true;
@@ -773,23 +876,18 @@
             closeChatSenderModal();
             updateChatSenderUI();
 
-            // Limpiar estado del input
             const input = document.getElementById('widget-chat-input');
             if (input) {
                 input.placeholder = 'Escribe un mensaje...';
                 input.style.borderColor = '';
             }
 
-            // Si hay un mensaje pendiente, enviarlo automáticamente
             if (pendingChatMessage) {
                 const message = pendingChatMessage;
                 pendingChatMessage = null;
-                // Limpiar el indicador de mensaje pendiente
                 const pendingContainer = document.getElementById('pending-message-container');
-                if (pendingContainer) {
-                    pendingContainer.classList.add('hidden');
-                }
-                // Esperar un momento para que se cierre el modal
+                if (pendingContainer) pendingContainer.classList.add('hidden');
+
                 setTimeout(() => {
                     const input = document.getElementById('widget-chat-input');
                     if (input) {
@@ -805,14 +903,12 @@
             modal.classList.remove('hidden');
             modal.classList.add('flex');
 
-            // Mostrar/ocultar mensaje pendiente
             const pendingContainer = document.getElementById('pending-message-container');
             const pendingText = document.getElementById('pending-message-text');
 
             if (pendingChatMessage) {
                 pendingContainer.classList.remove('hidden');
-                pendingText.textContent =
-                    `"${pendingChatMessage.substring(0, 40)}${pendingChatMessage.length > 40 ? '...' : ''}"`;
+                pendingText.textContent = `"${pendingChatMessage.substring(0, 40)}${pendingChatMessage.length > 40 ? '...' : ''}"`;
             } else {
                 pendingContainer.classList.add('hidden');
             }
@@ -824,7 +920,6 @@
             document.getElementById('chat-sender-modal').classList.add('hidden');
             document.getElementById('chat-sender-modal').classList.remove('flex');
 
-            // Si se cierra sin seleccionar remitente, restaurar el mensaje en el input
             if (pendingChatMessage) {
                 const input = document.getElementById('widget-chat-input');
                 if (input && !input.value) {
@@ -835,23 +930,17 @@
                 }
             }
 
-            // Ocultar mensaje pendiente
             const pendingContainer = document.getElementById('pending-message-container');
-            if (pendingContainer) {
-                pendingContainer.classList.add('hidden');
-            }
+            if (pendingContainer) pendingContainer.classList.add('hidden');
         }
 
         function updateChatSenderUI() {
             const displayElement = document.getElementById('chat-sender-display');
             if (displayElement) {
                 displayElement.textContent = currentChatSender || 'Sin seleccionar';
-                displayElement.className = currentChatSender ? 'text-indigo-400 font-medium' :
-                    'text-amber-400 font-medium';
+                displayElement.className = currentChatSender ? 'text-indigo-400 font-medium' : 'text-amber-400 font-medium';
             }
         }
-
-        // ============= END CHAT FUNCTIONS =============
 
         function resolveImageUrl(adjuntos, fallbackName) {
             if (Array.isArray(adjuntos) && adjuntos.length > 0 && adjuntos[0].url) {
@@ -874,8 +963,6 @@
                 return st === 'completado' || st === 'completada';
             });
 
-            const totalCompleted = completedTasks.length;
-
             const countsMap = {};
             completedTasks.forEach(t => {
                 const respName = getResponsableNameById(t.id_responsable);
@@ -893,9 +980,7 @@
             }
 
             const total = entries.reduce((acc, curr) => acc + curr[1], 0) || 1;
-            const colors = ['bg-orange-500', 'bg-purple-600', 'bg-amber-400', 'bg-blue-500', 'bg-emerald-500',
-                'bg-rose-500'
-            ];
+            const colors = ['bg-orange-500', 'bg-purple-600', 'bg-amber-400', 'bg-blue-500', 'bg-emerald-500', 'bg-rose-500'];
 
             let barHtml = '';
             let legendHtml = '';
@@ -903,18 +988,16 @@
             entries.forEach(([name, count], index) => {
                 const pct = ((count / total) * 100).toFixed(1);
                 const colorClass = colors[index % colors.length];
-                const dotColorHex = ['#f97316', '#9333ea', '#fbbf24', '#3b82f6', '#10b981', '#f43f5e'][index % colors
-                .length];
+                const dotColorHex = ['#f97316', '#9333ea', '#fbbf24', '#3b82f6', '#10b981', '#f43f5e'][index % colors.length];
 
-                barHtml +=
-                    `<div class="${colorClass} h-full transition-all duration-500" style="width: ${pct}%;" title="${name}: ${pct}% (${count} tareas)"></div>`;
+                barHtml += `<div class="${colorClass} h-full transition-all duration-500" style="width: ${pct}%;" title="${name}: ${pct}% (${count} tareas)"></div>`;
                 legendHtml += `
-                        <div class="flex items-center gap-2">
-                            <span class="w-3 h-3 rounded-full inline-block" style="background-color: ${dotColorHex};"></span>
-                            <span class="font-medium text-slate-200">${name}</span>
-                            <span class="text-zinc-400">${pct}%</span>
-                        </div>
-                    `;
+                    <div class="flex items-center gap-2">
+                        <span class="w-3 h-3 rounded-full inline-block" style="background-color: ${dotColorHex};"></span>
+                        <span class="font-medium text-slate-200">${name}</span>
+                        <span class="text-zinc-400">${pct}%</span>
+                    </div>
+                `;
             });
 
             barContainer.innerHTML = barHtml;
@@ -924,48 +1007,57 @@
         function renderDashboardWidgets() {
             const tasksContainer = document.getElementById('widget-tasks-equipo-pane');
 
-            const pendingTasks = appData.tasks
+            // Muestra las últimas tareas agregadas independientemente de su estado (excepto completadas)
+            const pendingTasks = [...appData.tasks]
                 .filter(t => {
                     const status = (t.estatus || '').toLowerCase();
                     return status !== 'completado' && status !== 'completada';
                 })
-                .sort((a, b) => {
-                    const dateA = a.fecha_creacion || a.fecha_limite || '';
-                    const dateB = b.fecha_creacion || b.fecha_limite || '';
-                    return dateB.localeCompare(dateA);
-                })
-                .slice(0, 6);
+                .reverse()
+                .slice(0, 7);
 
             if (pendingTasks.length === 0) {
                 tasksContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">No hay tareas pendientes actuales.</p>`;
             } else {
                 let html = pendingTasks.map(t => {
                     const responsableName = getResponsableNameById(t.id_responsable);
-                    return `
-                            <div class="flex items-center justify-between p-3 hover:bg-zinc-900/60 transition">
-                                <div class="flex items-center gap-3 overflow-hidden">
-                                    <span class="w-2 h-2 ${getStatusDotColor(t.estatus)}"></span>
-                                    <div class="truncate">
-                                        <p class="text-xs font-medium text-slate-200 truncate">${t.detalles || t.descripcion || 'Sin descripción'}</p>
-                                        <p class="text-[10px] text-slate-400 font-mono">
-                                            ${t.asignacion || 'S/A'}
-                                            <span class="text-slate-500">·</span>
-                                            <span class="text-slate-300">${responsableName}</span>
-                                        </p>
-                                    </div>
-                                </div>
-                                <span class="text-[10px] px-2 py-0.5 ${getStatusBadgeColor(t.estatus)}">${t.estatus || 'pendiente'}</span>
+                    const st = (t.estatus || 'pendiente').toLowerCase();
+
+                    let actionButtons = '';
+                    if (st === 'pendiente') {
+                        actionButtons = `<button onclick="requestStatusChange('${t.id}', 'en_curso')" class="px-2.5 py-1 text-[10px] font-semibold bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/30 transition flex items-center gap-1 shrink-0"><i data-lucide="play" class="w-3 h-3"></i> Iniciar</button>`;
+                    } else if (st === 'en_curso') {
+                        actionButtons = `
+                            <div class="flex items-center gap-1 shrink-0">
+                                <button onclick="requestStatusChange('${t.id}', 'pendiente')" class="px-2 py-1 text-[10px] font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 transition" title="Pausar"><i data-lucide="pause" class="w-3 h-3"></i></button>
+                                <button onclick="requestStatusChange('${t.id}', 'en_revision')" class="px-2 py-1 text-[10px] font-semibold bg-amber-600/20 hover:bg-amber-600/40 text-amber-400 border border-amber-500/30 transition flex items-center gap-1"><i data-lucide="file-search" class="w-3 h-3"></i> Revisión</button>
                             </div>
                         `;
-                }).join('');
-                html += `
-                        <div class="p-3 text-center bg-zinc-900/40 hover:bg-zinc-900 transition cursor-pointer mt-auto" onclick="switchTab('tasks')">
-                            <button class="text-xs text-indigo-400 hover:text-indigo-300 font-medium flex items-center justify-center gap-1.5 w-full">
-                                <span>Ver todas las tareas</span>
-                                <i data-lucide="arrow-right" class="w-3.5 h-3.5"></i>
-                            </button>
+                    } else if (st === 'en_revision') {
+                        actionButtons = `<button onclick="requestStatusChange('${t.id}', 'completado')" class="px-2.5 py-1 text-[10px] font-semibold bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 transition flex items-center gap-1 shrink-0"><i data-lucide="check" class="w-3 h-3"></i> Aprobar</button>`;
+                    }
+
+                    return `
+                        <div class="flex items-center justify-between p-3 hover:bg-zinc-900/60 transition gap-2">
+                            <div class="flex items-center gap-3 overflow-hidden min-w-0 flex-1">
+                                <span class="w-2 h-2 rounded-full shrink-0 ${getStatusDotColor(t.estatus)}"></span>
+                                <div class="truncate">
+                                    <p class="text-xs font-medium text-slate-200 truncate" title="${escapeHtml(t.detalles || t.descripcion || 'Sin descripción')}">${t.detalles || t.descripcion || 'Sin descripción'}</p>
+                                    <p class="text-[10px] text-slate-400 font-mono">
+                                        ${t.asignacion || 'S/A'}
+                                        <span class="text-slate-500">·</span>
+                                        <span class="text-slate-300">${responsableName}</span>
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-2 shrink-0">
+                                <span class="text-[10px] px-2 py-0.5 ${getStatusBadgeColor(t.estatus)}">${t.estatus || 'pendiente'}</span>
+                                ${actionButtons}
+                            </div>
                         </div>
                     `;
+                }).join('');
+
                 tasksContainer.innerHTML = html;
                 lucide.createIcons();
             }
@@ -980,12 +1072,12 @@
             artworksGrid.innerHTML = displayedArtworks.map(a => {
                 const imgUrl = resolveImageUrl(a.adjuntos, a.nombre_obra);
                 return `
-                        <div class="aspect-square bg-zinc-900 overflow-hidden relative group cursor-pointer border border-zinc-950 shadow-xl">
-                            <img src="${imgUrl}" alt="${a.nombre_obra || 'Obra'}"
-                                 onerror="this.onerror=null; this.src='https://placehold.co/400x400/18181b/71717a?text=Obra';"
-                                 class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                        </div>
-                    `;
+                    <div class="aspect-square bg-zinc-900 overflow-hidden relative group cursor-pointer border border-zinc-950 shadow-xl">
+                        <img src="${imgUrl}" alt="${a.nombre_obra || 'Obra'}"
+                             onerror="this.onerror=null; this.src='https://placehold.co/400x400/18181b/71717a?text=Obra';"
+                             class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                    </div>
+                `;
             }).join('');
             lucide.createIcons();
         }
@@ -998,25 +1090,42 @@
             }
             container.innerHTML = appData.tasks.map(t => {
                 const responsableName = getResponsableNameById(t.id_responsable);
-                return `
-                        <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 bg-black border border-zinc-800 hover:border-zinc-700 transition">
-                            <div class="flex items-start gap-3">
-                                <div class="p-2 bg-cyan-500/10 text-cyan-400 mt-0.5"><i data-lucide="check-circle" class="w-4 h-4"></i></div>
-                                <div>
-                                    <div class="flex items-center gap-2 flex-wrap">
-                                        <span class="font-mono text-xs text-cyan-400 font-bold">${t.asignacion || 'S/A'}</span>
-                                        <span class="text-[10px] text-slate-400">Responsable: <span class="text-slate-300">${responsableName}</span></span>
-                                        <span class="text-xs px-2 py-0.5 ${getStatusBadgeColor(t.estatus)}">${t.estatus || 'pendiente'}</span>
-                                    </div>
-                                    <h4 class="text-sm font-semibold text-slate-100 mt-1">${t.detalles || 'Sin detalles'}</h4>
-                                    <p class="text-xs text-slate-400 mt-0.5">${t.descripcion || ''}</p>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-4 text-xs text-slate-400 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-2 sm:pt-0 border-zinc-800">
-                                <span>Límite: <strong class="text-slate-200">${t.fecha_limite || 'N/A'}</strong></span>
-                            </div>
+                const st = (t.estatus || 'pendiente').toLowerCase();
+
+                let actionButtons = '';
+                if (st === 'pendiente') {
+                    actionButtons = `<button onclick="requestStatusChange('${t.id}', 'en_curso')" class="px-2.5 py-1 text-xs font-semibold bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/30 transition flex items-center gap-1"><i data-lucide="play" class="w-3.5 h-3.5"></i> Iniciar</button>`;
+                } else if (st === 'en_curso') {
+                    actionButtons = `
+                        <div class="flex items-center gap-1">
+                            <button onclick="requestStatusChange('${t.id}', 'pendiente')" class="px-2 py-1 text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 transition" title="Pausar"><i data-lucide="pause" class="w-3.5 h-3.5"></i></button>
+                            <button onclick="requestStatusChange('${t.id}', 'en_revision')" class="px-2.5 py-1 text-xs font-semibold bg-amber-600/20 hover:bg-amber-600/40 text-amber-400 border border-amber-500/30 transition flex items-center gap-1"><i data-lucide="file-search" class="w-3.5 h-3.5"></i> Enviar a revisión</button>
                         </div>
                     `;
+                } else if (st === 'en_revision') {
+                    actionButtons = `<button onclick="requestStatusChange('${t.id}', 'completado')" class="px-2.5 py-1 text-xs font-semibold bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 transition flex items-center gap-1"><i data-lucide="check" class="w-3.5 h-3.5"></i> Aprobar</button>`;
+                }
+
+                return `
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 bg-black border border-zinc-800 hover:border-zinc-700 transition">
+                        <div class="flex items-start gap-3">
+                            <div class="p-2 bg-cyan-500/10 text-cyan-400 mt-0.5"><i data-lucide="check-circle" class="w-4 h-4"></i></div>
+                            <div>
+                                <div class="flex items-center gap-2 flex-wrap">
+                                    <span class="font-mono text-xs text-cyan-400 font-bold">${t.asignacion || 'S/A'}</span>
+                                    <span class="text-[10px] text-slate-400">Responsable: <span class="text-slate-300">${responsableName}</span></span>
+                                    <span class="text-xs px-2 py-0.5 ${getStatusBadgeColor(t.estatus)}">${t.estatus || 'pendiente'}</span>
+                                </div>
+                                <h4 class="text-sm font-semibold text-slate-100 mt-1">${t.detalles || 'Sin detalles'}</h4>
+                                <p class="text-xs text-slate-400 mt-0.5">${t.descripcion || ''}</p>
+                            </div>
+                        </div>
+                        <div class="flex items-center gap-4 text-xs text-slate-400 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-2 sm:pt-0 border-zinc-800">
+                            <span>Límite: <strong class="text-slate-200">${t.fecha_limite || 'N/A'}</strong></span>
+                            ${actionButtons}
+                        </div>
+                    </div>
+                `;
             }).join('');
             lucide.createIcons();
         }
@@ -1024,8 +1133,7 @@
         function renderArtworksGrid() {
             const container = document.getElementById('artworks-grid-container');
             if (appData.artworks.length === 0) {
-                container.innerHTML =
-                    `<p class="text-sm text-slate-500 text-center col-span-full py-10">No se encontraron registros de obra.</p>`;
+                container.innerHTML = `<p class="text-sm text-slate-500 text-center col-span-full py-10">No se encontraron registros de obra.</p>`;
                 return;
             }
             let artworkItems = [...appData.artworks].reverse();
@@ -1038,84 +1146,35 @@
                 const imgUrl = resolveImageUrl(a.adjuntos, a.nombre_obra);
                 const adjCount = Array.isArray(a.adjuntos) ? a.adjuntos.length : 0;
                 return `
-                        <div class="bg-black border border-zinc-950 overflow-hidden flex flex-col group hover:border-zinc-700 transition shadow-lg aspect-square relative">
-                            <div class="w-full h-full bg-zinc-900 relative overflow-hidden flex items-center justify-center">
-                                <img src="${imgUrl}" alt="Obra" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
-                                <div class="absolute top-2 right-2 bg-zinc-900/90 backdrop-blur px-2 py-0.5 text-[10px] text-slate-200 border border-zinc-700">${a.estatus || 'Consolidación'}</div>
-                                ${adjCount > 0 ? `<div class="absolute bottom-2 right-2 bg-indigo-600/90 backdrop-blur px-1.5 py-0.5 text-[10px] text-white flex items-center gap-1"><i data-lucide="paperclip" class="w-3 h-3"></i> ${adjCount}</div>` : ''}
-                            </div>
+                    <div class="bg-black border border-zinc-950 overflow-hidden flex flex-col group hover:border-zinc-700 transition shadow-lg aspect-square relative">
+                        <div class="w-full h-full bg-zinc-900 relative overflow-hidden flex items-center justify-center">
+                            <img src="${imgUrl}" alt="Obra" class="w-full h-full object-cover group-hover:scale-105 transition duration-500">
+                            <div class="absolute top-2 right-2 bg-zinc-900/90 backdrop-blur px-2 py-0.5 text-[10px] text-slate-200 border border-zinc-700">${a.estatus || 'Consolidación'}</div>
+                            ${adjCount > 0 ? `<div class="absolute bottom-2 right-2 bg-indigo-600/90 backdrop-blur px-1.5 py-0.5 text-[10px] text-white flex items-center gap-1"><i data-lucide="paperclip" class="w-3 h-3"></i> ${adjCount}</div>` : ''}
                         </div>
-                    `;
+                    </div>
+                `;
             }).join('');
             lucide.createIcons();
         }
 
         function getMockTasks() {
             return [
-                { asignacion: '2.5.9JM', estatus: 'completado', prioridad: 'alta', detalles: 'Revisar documentación del proyecto',
-                    descripcion: 'Validar planos estructurales con el equipo.', fecha_limite: '2026-06-15',
-                    id_responsable: '1' },
-                { asignacion: '1.2.2MR', estatus: 'completado', prioridad: 'media', detalles: 'Aprobación de presupuesto inicial',
-                    descripcion: 'Validación con directiva.', fecha_limite: '2026-05-30', id_responsable: '2' },
-                { asignacion: '2.1.1AL', estatus: 'completado', prioridad: 'baja', detalles: 'Entrega de catálogo de obras',
-                    descripcion: 'Compilación fotográfica.', fecha_limite: '2026-06-20', id_responsable: '3' },
-                { asignacion: '1.3.4IS', estatus: 'completado', prioridad: 'media', detalles: 'Actualizar inventario de obras',
-                    descripcion: 'Registrar nuevas adquisiciones.', fecha_limite: '2026-07-01', id_responsable: '1' },
-                { asignacion: '3.2.1DR', estatus: 'en_curso', prioridad: 'urgente', detalles: 'Resolver conflicto de permisos',
-                    descripcion: 'Coordinación con autoridades.', fecha_limite: '2026-06-10', id_responsable: '4' }
+                { id: 'T1', asignacion: '2.5.9JM', estatus: 'completado', prioridad: 'alta', detalles: 'Revisar documentación del proyecto', descripcion: 'Validar planos estructurales con el equipo.', fecha_limite: '2026-06-15', id_responsable: '1' },
+                { id: 'T2', asignacion: '1.2.2MR', estatus: 'completado', prioridad: 'media', detalles: 'Aprobación de presupuesto inicial', descripcion: 'Validación con directiva.', fecha_limite: '2026-05-30', id_responsable: '2' },
+                { id: 'T3', asignacion: '2.1.1AL', estatus: 'completado', prioridad: 'baja', detalles: 'Entrega de catálogo de obras', descripcion: 'Compilación fotográfica.', fecha_limite: '2026-06-20', id_responsable: '3' },
+                { id: 'T4', asignacion: '1.3.4IS', estatus: 'en_curso', prioridad: 'media', detalles: 'Actualizar inventario de obras', descripcion: 'Registrar nuevas adquisiciones.', fecha_limite: '2026-07-01', id_responsable: '1' },
+                { id: 'T5', asignacion: '3.2.1DR', estatus: 'pendiente', prioridad: 'urgente', detalles: 'Resolver conflicto de permisos', descripcion: 'Coordinación con autoridades.', fecha_limite: '2026-06-10', id_responsable: '4' }
             ];
         }
 
         function getMockArtworks() {
             return [
-                { nombre_obra: 'Residencia Minimalista', autor: 'Carlos Mendoza', ubicacion: 'Puebla, MX',
-                    estatus: 'Consolidación', adjuntos: [{ url: 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=500' }] },
-                { nombre_obra: 'Torre Corporativa', autor: 'Sofía Valdés', ubicacion: 'CDMX', estatus: 'Bodega',
-                    adjuntos: [{ url: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=500' }] },
-                { nombre_obra: 'Pabellón Botánico', autor: 'Estudio Arquitectura', ubicacion: 'Monterrey',
-                    estatus: 'Vendida', adjuntos: [{ url: 'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=500' }] },
-                { nombre_obra: 'Casa del Bosque', autor: 'Grupo Z', ubicacion: 'Valle de Bravo', estatus: 'Consolidación',
-                    adjuntos: [{ url: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=500' }] }
+                { nombre_obra: 'Residencia Minimalista', autor: 'Carlos Mendoza', ubicacion: 'Puebla, MX', estatus: 'Consolidación', adjuntos: [{ url: 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=500' }] },
+                { nombre_obra: 'Torre Corporativa', autor: 'Sofía Valdés', ubicacion: 'CDMX', estatus: 'Bodega', adjuntos: [{ url: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=500' }] },
+                { nombre_obra: 'Pabellón Botánico', autor: 'Estudio Arquitectura', ubicacion: 'Monterrey', estatus: 'Vendida', adjuntos: [{ url: 'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=500' }] },
+                { nombre_obra: 'Casa del Bosque', autor: 'Grupo Z', ubicacion: 'Valle de Bravo', estatus: 'Consolidación', adjuntos: [{ url: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=500' }] }
             ];
-        }
-
-        function openChatSenderModal() {
-            const modal = document.getElementById('chat-sender-modal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-
-            const pendingContainer = document.getElementById('pending-message-container');
-            const pendingText = document.getElementById('pending-message-text');
-
-            if (pendingChatMessage) {
-                pendingContainer.classList.remove('hidden');
-                pendingText.textContent =
-                    `"${pendingChatMessage.substring(0, 40)}${pendingChatMessage.length > 40 ? '...' : ''}"`;
-            } else {
-                pendingContainer.classList.add('hidden');
-            }
-
-            lucide.createIcons();
-        }
-
-        function closeChatSenderModal() {
-            document.getElementById('chat-sender-modal').classList.add('hidden');
-            document.getElementById('chat-sender-modal').classList.remove('flex');
-
-            if (pendingChatMessage) {
-                const input = document.getElementById('widget-chat-input');
-                if (input && !input.value) {
-                    input.value = pendingChatMessage;
-                    input.placeholder = 'Selecciona un remitente...';
-                    input.style.borderColor = 'rgba(251, 191, 36, 0.5)';
-                    pendingChatMessage = null;
-                }
-            }
-
-            const pendingContainer = document.getElementById('pending-message-container');
-            if (pendingContainer) {
-                pendingContainer.classList.add('hidden');
-            }
         }
 
         function openLoginModal() {
@@ -1132,8 +1191,7 @@
         function loadDirectorsList() {
             const container = document.getElementById('login-users-list');
             if (appData.responsables.length === 0) {
-                container.innerHTML =
-                `<div class="text-center text-zinc-500 text-xs py-4">Cargando usuarios...</div>`;
+                container.innerHTML = `<div class="text-center text-zinc-500 text-xs py-4">Cargando usuarios...</div>`;
                 fetchAllData().then(() => {
                     renderDirectorsList();
                 });
@@ -1150,32 +1208,33 @@
 
             if (directors.length === 0) {
                 container.innerHTML = `
-                        <div class="text-center text-zinc-500 text-xs py-4">
-                            <p>No hay usuarios con rol Director.</p>
-                            <p class="mt-2 text-[10px] text-zinc-600">Solo los Directores pueden crear tareas.</p>
-                        </div>
-                    `;
+                    <div class="text-center text-zinc-500 text-xs py-4">
+                        <p>No hay usuarios con rol Director.</p>
+                        <p class="mt-2 text-[10px] text-zinc-600">Solo los Directores pueden crear tareas.</p>
+                    </div>
+                `;
                 return;
             }
 
             container.innerHTML = directors.map(d => `
-                    <button onclick="selectDirector('${d.id}', '${d.nombre}', '${d.rol}')"
-                            class="flex items-center gap-3 p-3 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-indigo-500/50 transition w-full text-left">
-                        <div class="w-10 h-10 bg-indigo-600/30 flex items-center justify-center text-indigo-400 font-bold text-sm">
-                            ${d.nombre ? d.nombre.charAt(0).toUpperCase() : '?'}
-                        </div>
-                        <div>
-                            <p class="text-sm font-medium text-slate-200">${d.nombre || 'Sin nombre'}</p>
-                            <p class="text-[10px] text-slate-400">${d.email || 'Sin email'} • ${d.rol || 'Director'}</p>
-                        </div>
-                        <span class="ml-auto text-xs px-2 py-0.5 bg-indigo-500/20 text-indigo-400">Director</span>
-                    </button>
-                `).join('');
+                <button onclick="selectDirector('${d.id}', '${d.nombre}', '${d.rol}')"
+                        class="flex items-center gap-3 p-3 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-indigo-500/50 transition w-full text-left">
+                    <div class="w-10 h-10 bg-indigo-600/30 flex items-center justify-center text-indigo-400 font-bold text-sm">
+                        ${d.nombre ? d.nombre.charAt(0).toUpperCase() : '?'}
+                    </div>
+                    <div>
+                        <p class="text-sm font-medium text-slate-200">${d.nombre || 'Sin nombre'}</p>
+                        <p class="text-[10px] text-slate-400">${d.email || 'Sin email'} • ${d.rol || 'Director'}</p>
+                    </div>
+                    <span class="ml-auto text-xs px-2 py-0.5 bg-indigo-500/20 text-indigo-400">Director</span>
+                </button>
+            `).join('');
             lucide.createIcons();
         }
 
         function selectDirector(id, nombre, rol) {
             taskFlow.authenticatedUser = { id, nombre, rol };
+            sessionStorage.setItem('currentUser', JSON.stringify({ id, name: nombre, role: rol }));
             closeLoginModal();
             openSelectProjectModal();
         }
@@ -1185,8 +1244,7 @@
                 openLoginModal();
                 return;
             }
-            document.getElementById('auth-user-display').textContent =
-                `${taskFlow.authenticatedUser.nombre} (${taskFlow.authenticatedUser.rol})`;
+            document.getElementById('auth-user-display').textContent = `${taskFlow.authenticatedUser.nombre} (${taskFlow.authenticatedUser.rol})`;
 
             const projSelect = document.getElementById('project-select');
             projSelect.innerHTML = '<option value="">Selecciona un proyecto...</option>';
@@ -1367,12 +1425,11 @@
             if (existing) existing.remove();
 
             const div = document.createElement('div');
-            div.className =
-                'rtbrok-notification fixed bottom-4 left-1/2 -translate-x-1/2 bg-zinc-900 border border-indigo-600/30 px-6 py-3 shadow-2xl z-[100] flex items-center gap-3';
+            div.className = 'rtbrok-notification fixed bottom-4 left-1/2 -translate-x-1/2 bg-zinc-900 border border-indigo-600/30 px-6 py-3 shadow-2xl z-[100] flex items-center gap-3';
             div.innerHTML = `
-                    <span class="text-indigo-400"><i data-lucide="check-circle" class="w-5 h-5"></i></span>
-                    <span class="text-sm text-slate-200">${message}</span>
-                `;
+                <span class="text-indigo-400"><i data-lucide="check-circle" class="w-5 h-5"></i></span>
+                <span class="text-sm text-slate-200">${message}</span>
+            `;
             document.body.appendChild(div);
             lucide.createIcons();
 
@@ -1398,10 +1455,10 @@
                 closeLoginModal();
                 closeSelectProjectModal();
                 closeChatSenderModal();
+                closeActionLoginModal();
             }
         });
 
-        // Función para abrir el modal de tareas (alias)
         function openAddTaskModal() {
             openSelectProjectModal();
         }
