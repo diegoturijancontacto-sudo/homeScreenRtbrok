@@ -50,6 +50,19 @@
             -webkit-text-fill-color: transparent;
             background-clip: text;
         }
+
+        .loading-spinner {
+            border: 2px solid rgba(255, 255, 255, 0.1);
+            border-top-color: #ffffff;
+            border-radius: 50%;
+            width: 20px;
+            height: 20px;
+            animation: spin 0.8s linear infinite;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
     </style>
 </head>
 <body class="min-h-screen flex items-center justify-center p-6">
@@ -75,7 +88,7 @@
             </div>
 
             <!-- Botón de Google -->
-            <button id="googleLoginBtn" class="btn-google w-full flex items-center justify-center gap-3 py-3.5 px-4 rounded-sm text-white font-medium text-sm transition shadow-lg">
+            <button id="googleLoginBtn" class="btn-google w-full flex items-center justify-center gap-3 py-3.5 px-4 rounded-sm text-white font-medium text-sm transition shadow-lg relative">
                 <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" viewBox="0 0 48 48">
                     <path fill="#fbc02d" d="M43.611,20.083H42V20H24v8h11.303c-1.649,4.657-6.08,8-11.303,8c-6.627,0-12-5.373-12-12
                     c0-6.627,5.373-12,12-12c3.059,0,5.842,1.154,7.961,3.039l5.657-5.657C34.046,6.053,29.268,4,24,4C12.955,4,4,12.955,4,24
@@ -87,7 +100,10 @@
                     <path fill="#1565c0" d="M43.611,20.083L43.595,20L24,20v8h11.303c-0.792,2.237-2.231,4.166-4.087,5.571
                     c0.001-0.001,0.002-0.001,0.003-0.002l6.19,5.238C36.971,39.205,44,34,44,24C44,22.659,43.862,21.35,43.611,20.083z" />
                 </svg>
-                <span>Iniciar sesión con Google</span>
+                <span id="btnText">Iniciar sesión con Google</span>
+                <div id="btnSpinner" class="hidden absolute right-4">
+                    <div class="loading-spinner"></div>
+                </div>
             </button>
 
             <!-- Separador sutil -->
@@ -112,7 +128,12 @@
                 <button id="logoutBtn" class="w-full text-xs font-medium text-zinc-400 hover:text-white transition py-2 border-t border-zinc-800/60 mt-1">
                     Cerrar sesión
                 </button>
-                <p class="text-[10px] text-zinc-500 mt-1 tracking-wider">✔️ Autenticación exitosa</p>
+                <button id="goToWorkspaceBtn" class="w-full text-xs font-medium bg-indigo-600 hover:bg-indigo-500 text-white transition py-2.5 rounded-sm flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M9 6l6 6-6 6"/>
+                    </svg>
+                    Ir al Workspace
+                </button>
             </div>
 
             <!-- Pie de página -->
@@ -149,11 +170,14 @@
         // -----------------------------------------------
         const statusEl = document.getElementById('statusMessage');
         const googleBtn = document.getElementById('googleLoginBtn');
+        const btnText = document.getElementById('btnText');
+        const btnSpinner = document.getElementById('btnSpinner');
         const userInfo = document.getElementById('userInfo');
         const userName = document.getElementById('userName');
         const userEmail = document.getElementById('userEmail');
         const userAvatar = document.getElementById('userAvatar');
         const logoutBtn = document.getElementById('logoutBtn');
+        const goToWorkspaceBtn = document.getElementById('goToWorkspaceBtn');
 
         // -----------------------------------------------
         // 3. Funciones auxiliares (UI)
@@ -172,12 +196,34 @@
             userEmail.textContent = user.email || 'sin email';
             userAvatar.src = user.photoURL || 'https://ui-avatars.com/api/?background=2d2d2d&color=fff&size=40';
             setStatus(`Bienvenido, ${user.displayName?.split(' ')[0] || 'usuario'} 👋`);
+
+            // Guardar datos del usuario en sessionStorage para que index.html los use
+            sessionStorage.setItem('firebaseUser', JSON.stringify({
+                uid: user.uid,
+                displayName: user.displayName,
+                email: user.email,
+                photoURL: user.photoURL,
+                emailVerified: user.emailVerified
+            }));
         }
 
         function showLogin() {
             googleBtn.classList.remove('hidden');
             userInfo.classList.add('hidden');
             setStatus('Accede con tu cuenta de Google');
+            sessionStorage.removeItem('firebaseUser');
+        }
+
+        function setLoading(loading) {
+            if (loading) {
+                btnText.textContent = 'Iniciando sesión...';
+                btnSpinner.classList.remove('hidden');
+                googleBtn.disabled = true;
+            } else {
+                btnText.textContent = 'Iniciar sesión con Google';
+                btnSpinner.classList.add('hidden');
+                googleBtn.disabled = false;
+            }
         }
 
         // -----------------------------------------------
@@ -185,13 +231,12 @@
         // -----------------------------------------------
         async function loginWithGoogle() {
             try {
+                setLoading(true);
                 setStatus('Abriendo ventana de Google...', false);
-                googleBtn.disabled = true;
 
                 const result = await signInWithPopup(auth, provider);
                 const user = result.user;
 
-                // usuario autenticado → se dispara onAuthStateChanged
                 setStatus(`✅ Sesión iniciada como ${user.displayName}`, false);
             } catch (error) {
                 console.error('Error en login:', error);
@@ -203,7 +248,7 @@
                 }
                 setStatus(`❌ ${msg}`, true);
             } finally {
-                googleBtn.disabled = false;
+                setLoading(false);
             }
         }
 
@@ -218,6 +263,24 @@
             }
         }
 
+        function goToWorkspace() {
+            // Verificar que el usuario esté autenticado
+            const user = auth.currentUser;
+            if (user) {
+                // Guardar datos en sessionStorage por si acaso
+                sessionStorage.setItem('firebaseUser', JSON.stringify({
+                    uid: user.uid,
+                    displayName: user.displayName,
+                    email: user.email,
+                    photoURL: user.photoURL,
+                    emailVerified: user.emailVerified
+                }));
+                window.location.href = 'index.html';
+            } else {
+                setStatus('❌ No hay sesión activa. Inicia sesión primero.', true);
+            }
+        }
+
         // -----------------------------------------------
         // 5. Observador de estado de autenticación
         // -----------------------------------------------
@@ -225,8 +288,15 @@
             if (user) {
                 // Usuario autenticado
                 showUser(user);
-                // Opcional: redirigir a index.html después de un breve momento
-                // setTimeout(() => { window.location.href = 'index.html'; }, 800);
+                // Si llegamos aquí desde index.html y ya estamos autenticados, redirigir automáticamente
+                // pero solo si no hay interacción del usuario (para no forzar)
+                const autoRedirect = sessionStorage.getItem('autoRedirect') === 'true';
+                if (autoRedirect) {
+                    sessionStorage.removeItem('autoRedirect');
+                    setTimeout(() => {
+                        window.location.href = 'index.html';
+                    }, 500);
+                }
             } else {
                 // Usuario no autenticado
                 showLogin();
@@ -238,9 +308,7 @@
         // -----------------------------------------------
         googleBtn.addEventListener('click', loginWithGoogle);
         logoutBtn.addEventListener('click', logout);
-
-        // Prevenir que el botón de logout dispare navegación
-        logoutBtn.addEventListener('click', (e) => e.preventDefault());
+        goToWorkspaceBtn.addEventListener('click', goToWorkspace);
 
         // Mensaje inicial
         setStatus('Accede con tu cuenta de Google');
