@@ -11,6 +11,17 @@
     <script src="https://cdn.jsdelivr.net/npm/chart.js">
     </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+    
+    <!-- Firebase SDKs (modular) -->
+    <script type="importmap">
+        {
+            "imports": {
+                "firebase/app": "https://www.gstatic.com/firebasejs/10.13.1/firebase-app.js",
+                "firebase/auth": "https://www.gstatic.com/firebasejs/10.13.1/firebase-auth.js"
+            }
+        }
+    </script>
+
     <script>
         tailwind.config = {
             darkMode: 'class',
@@ -63,7 +74,6 @@
                 border-color: rgba(251, 191, 36, 0.6);
             }
         }
-        /* Estilos para el carrusel */
         .artwork-card {
             transition: all 0.3s ease;
             cursor: pointer;
@@ -80,7 +90,6 @@
         .artwork-card:hover .overlay {
             opacity: 1;
         }
-        /* Estilos para el modal de detalles */
         .detail-modal {
             animation: fadeIn 0.3s ease;
         }
@@ -177,11 +186,23 @@
             font-size: 9px;
             color: #888;
         }
+        .user-avatar-small {
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            border: 1px solid rgba(255,255,255,0.1);
+            object-fit: cover;
+            cursor: pointer;
+            transition: border-color 0.2s;
+        }
+        .user-avatar-small:hover {
+            border-color: rgba(255,255,255,0.3);
+        }
     </style>
 </head>
 <body class="h-full bg-black text-slate-100 flex overflow-hidden select-none">
 
-    <!-- Sidebar (igual que antes) -->
+    <!-- Sidebar -->
     <aside class="w-20 bg-black border-r border-zinc-900/80 flex flex-col items-center justify-between py-6 shrink-0 z-20">
         <div class="flex flex-col items-center gap-6">
             <div class="w-10 h-10 bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white font-bold text-xs shadow-inner cursor-pointer" onclick="switchTab('dashboard')">
@@ -220,6 +241,10 @@
             </a>
         </div>
         <div class="flex flex-col items-center gap-4">
+            <!-- Avatar del usuario autenticado -->
+            <div id="userAvatarContainer" class="hidden">
+                <img id="sidebarUserAvatar" src="" alt="User" class="user-avatar-small" onclick="handleUserClick()" title="Usuario autenticado">
+            </div>
             <button onclick="openLoginModal()" class="w-10 h-10 bg-zinc-900/60 hover:bg-zinc-800 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white transition" title="Configuración / Iniciar sesión">
                 <i data-lucide="settings" class="w-4 h-4"></i>
             </button>
@@ -234,7 +259,15 @@
 
         <!-- Top Bar -->
         <header class="w-full px-6 sm:px-10 py-5 flex items-center justify-between border-b border-zinc-900 shrink-0">
-            <h1 class="font-bold text-lg sm:text-xl tracking-[0.25em] bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">R T B R O K</h1>
+            <div class="flex items-center gap-4">
+                <h1 class="font-bold text-lg sm:text-xl tracking-[0.25em] bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">R T B R O K</h1>
+                <!-- Información del usuario autenticado -->
+                <div id="headerUserInfo" class="hidden text-xs text-zinc-400 border-l border-zinc-800 pl-4">
+                    <span id="headerUserName" class="text-white font-medium">Usuario</span>
+                    <span class="text-zinc-500">·</span>
+                    <span id="headerUserEmail" class="text-zinc-500">email</span>
+                </div>
+            </div>
             <div class="hidden md:flex items-center w-full max-w-md mx-6">
                 <form id="search-form" onsubmit="handleSearch(event)" class="relative flex items-center w-full">
                     <span class="absolute left-3.5 text-zinc-500"><i data-lucide="search" class="w-4 h-4"></i></span>
@@ -254,9 +287,9 @@
             <!-- TAB: DASHBOARD -->
             <div id="tab-dashboard" class="flex flex-col gap-8 w-full">
                 <div class="flex flex-col gap-8 w-full px-6 sm:px-8 pt-8 max-w-7xl mx-auto">
-                    <!-- Top Grid: TAREAS y CHAT (igual) -->
+                    <!-- Top Grid: TAREAS y CHAT -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- TAREAS WIDGET (igual) -->
+                        <!-- TAREAS WIDGET -->
                         <section class="bg-zinc-950 border border-zinc-900 p-5 sm:p-6 flex flex-col h-[420px] shadow-2xl relative">
                             <div class="flex items-center justify-between mb-4">
                                 <div class="flex items-center gap-1 bg-black p-1 border border-zinc-800">
@@ -297,7 +330,7 @@
                             </div>
                         </section>
 
-                        <!-- CHAT WIDGET (igual) -->
+                        <!-- CHAT WIDGET -->
                         <section class="bg-zinc-950 border border-zinc-900 p-5 sm:p-6 flex flex-col h-[420px] shadow-2xl relative">
                             <div class="flex items-center justify-between mb-3 pb-2 border-b border-zinc-900">
                                 <div class="flex items-center gap-3">
@@ -327,7 +360,7 @@
                         </section>
                     </div>
 
-                    <!-- RENDIMIENTO GENERAL (igual) -->
+                    <!-- RENDIMIENTO GENERAL -->
                     <section class="bg-zinc-950 border border-zinc-900 p-6 shadow-2xl flex flex-col gap-4">
                         <div class="flex items-center justify-between">
                             <span class="text-xs font-bold uppercase tracking-wider text-zinc-400">RENDIMIENTO GENERAL (Tareas completadas por responsable)</span>
@@ -539,17 +572,59 @@
         </div>
     </div>
 
-    <!-- MODAL: Login / Selección de Director -->
+    <!-- MODAL: Login / Selección de Director (con integración Firebase) -->
     <div id="login-modal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-4">
         <div class="bg-zinc-950 border border-zinc-900 w-full max-w-md p-6 shadow-2xl flex flex-col gap-5">
             <div class="flex items-center justify-between border-b border-zinc-900 pb-4">
                 <h3 class="font-bold text-sm text-slate-100 flex items-center gap-2">
-                    <i data-lucide="shield" class="w-4 h-4 text-white"></i> Iniciar Sesión (Director)
+                    <i data-lucide="shield" class="w-4 h-4 text-white"></i> Iniciar Sesión
                 </h3>
                 <button onclick="closeLoginModal()" class="text-zinc-500 hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
+            
+            <!-- Opción: Usuario de Firebase (si ya está autenticado) -->
+            <div id="firebaseUserOption" class="hidden flex flex-col gap-2">
+                <p class="text-xs text-zinc-400">Sesión activa con Google:</p>
+                <div class="flex items-center gap-3 p-3 bg-zinc-900 border border-zinc-800 rounded-sm">
+                    <img id="modalUserAvatar" src="" alt="avatar" class="w-9 h-9 rounded-full border border-zinc-700">
+                    <div class="flex-1 min-w-0">
+                        <p id="modalUserName" class="text-sm font-medium text-white truncate">Usuario</p>
+                        <p id="modalUserEmail" class="text-xs text-zinc-400 truncate">email</p>
+                    </div>
+                    <button onclick="useFirebaseUser()" class="text-xs bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 transition rounded-sm">
+                        Usar
+                    </button>
+                </div>
+                <button onclick="logoutFirebase()" class="text-xs text-rose-400 hover:text-rose-300 transition text-center py-1">
+                    Cerrar sesión de Google
+                </button>
+            </div>
+
+            <!-- Separador -->
+            <div class="relative" id="authSeparator">
+                <div class="absolute inset-0 flex items-center">
+                    <div class="w-full border-t border-zinc-800/60"></div>
+                </div>
+                <div class="relative flex justify-center text-xs">
+                    <span class="px-3 bg-zinc-950 text-zinc-500">o</span>
+                </div>
+            </div>
+
+            <!-- Lista de Directores (sistema local) -->
             <div id="login-users-list" class="flex flex-col gap-2 max-h-60 overflow-y-auto">
                 <div class="text-center text-zinc-500 text-xs py-4">Cargando usuarios...</div>
+            </div>
+            
+            <!-- Botón para ir a login.html -->
+            <div class="mt-2 pt-3 border-t border-zinc-900">
+                <button onclick="goToLoginPage()" class="w-full text-xs text-zinc-400 hover:text-white transition py-2 flex items-center justify-center gap-2">
+                    <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
+                        <polyline points="10 17 15 12 10 7"/>
+                        <line x1="15" y1="12" x2="3" y2="12"/>
+                    </svg>
+                    Iniciar sesión con Google
+                </button>
             </div>
         </div>
     </div>
@@ -617,7 +692,30 @@
         </div>
     </div>
 
-    <script>
+    <script type="module">
+        // ============================================================
+        // FIREBASE AUTH - Módulo
+        // ============================================================
+        import { initializeApp } from 'firebase/app';
+        import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
+
+        const firebaseConfig = {
+            apiKey: "AIzaSyD1g7Y77PR2Wdylb05M2Kxz-DCKt4kNLXo",
+            authDomain: "rtbrok-auth.firebaseapp.com",
+            projectId: "rtbrok-auth",
+            storageBucket: "rtbrok-auth.firebasestorage.app",
+            messagingSenderId: "778465907066",
+            appId: "1:778465907066:web:6831c57e3bdb6dded8c6c3",
+            measurementId: "G-1Z2X1293ZN"
+        };
+
+        const app = initializeApp(firebaseConfig);
+        const auth = getAuth(app);
+
+        // Variables para el usuario de Firebase
+        let firebaseUser = null;
+        let isFirebaseUser = false;
+
         // ============================================================
         // CONFIGURACIÓN Y CONSTANTES
         // ============================================================
@@ -646,7 +744,6 @@
         const tabsOrder = ['dashboard', 'tasks', 'artworks'];
         let currentTabIdx = 0;
 
-        // Control de cantidad de obras mostradas (carrusel infinito)
         const INITIAL_ARTWORKS = 12;
         const ARTWORKS_PER_PAGE = 12;
         let displayedArtworksCount = INITIAL_ARTWORKS;
@@ -655,16 +752,49 @@
         // INICIO
         // ============================================================
         window.onload = function() {
+            // Verificar si hay un usuario en sessionStorage
+            const savedUser = sessionStorage.getItem('firebaseUser');
+            if (savedUser) {
+                try {
+                    const userData = JSON.parse(savedUser);
+                    firebaseUser = userData;
+                    isFirebaseUser = true;
+                    updateUserUI(userData);
+                } catch (e) {}
+            }
+
+            // Iniciar Firebase Auth Listener
+            onAuthStateChanged(auth, (user) => {
+                if (user) {
+                    const userData = {
+                        uid: user.uid,
+                        displayName: user.displayName,
+                        email: user.email,
+                        photoURL: user.photoURL,
+                        emailVerified: user.emailVerified
+                    };
+                    firebaseUser = userData;
+                    isFirebaseUser = true;
+                    sessionStorage.setItem('firebaseUser', JSON.stringify(userData));
+                    updateUserUI(userData);
+                } else {
+                    firebaseUser = null;
+                    isFirebaseUser = false;
+                    sessionStorage.removeItem('firebaseUser');
+                    updateUserUI(null);
+                }
+            });
+
             initClock();
             updateChatSenderUI();
             fetchAllData();
             setInterval(fetchChatMessages, 8000);
             renderLocalTasks();
 
-            const savedUser = sessionStorage.getItem('currentUser');
-            if (savedUser) {
+            const savedLocalUser = sessionStorage.getItem('currentUser');
+            if (savedLocalUser) {
                 try {
-                    taskFlow.authenticatedUser = JSON.parse(savedUser);
+                    taskFlow.authenticatedUser = JSON.parse(savedLocalUser);
                 } catch (e) {}
             }
 
@@ -673,6 +803,83 @@
             document.getElementById('current-date').textContent = now.toLocaleDateString('es-ES', options);
         };
 
+        // ============================================================
+        // FUNCIONES DE USUARIO FIREBASE
+        // ============================================================
+        function updateUserUI(user) {
+            const avatarContainer = document.getElementById('userAvatarContainer');
+            const sidebarAvatar = document.getElementById('sidebarUserAvatar');
+            const headerInfo = document.getElementById('headerUserInfo');
+            const headerName = document.getElementById('headerUserName');
+            const headerEmail = document.getElementById('headerUserEmail');
+
+            if (user) {
+                avatarContainer.classList.remove('hidden');
+                sidebarAvatar.src = user.photoURL || 'https://ui-avatars.com/api/?background=2d2d2d&color=fff&size=32&name=' + encodeURIComponent(user.displayName || 'User');
+                sidebarAvatar.title = user.displayName || 'Usuario';
+
+                headerInfo.classList.remove('hidden');
+                headerName.textContent = user.displayName || 'Usuario';
+                headerEmail.textContent = user.email || '';
+
+                const modalAvatar = document.getElementById('modalUserAvatar');
+                const modalName = document.getElementById('modalUserName');
+                const modalEmail = document.getElementById('modalUserEmail');
+                if (modalAvatar) modalAvatar.src = user.photoURL || 'https://ui-avatars.com/api/?background=2d2d2d&color=fff&size=36&name=' + encodeURIComponent(user.displayName || 'User');
+                if (modalName) modalName.textContent = user.displayName || 'Usuario';
+                if (modalEmail) modalEmail.textContent = user.email || '';
+
+                document.getElementById('firebaseUserOption').classList.remove('hidden');
+                document.getElementById('authSeparator').classList.remove('hidden');
+            } else {
+                avatarContainer.classList.add('hidden');
+                headerInfo.classList.add('hidden');
+                document.getElementById('firebaseUserOption').classList.add('hidden');
+                document.getElementById('authSeparator').classList.add('hidden');
+            }
+        }
+
+        window.handleUserClick = function() {
+            if (firebaseUser) {
+                openLoginModal();
+            } else {
+                goToLoginPage();
+            }
+        };
+
+        window.goToLoginPage = function() {
+            sessionStorage.setItem('autoRedirect', 'true');
+            window.location.href = 'login.html';
+        };
+
+        window.useFirebaseUser = function() {
+            if (firebaseUser) {
+                const userData = {
+                    id: firebaseUser.uid,
+                    nombre: firebaseUser.displayName || 'Usuario Firebase',
+                    email: firebaseUser.email || '',
+                    rol: 'director'
+                };
+                taskFlow.authenticatedUser = userData;
+                sessionStorage.setItem('currentUser', JSON.stringify(userData));
+                closeLoginModal();
+                openSelectProjectModal();
+                showNotification(`Sesión iniciada como ${userData.nombre}`);
+            }
+        };
+
+        window.logoutFirebase = function() {
+            signOut(auth).then(() => {
+                showNotification('Sesión cerrada');
+                updateUserUI(null);
+            }).catch((error) => {
+                console.error('Error al cerrar sesión:', error);
+            });
+        };
+
+        // ============================================================
+        // FUNCIONES DE RELOJ
+        // ============================================================
         function initClock() {
             setInterval(() => {
                 const now = new Date();
@@ -683,7 +890,10 @@
             }, 1000);
         }
 
-        function switchTab(tabName) {
+        // ============================================================
+        // FUNCIONES DE NAVEGACIÓN
+        // ============================================================
+        window.switchTab = function(tabName) {
             currentTabIdx = tabsOrder.indexOf(tabName);
             if (currentTabIdx === -1) currentTabIdx = 0;
             tabsOrder.forEach(t => {
@@ -695,17 +905,23 @@
                 }
             });
             lucide.createIcons();
-            // Si vamos a artworks, recargar con todas las obras
             if (tabName === 'artworks') {
                 renderFullArtworksGrid();
             }
-        }
+        };
 
-        function nextPage() { switchTab(tabsOrder[(currentTabIdx + 1) % tabsOrder.length]); }
+        window.nextPage = function() { 
+            switchTab(tabsOrder[(currentTabIdx + 1) % tabsOrder.length]); 
+        };
 
-        function prevPage() { switchTab(tabsOrder[(currentTabIdx - 1 + tabsOrder.length) % tabsOrder.length]); }
+        window.prevPage = function() { 
+            switchTab(tabsOrder[(currentTabIdx - 1 + tabsOrder.length) % tabsOrder.length]); 
+        };
 
-        function switchTaskWidgetTab(tab) {
+        // ============================================================
+        // FUNCIONES DE TAREAS
+        // ============================================================
+        window.switchTaskWidgetTab = function(tab) {
             const btnEq = document.getElementById('widget-tab-equipo');
             const btnYo = document.getElementById('widget-tab-yo');
             const paneEq = document.getElementById('widget-tasks-equipo-pane');
@@ -728,12 +944,12 @@
                 document.getElementById('btn-add-task-equipo').classList.add('hidden');
             }
             lucide.createIcons();
-        }
+        };
 
         // ============================================================
         // TAREAS PERSONALES (LocalStorage)
         // ============================================================
-        function addLocalTask() {
+        window.addLocalTask = function() {
             const input = document.getElementById('new-local-task-input');
             const text = input.value.trim();
             if (!text) return;
@@ -741,19 +957,19 @@
             localStorage.setItem('rtbrok_local_tasks', JSON.stringify(localTasks));
             input.value = '';
             renderLocalTasks();
-        }
+        };
 
-        function toggleLocalTask(id) {
+        window.toggleLocalTask = function(id) {
             localTasks = localTasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
             localStorage.setItem('rtbrok_local_tasks', JSON.stringify(localTasks));
             renderLocalTasks();
-        }
+        };
 
-        function deleteLocalTask(id) {
+        window.deleteLocalTask = function(id) {
             localTasks = localTasks.filter(t => t.id !== id);
             localStorage.setItem('rtbrok_local_tasks', JSON.stringify(localTasks));
             renderLocalTasks();
-        }
+        };
 
         function renderLocalTasks() {
             const container = document.getElementById('widget-tasks-yo-list');
@@ -815,8 +1031,7 @@
         }
 
         function escapeHtml(str) {
-            return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(
-                /'/g, '&#39;');
+            return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
         }
 
         function resolveImageUrl(adjuntos, fallbackName) {
@@ -830,6 +1045,32 @@
             }
             return `https://placehold.co/400x400/18181b/71717a?text=${encodeURIComponent(fallbackName || 'Obra')}`;
         }
+
+        function showNotification(message) {
+            const existing = document.querySelector('.rtbrok-notification');
+            if (existing) existing.remove();
+
+            const div = document.createElement('div');
+            div.className = 'rtbrok-notification fixed bottom-4 left-1/2 -translate-x-1/2 bg-zinc-900 border border-indigo-600/30 px-6 py-3 shadow-2xl z-[100] flex items-center gap-3';
+            div.innerHTML = `
+                <span class="text-indigo-400"><i data-lucide="check-circle" class="w-5 h-5"></i></span>
+                <span class="text-sm text-slate-200">${message}</span>
+            `;
+            document.body.appendChild(div);
+            lucide.createIcons();
+
+            setTimeout(() => {
+                div.style.opacity = '0';
+                div.style.transition = 'opacity 0.3s';
+                setTimeout(() => div.remove(), 300);
+            }, 3000);
+        }
+
+        window.handleSearch = function(e) {
+            e.preventDefault();
+            const q = document.getElementById('search-input').value.trim();
+            if (q) window.open(`https://www.google.com/search?q=${encodeURIComponent(q)}`, '_blank');
+        };
 
         // ============================================================
         // FETCH DATA
@@ -923,7 +1164,7 @@
             container.scrollTop = container.scrollHeight;
         }
 
-        async function sendWidgetChatMessage() {
+        window.sendWidgetChatMessage = async function() {
             const input = document.getElementById('widget-chat-input');
             const message = input.value.trim();
             if (!message) return;
@@ -989,9 +1230,9 @@
                     renderChatMessages();
                 }
             }
-        }
+        };
 
-        function setChatSender(name) {
+        window.setChatSender = function(name) {
             currentChatSender = name;
             localStorage.setItem('rtbrok_chat_sender', name);
             closeChatSenderModal();
@@ -1017,9 +1258,9 @@
                     }
                 }, 100);
             }
-        }
+        };
 
-        function openChatSenderModal() {
+        window.openChatSenderModal = function() {
             const modal = document.getElementById('chat-sender-modal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
@@ -1035,9 +1276,9 @@
             }
 
             lucide.createIcons();
-        }
+        };
 
-        function closeChatSenderModal() {
+        window.closeChatSenderModal = function() {
             document.getElementById('chat-sender-modal').classList.add('hidden');
             document.getElementById('chat-sender-modal').classList.remove('flex');
 
@@ -1053,7 +1294,7 @@
 
             const pendingContainer = document.getElementById('pending-message-container');
             if (pendingContainer) pendingContainer.classList.add('hidden');
-        }
+        };
 
         function updateChatSenderUI() {
             const displayElement = document.getElementById('chat-sender-display');
@@ -1066,16 +1307,16 @@
         // ============================================================
         // TAREAS - ACCIONES DE ESTADO
         // ============================================================
-        function requestStatusChange(taskId, newStatus) {
+        window.requestStatusChange = function(taskId, newStatus) {
             pendingStatusChange = { taskId, newStatus };
             if (!taskFlow.authenticatedUser) {
                 openActionLoginModal();
             } else {
                 executeStatusChange(taskId, newStatus, taskFlow.authenticatedUser);
             }
-        }
+        };
 
-        function openActionLoginModal() {
+        window.openActionLoginModal = function() {
             const container = document.getElementById('action-users-list');
             if (!container) return;
 
@@ -1101,16 +1342,16 @@
             modal.classList.remove('hidden');
             modal.classList.add('flex');
             lucide.createIcons();
-        }
+        };
 
-        function closeActionLoginModal() {
+        window.closeActionLoginModal = function() {
             const modal = document.getElementById('action-login-modal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
             pendingStatusChange = null;
-        }
+        };
 
-        function selectUserForAction(id, nombre, rol) {
+        window.selectUserForAction = function(id, nombre, rol) {
             taskFlow.authenticatedUser = { id, nombre, rol };
             sessionStorage.setItem('currentUser', JSON.stringify({ id, name: nombre, role: rol }));
 
@@ -1124,7 +1365,7 @@
                 pendingStatusChange = null;
                 executeStatusChange(taskId, newStatus, taskFlow.authenticatedUser);
             }
-        }
+        };
 
         async function executeStatusChange(taskId, newStatus, user) {
             const tarea = appData.tasks.find(t => t.id === taskId);
@@ -1304,8 +1545,7 @@
             entries.forEach(([name, count], index) => {
                 const pct = ((count / total) * 100).toFixed(1);
                 const colorClass = colors[index % colors.length];
-                const dotColorHex = ['#f97316', '#9333ea', '#fbbf24', '#3b82f6', '#10b981', '#f43f5e'][index % colors
-                .length];
+                const dotColorHex = ['#f97316', '#9333ea', '#fbbf24', '#3b82f6', '#10b981', '#f43f5e'][index % colors.length];
 
                 barHtml += `<div class="${colorClass} h-full transition-all duration-500" style="width: ${pct}%;" title="${name}: ${pct}% (${count} tareas)"></div>`;
                 legendHtml += `
@@ -1322,20 +1562,18 @@
         }
 
         // ============================================================
-        // RENDER: ARTWORKS (CARRUSEL INFINITO CON "MOSTRAR MÁS")
+        // RENDER: ARTWORKS (CARRUSEL INFINITO)
         // ============================================================
         function renderArtworksCarousel() {
             const container = document.getElementById('artworks-carousel');
             if (!container) return;
 
-            // Obtener obras ordenadas por fecha (más recientes primero)
             const sortedArtworks = [...appData.artworks].sort((a, b) => {
                 const dateA = a.fecha_registro ? new Date(a.fecha_registro) : new Date(0);
                 const dateB = b.fecha_registro ? new Date(b.fecha_registro) : new Date(0);
                 return dateB - dateA;
             });
 
-            // Mostrar solo las primeras 'displayedArtworksCount'
             const toShow = sortedArtworks.slice(0, displayedArtworksCount);
 
             container.innerHTML = toShow.map(a => {
@@ -1361,7 +1599,6 @@
                 `;
             }).join('');
 
-            // Actualizar contador de obras
             const totalCount = document.getElementById('total-artworks-count');
             if (totalCount) {
                 const total = sortedArtworks.length;
@@ -1369,7 +1606,6 @@
                 totalCount.textContent = `(${shown} de ${total} obras)`;
             }
 
-            // Ocultar botón si ya se mostraron todas
             const showBtn = document.getElementById('show-more-btn');
             if (showBtn) {
                 if (displayedArtworksCount >= sortedArtworks.length) {
@@ -1382,12 +1618,11 @@
             lucide.createIcons();
         }
 
-        function showMoreArtworks() {
+        window.showMoreArtworks = function() {
             displayedArtworksCount += ARTWORKS_PER_PAGE;
             renderArtworksCarousel();
-            // También actualizar la vista completa si está visible
             renderFullArtworksGrid();
-        }
+        };
 
         // ============================================================
         // RENDER: ARTWORKS (VISTA COMPLETA)
@@ -1401,7 +1636,6 @@
                 return;
             }
 
-            // Ordenar por fecha (más recientes primero)
             const sortedArtworks = [...appData.artworks].sort((a, b) => {
                 const dateA = a.fecha_registro ? new Date(a.fecha_registro) : new Date(0);
                 const dateB = b.fecha_registro ? new Date(b.fecha_registro) : new Date(0);
@@ -1437,7 +1671,7 @@
         // ============================================================
         // ARTWORK DETAIL MODAL
         // ============================================================
-        function openArtworkDetail(artworkId) {
+        window.openArtworkDetail = function(artworkId) {
             const artwork = appData.artworks.find(a => a.id === artworkId);
             if (!artwork) return;
 
@@ -1460,7 +1694,6 @@
                 `$${artwork.precio_venta.toLocaleString()} ${artwork.tipo_moneda || 'MXN'}` :
                 (artwork.precio_lista ? `$${artwork.precio_lista.toLocaleString()} ${artwork.tipo_moneda || 'MXN'}` : 'No disponible');
 
-            // Medidas
             const measures = [];
             if (artwork.ancho) measures.push(`Ancho: ${artwork.ancho}m`);
             if (artwork.alto) measures.push(`Alto: ${artwork.alto}m`);
@@ -1471,7 +1704,6 @@
             document.getElementById('detail-provenance').textContent = artwork.provenance || 'No especificado';
             document.getElementById('detail-observations').textContent = artwork.observaciones || 'Sin observaciones';
 
-            // Tags
             const tagsContainer = document.getElementById('detail-tags');
             if (Array.isArray(artwork.tags) && artwork.tags.length > 0) {
                 tagsContainer.innerHTML = artwork.tags.map(tag =>
@@ -1481,7 +1713,6 @@
                 tagsContainer.innerHTML = '<span class="text-xs text-zinc-500">Sin etiquetas</span>';
             }
 
-            // Documentos
             const docsContainer = document.getElementById('detail-documents');
             if (Array.isArray(artwork.documentos) && artwork.documentos.length > 0) {
                 docsContainer.innerHTML = artwork.documentos.map(d =>
@@ -1491,7 +1722,6 @@
                 docsContainer.innerHTML = '<span class="text-xs text-zinc-500">Sin documentos</span>';
             }
 
-            // Adjuntos
             const adjContainer = document.getElementById('detail-attachments');
             if (Array.isArray(artwork.adjuntos) && artwork.adjuntos.length > 0) {
                 adjContainer.innerHTML = artwork.adjuntos.map(a =>
@@ -1503,16 +1733,15 @@
 
             lucide.createIcons();
             document.body.style.overflow = 'hidden';
-        }
+        };
 
-        function closeArtworkDetail() {
+        window.closeArtworkDetail = function() {
             const modal = document.getElementById('artwork-detail-modal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
             document.body.style.overflow = 'auto';
-        }
+        };
 
-        // Cerrar modal con Escape
         document.addEventListener('keydown', function(e) {
             if (e.key === 'Escape') {
                 closeArtworkDetail();
@@ -1524,26 +1753,40 @@
         });
 
         // ============================================================
-        // LOGIN / AUTH
+        // LOGIN / AUTH - LOCAL
         // ============================================================
-        function openLoginModal() {
+        window.openLoginModal = function() {
             document.getElementById('login-modal').classList.remove('hidden');
             document.getElementById('login-modal').classList.add('flex');
             loadDirectorsList();
-        }
 
-        function closeLoginModal() {
+            if (firebaseUser) {
+                const modalAvatar = document.getElementById('modalUserAvatar');
+                const modalName = document.getElementById('modalUserName');
+                const modalEmail = document.getElementById('modalUserEmail');
+                if (modalAvatar) modalAvatar.src = firebaseUser.photoURL || 'https://ui-avatars.com/api/?background=2d2d2d&color=fff&size=36&name=' + encodeURIComponent(firebaseUser.displayName || 'User');
+                if (modalName) modalName.textContent = firebaseUser.displayName || 'Usuario';
+                if (modalEmail) modalEmail.textContent = firebaseUser.email || '';
+                document.getElementById('firebaseUserOption').classList.remove('hidden');
+                document.getElementById('authSeparator').classList.remove('hidden');
+            } else {
+                document.getElementById('firebaseUserOption').classList.add('hidden');
+                document.getElementById('authSeparator').classList.add('hidden');
+            }
+        };
+
+        window.closeLoginModal = function() {
             document.getElementById('login-modal').classList.add('hidden');
             document.getElementById('login-modal').classList.remove('flex');
-        }
+        };
 
         function loadDirectorsList() {
             const container = document.getElementById('login-users-list');
             if (appData.responsables.length === 0) {
                 container.innerHTML = `<div class="text-center text-zinc-500 text-xs py-4">Cargando usuarios...</div>`;
-                fetchAllData().then(() => {
+                setTimeout(() => {
                     renderDirectorsList();
-                });
+                }, 500);
             } else {
                 renderDirectorsList();
             }
@@ -1581,17 +1824,17 @@
             lucide.createIcons();
         }
 
-        function selectDirector(id, nombre, rol) {
+        window.selectDirector = function(id, nombre, rol) {
             taskFlow.authenticatedUser = { id, nombre, rol };
             sessionStorage.setItem('currentUser', JSON.stringify({ id, name: nombre, role: rol }));
             closeLoginModal();
             openSelectProjectModal();
-        }
+        };
 
         // ============================================================
         // CREAR TAREA
         // ============================================================
-        function openSelectProjectModal() {
+        window.openSelectProjectModal = function() {
             if (!taskFlow.authenticatedUser) {
                 openLoginModal();
                 return;
@@ -1624,12 +1867,12 @@
             document.getElementById('select-project-modal').classList.remove('hidden');
             document.getElementById('select-project-modal').classList.add('flex');
             lucide.createIcons();
-        }
+        };
 
-        function closeSelectProjectModal() {
+        window.closeSelectProjectModal = function() {
             document.getElementById('select-project-modal').classList.add('hidden');
             document.getElementById('select-project-modal').classList.remove('flex');
-        }
+        };
 
         function populateProjectSelect() {
             const select = document.getElementById('project-select');
@@ -1706,7 +1949,7 @@
             }
         }
 
-        async function confirmAddTask() {
+        window.confirmAddTask = async function() {
             const projectSelect = document.getElementById('project-select');
             const subprojectSelect = document.getElementById('subproject-select');
             const responsibleSelect = document.getElementById('responsible-select');
@@ -1771,41 +2014,11 @@
                     lucide.createIcons();
                 }
             }
-        }
+        };
 
-        function openAddTaskModal() {
+        window.openAddTaskModal = function() {
             openSelectProjectModal();
-        }
-
-        // ============================================================
-        // NOTIFICACIONES Y UTILIDADES
-        // ============================================================
-        function showNotification(message) {
-            const existing = document.querySelector('.rtbrok-notification');
-            if (existing) existing.remove();
-
-            const div = document.createElement('div');
-            div.className =
-                'rtbrok-notification fixed bottom-4 left-1/2 -translate-x-1/2 bg-zinc-900 border border-indigo-600/30 px-6 py-3 shadow-2xl z-[100] flex items-center gap-3';
-            div.innerHTML = `
-                <span class="text-indigo-400"><i data-lucide="check-circle" class="w-5 h-5"></i></span>
-                <span class="text-sm text-slate-200">${message}</span>
-            `;
-            document.body.appendChild(div);
-            lucide.createIcons();
-
-            setTimeout(() => {
-                div.style.opacity = '0';
-                div.style.transition = 'opacity 0.3s';
-                setTimeout(() => div.remove(), 300);
-            }, 3000);
-        }
-
-        function handleSearch(e) {
-            e.preventDefault();
-            const q = document.getElementById('search-input').value.trim();
-            if (q) window.open(`https://www.google.com/search?q=${encodeURIComponent(q)}`, '_blank');
-        }
+        };
 
         // ============================================================
         // MOCK DATA
@@ -1843,7 +2056,7 @@
                     adjuntos: [{ url: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=500' }],
                     documentos: [{ nombre: 'Planos', url: '#' }],
                     tags: ['corporativo', 'moderno'], ancho: 25, alto: 80, largo: 25, tipo_moneda: 'MXN',
-                verificada: false },
+                    verificada: false },
                 { id: 'obra-3', nombre_obra: 'Pabellón Botánico', autor: 'Estudio Arquitectura', ubicacion: 'Monterrey',
                     estatus: 'Vendida', tipo_obra: 'Cultural', superficie: 800, precio_lista: 2200000,
                     precio_venta: 2100000, fecha_registro: '2024-11-10', fecha_venta: '2025-01-05',
@@ -1851,21 +2064,21 @@
                     adjuntos: [{ url: 'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=500' }],
                     documentos: [{ nombre: 'Contrato', url: '#' }],
                     tags: ['público', 'botánico', 'premiado'], ancho: 30, alto: 12, largo: 30, tipo_moneda: 'MXN',
-                verificada: true },
+                    verificada: true },
                 { id: 'obra-4', nombre_obra: 'Casa del Bosque', autor: 'Grupo Z', ubicacion: 'Valle de Bravo',
                     estatus: 'Consolidación', tipo_obra: 'Residencial', superficie: 180, precio_lista: 850000,
                     fecha_registro: '2025-03-01', cliente: 'Familia Rodríguez', observaciones: 'Diseño sustentable',
                     provenance: 'Proyecto personal',
                     adjuntos: [{ url: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=500' }],
                     tags: ['sustentable', 'bosque', 'moderno'], ancho: 10, alto: 4, largo: 12, tipo_moneda: 'MXN',
-                verificada: false },
+                    verificada: false },
                 { id: 'obra-5', nombre_obra: 'Edificio Multifamiliar', autor: 'Arquitectos Asociados',
                     ubicacion: 'Guadalajara, MX', estatus: 'Consolidación', tipo_obra: 'Residencial', superficie: 320,
                     precio_lista: 1800000, fecha_registro: '2025-03-15', cliente: 'Inmobiliaria del Sur',
                     observaciones: 'En construcción', provenance: 'Encargo directo',
                     adjuntos: [{ url: 'https://images.unsplash.com/photo-1574362848149-11496d93a7c7?w=500' }],
                     tags: ['multifamiliar', 'moderno'], ancho: 18, alto: 20, largo: 15, tipo_moneda: 'MXN',
-                verificada: false },
+                    verificada: false },
                 { id: 'obra-6', nombre_obra: 'Centro Cultural', autor: 'Mónica Torres', ubicacion: 'Querétaro, MX',
                     estatus: 'Bodega', tipo_obra: 'Cultural', superficie: 1200, precio_lista: 3500000,
                     fecha_registro: '2024-12-01', cliente: 'Fundación Cultural', observaciones: 'Restauración en curso',
@@ -1873,7 +2086,7 @@
                     adjuntos: [{ url: 'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=500' }],
                     documentos: [{ nombre: 'Dictamen', url: '#' }],
                     tags: ['cultural', 'restauración'], ancho: 40, alto: 10, largo: 30, tipo_moneda: 'MXN',
-                verificada: false },
+                    verificada: false },
                 { id: 'obra-7', nombre_obra: 'Oficinas Creativas', autor: 'Estudio NOMADA', ubicacion: 'CDMX',
                     estatus: 'Vendida', tipo_obra: 'Comercial', superficie: 450, precio_lista: 2800000,
                     precio_venta: 2750000, fecha_registro: '2024-09-20', fecha_venta: '2025-02-15',
@@ -1893,14 +2106,14 @@
                     adjuntos: [{ url: 'https://images.unsplash.com/photo-1486718448742-163732cd1544?w=500' }],
                     documentos: [{ nombre: 'Estudio de impacto', url: '#' }],
                     tags: ['corporativo', 'alto'], ancho: 30, alto: 100, largo: 30, tipo_moneda: 'MXN',
-                verificada: false },
+                    verificada: false },
                 { id: 'obra-10', nombre_obra: 'Vivienda Sustentable', autor: 'EcoArquitectos', ubicacion: 'Puebla, MX',
                     estatus: 'Consolidación', tipo_obra: 'Residencial', superficie: 200, precio_lista: 720000,
                     fecha_registro: '2025-03-20', cliente: 'Familia Morales', observaciones: 'Certificación LEED',
                     provenance: 'Encargo directo',
                     adjuntos: [{ url: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=500' }],
                     tags: ['sustentable', 'LEED', 'moderno'], ancho: 10, alto: 4, largo: 12, tipo_moneda: 'MXN',
-                verificada: true },
+                    verificada: true },
                 { id: 'obra-11', nombre_obra: 'Museo de Arte Moderno', autor: 'Galería Nacional', ubicacion: 'CDMX',
                     estatus: 'Vendida', tipo_obra: 'Cultural', superficie: 3000, precio_lista: 15000000,
                     precio_venta: 14500000, fecha_registro: '2023-11-01', fecha_venta: '2024-06-15',
@@ -1909,7 +2122,7 @@
                     adjuntos: [{ url: 'https://images.unsplash.com/photo-1558030006-450675393462?w=500' }],
                     documentos: [{ nombre: 'Concesión', url: '#' }],
                     tags: ['museo', 'arte', 'público'], ancho: 50, alto: 15, largo: 40, tipo_moneda: 'MXN',
-                verificada: true },
+                    verificada: true },
                 { id: 'obra-12', nombre_obra: 'Loft Industrial', autor: 'Diseño Urbano', ubicacion: 'Guadalajara',
                     estatus: 'Bodega', tipo_obra: 'Residencial', superficie: 120, precio_lista: 450000,
                     fecha_registro: '2025-01-25', cliente: 'Inversor Privado', observaciones: 'Estilo industrial',
@@ -1922,7 +2135,7 @@
                     provenance: 'Licitación pública',
                     adjuntos: [{ url: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=500' }],
                     tags: ['educativo', 'público'], ancho: 20, alto: 6, largo: 30, tipo_moneda: 'MXN',
-                verificada: false },
+                    verificada: false },
                 { id: 'obra-14', nombre_obra: 'Hotel Boutique', autor: 'Grupo H', ubicacion: 'San Miguel de Allende',
                     estatus: 'Vendida', tipo_obra: 'Comercial', superficie: 800, precio_lista: 4200000,
                     precio_venta: 4000000, fecha_registro: '2024-10-05', fecha_venta: '2025-01-20',
@@ -1930,14 +2143,14 @@
                     adjuntos: [{ url: 'https://images.unsplash.com/photo-1566073771259-6a8506099945?w=500' }],
                     documentos: [{ nombre: 'Licencia', url: '#' }],
                     tags: ['hotelero', 'boutique'], ancho: 25, alto: 8, largo: 30, tipo_moneda: 'MXN',
-                verificada: true },
+                    verificada: true },
                 { id: 'obra-15', nombre_obra: 'Centro Comercial', autor: 'Arquitectos del Norte',
                     ubicacion: 'Monterrey, MX', estatus: 'Bodega', tipo_obra: 'Comercial', superficie: 5000,
                     precio_lista: 18000000, fecha_registro: '2024-07-01', cliente: 'Grupo Inmobiliario',
                     observaciones: 'En espera de inquilinos', provenance: 'Proyecto conjunto',
                     adjuntos: [{ url: 'https://images.unsplash.com/photo-1580216643062-e6c160b9b39f?w=500' }],
                     tags: ['comercial', 'grande'], ancho: 60, alto: 10, largo: 50, tipo_moneda: 'MXN',
-                verificada: false }
+                    verificada: false }
             ];
         }
     </script>
