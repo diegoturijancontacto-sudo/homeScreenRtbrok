@@ -1372,6 +1372,30 @@
             };
         }
 
+        function getArtworkRecords(payload) {
+            if (Array.isArray(payload)) return payload;
+            if (Array.isArray(payload?.registrosObra)) return payload.registrosObra;
+            if (Array.isArray(payload?.obras)) return payload.obras;
+            if (Array.isArray(payload?.data)) return payload.data;
+            if (Array.isArray(payload?.data?.registrosObra)) return payload.data.registrosObra;
+            if (Array.isArray(payload?.data?.obras)) return payload.data.obras;
+            return [];
+        }
+
+        async function fetchCatalogArtworks(selectedIds) {
+            // La fuente de verdad para las obras es ENDPOINT_ARTWORKS. No usamos
+            // sólo appData.artworks, porque la galería puede no haber terminado de cargar.
+            const response = await fetch(ENDPOINT_ARTWORKS, { cache: 'no-store' });
+            if (!response.ok) throw new Error('No fue posible consultar las obras del catálogo.');
+            const records = getArtworkRecords(await response.json());
+            const byId = new Map(records.map(artwork => [String(artwork.id || '').trim(), artwork]));
+
+            // Mantiene el mismo orden en el que las obras fueron guardadas en el catálogo.
+            return selectedIds
+                .map(id => byId.get(String(id).trim()))
+                .filter(Boolean);
+        }
+
         async function createCatalogPdf(artworks, config) {
             const Pdf = window.jspdf?.jsPDF;
             if (!Pdf) throw new Error('La librería para crear el PDF no está disponible.');
@@ -1481,9 +1505,12 @@
                 const payload = await response.json();
                 if (payload.status !== 'success' || !payload.data) throw new Error(payload.message || 'No se encontró el catálogo.');
                 const catalog = payload.data;
-                const ids = new Set((catalog.selectedIds || []).map(id => String(id)));
-                const selectedArtworks = appData.artworks.filter(artwork => ids.has(String(artwork.id)));
-                if (!selectedArtworks.length) throw new Error('No se encontraron las obras asignadas a este catálogo.');
+                const selectedIds = Array.isArray(catalog.selectedIds) ? catalog.selectedIds : [];
+                if (!selectedIds.length) throw new Error('Este catálogo no tiene obras asignadas.');
+                const selectedArtworks = await fetchCatalogArtworks(selectedIds);
+                if (!selectedArtworks.length) {
+                    throw new Error('No se pudo recuperar la información de las obras asignadas desde el registro de obras.');
+                }
 
                 const processedArtworks = [];
                 for (const artwork of selectedArtworks) {
@@ -1506,7 +1533,10 @@
                 });
                 const fileName = `CATALOGO_${(catalog.title || cfg.artistName || 'RTBROK').replace(/[^a-z0-9áéíóúñ_-]+/gi, '_')}.pdf`;
                 doc.save(fileName);
-                showNotification('PDF generado y descargado.');
+                const missingWorks = selectedIds.length - selectedArtworks.length;
+                showNotification(missingWorks
+                    ? `PDF generado con ${selectedArtworks.length} de ${selectedIds.length} obras disponibles.`
+                    : 'PDF generado y descargado.');
             } catch (error) {
                 console.error('Error generando PDF del catálogo:', error);
                 showNotification(error.message || 'No fue posible generar el PDF.');
