@@ -10,6 +10,7 @@
     </script>
     <script src="https://cdn.jsdelivr.net/npm/chart.js">
     </script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
 
     <!-- Firebase SDKs (modular) -->
@@ -1300,7 +1301,7 @@
                 const works = Number(catalog.selectedWorksCount) || 0;
                 const artist = catalog.config?.artistName || '';
                 return `
-                    <article class="border border-zinc-800 bg-black/50 p-3 hover:border-zinc-700 transition">
+                    <button type="button" data-catalog-id="${escapeHtml(catalog.id)}" class="catalog-download-card w-full text-left border border-zinc-800 bg-black/50 p-3 hover:border-violet-500/50 hover:bg-violet-500/[0.04] transition focus:outline-none focus:ring-1 focus:ring-violet-400">
                         <div class="flex items-start justify-between gap-3">
                             <div class="min-w-0">
                                 <h4 class="text-xs font-semibold text-slate-100 truncate" title="${escapeHtml(catalog.title || 'Catálogo sin título')}">${escapeHtml(catalog.title || 'Catálogo sin título')}</h4>
@@ -1308,10 +1309,16 @@
                             </div>
                             <span class="shrink-0 text-[10px] text-zinc-400 bg-zinc-900 border border-zinc-800 px-1.5 py-0.5">${works} ${works === 1 ? 'obra' : 'obras'}</span>
                         </div>
-                        ${catalog.date ? `<p class="text-[10px] text-zinc-500 mt-2">Actualizado: ${escapeHtml(catalog.date)}</p>` : ''}
-                    </article>
+                        <div class="flex items-center justify-between gap-2 mt-2">
+                            ${catalog.date ? `<p class="text-[10px] text-zinc-500">Actualizado: ${escapeHtml(catalog.date)}</p>` : '<span></span>'}
+                            <span class="text-[10px] text-violet-300 flex items-center gap-1"><i data-lucide="download" class="w-3 h-3"></i> PDF</span>
+                        </div>
+                    </button>
                 `;
             }).join('');
+            container.querySelectorAll('.catalog-download-card').forEach(card => {
+                card.addEventListener('click', () => downloadCatalogPdf(card.dataset.catalogId));
+            });
             lucide.createIcons();
         }
 
@@ -1329,6 +1336,189 @@
             }
             renderCatalogsList();
         };
+
+        async function imageToDataUrl(url) {
+            if (!url || url.includes('placehold.co')) return null;
+            try {
+                const response = await fetch(url);
+                if (!response.ok) throw new Error(`HTTP ${response.status}`);
+                const blob = await response.blob();
+                return await new Promise((resolve, reject) => {
+                    const reader = new FileReader();
+                    reader.onloadend = () => resolve(reader.result);
+                    reader.onerror = reject;
+                    reader.readAsDataURL(blob);
+                });
+            } catch (_) {
+                return null;
+            }
+        }
+
+        function catalogArtworkData(artwork, image) {
+            const dimensions = [artwork.ancho, artwork.alto, artwork.largo]
+                .filter(value => value !== undefined && value !== null && value !== '')
+                .join(' x ');
+            const price = Number(artwork.precio_lista) || 0;
+            return {
+                image,
+                title: artwork.nombre_obra || artwork.title || 'SIN TÍTULO',
+                artist: artwork.autor || artwork.artist || '',
+                medium: artwork.tipo_obra || artwork.medium || '',
+                dimensions: dimensions ? `${dimensions} cm` : '',
+                price: price ? `$${price.toLocaleString('en-US')} ${artwork.tipo_moneda || 'MXN'}` : '',
+                location: artwork.ubicacion || artwork.location || '',
+                provider: artwork.provenance || artwork.proveedor || '',
+                code: artwork.clave || artwork.codigo || artwork.id || ''
+            };
+        }
+
+        async function createCatalogPdf(artworks, config) {
+            const Pdf = window.jspdf?.jsPDF;
+            if (!Pdf) throw new Error('La librería para crear el PDF no está disponible.');
+
+            const doc = new Pdf('p', 'mm', 'a4');
+            const pageWidth = 210;
+            const pageHeight = 297;
+            const titleY = 120;
+            const artistName = config.artistName || config.title || 'CATÁLOGO';
+
+            // Portada, siguiendo el formato de pdfcatalog.js.
+            doc.setDrawColor(225, 225, 225);
+            doc.rect(15, 15, pageWidth - 30, pageHeight - 30);
+            doc.setTextColor(20, 20, 20);
+            doc.setFont('times', 'normal');
+            doc.setFontSize(28);
+            doc.text(artistName.toUpperCase().split('').join(' '), pageWidth / 2, titleY, { align: 'center' });
+            doc.setFontSize(10);
+            doc.text((config.subtitle || 'OBRA SELECCIONADA').toUpperCase().split('').join(' '), pageWidth / 2, titleY + 15, { align: 'center' });
+            doc.setFont('helvetica', 'bold');
+            doc.setFontSize(9);
+            doc.text((config.updateText || config.date || '').toUpperCase(), pageWidth / 2, pageHeight - 40, { align: 'center' });
+            if (config.legalNote) {
+                doc.setFont('helvetica', 'italic');
+                doc.setFontSize(8);
+                doc.setTextColor(110);
+                doc.text(doc.splitTextToSize(config.legalNote, 160), pageWidth / 2, pageHeight - 25, { align: 'center' });
+            }
+
+            const artworksPerPage = 1;
+            for (let i = 0; i < artworks.length; i += artworksPerPage) {
+                doc.addPage();
+                const art = artworks[i];
+                const margin = 20;
+                const imageMaxW = pageWidth - (margin * 2) - 10;
+                const imageMaxH = 190;
+                const imageX = (pageWidth - imageMaxW) / 2;
+                const imageY = margin;
+
+                if (art.image) {
+                    try {
+                        const image = new Image();
+                        image.src = art.image;
+                        await new Promise((resolve, reject) => { image.onload = resolve; image.onerror = reject; });
+                        const imageRatio = image.width / image.height;
+                        const boxRatio = imageMaxW / imageMaxH;
+                        const renderW = imageRatio > boxRatio ? imageMaxW : imageMaxH * imageRatio;
+                        const renderH = imageRatio > boxRatio ? imageMaxW / imageRatio : imageMaxH;
+                        doc.addImage(art.image, undefined, imageX + (imageMaxW - renderW) / 2, imageY + (imageMaxH - renderH) / 2, renderW, renderH, undefined, 'FAST');
+                    } catch (_) {
+                        doc.setFillColor(245, 247, 250);
+                        doc.rect(imageX, imageY, imageMaxW, imageMaxH, 'F');
+                    }
+                } else {
+                    doc.setFillColor(245, 247, 250);
+                    doc.rect(imageX, imageY, imageMaxW, imageMaxH, 'F');
+                    doc.setTextColor(150);
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(8);
+                    doc.text('IMAGEN NO DISPONIBLE', pageWidth / 2, imageY + imageMaxH / 2, { align: 'center' });
+                }
+
+                const infoY = imageY + imageMaxH + 12;
+                doc.setTextColor(20, 20, 20);
+                doc.setFont('times', 'bold');
+                doc.setFontSize(13);
+                doc.text(art.title.toUpperCase(), pageWidth / 2, infoY, { align: 'center', maxWidth: 165 });
+                if (art.artist) {
+                    doc.setFont('helvetica', 'normal');
+                    doc.setFontSize(9);
+                    doc.setTextColor(100);
+                    doc.text(art.artist.toUpperCase(), pageWidth / 2, infoY + 8, { align: 'center' });
+                }
+                const metadata = [];
+                if (config.showFicha && art.medium) metadata.push(art.medium);
+                if (config.showDims && art.dimensions) metadata.push(art.dimensions);
+                if (config.showPrices && art.price) metadata.push(art.price);
+                if (config.showLocation && art.location) metadata.push(art.location);
+                if (config.showProveedor && art.provider) metadata.push(`PROV: ${art.provider}`);
+                if (art.code) metadata.push(art.code);
+                if (metadata.length) {
+                    doc.setFontSize(7);
+                    doc.setTextColor(90);
+                    doc.text(doc.splitTextToSize(metadata.join(' | ').toUpperCase(), 165), pageWidth / 2, infoY + 16, { align: 'center' });
+                }
+                doc.setFontSize(6);
+                doc.setTextColor(170);
+                doc.text(`PÁGINA ${i + 1} DE ${artworks.length}`, pageWidth / 2, pageHeight - 10, { align: 'center' });
+            }
+            return doc;
+        }
+
+        async function downloadCatalogPdf(catalogId) {
+            if (!catalogId) return;
+            const card = [...document.querySelectorAll('.catalog-download-card')]
+                .find(element => element.dataset.catalogId === catalogId);
+            const original = card?.innerHTML;
+            if (card) {
+                card.disabled = true;
+                card.classList.add('opacity-60', 'cursor-wait');
+                card.innerHTML = '<span class="text-xs text-violet-300 flex items-center justify-center gap-2 py-5"><i data-lucide="loader-circle" class="w-4 h-4 animate-spin"></i> Generando PDF...</span>';
+                lucide.createIcons();
+            }
+
+            try {
+                const response = await fetch(`${ENDPOINT_CATALOGS}?action=get&id=${encodeURIComponent(catalogId)}`);
+                const payload = await response.json();
+                if (payload.status !== 'success' || !payload.data) throw new Error(payload.message || 'No se encontró el catálogo.');
+                const catalog = payload.data;
+                const ids = new Set((catalog.selectedIds || []).map(id => String(id)));
+                const selectedArtworks = appData.artworks.filter(artwork => ids.has(String(artwork.id)));
+                if (!selectedArtworks.length) throw new Error('No se encontraron las obras asignadas a este catálogo.');
+
+                const processedArtworks = [];
+                for (const artwork of selectedArtworks) {
+                    const imageUrl = resolveImageUrl(artwork.adjuntos, artwork.nombre_obra || artwork.title);
+                    processedArtworks.push(catalogArtworkData(artwork, await imageToDataUrl(imageUrl)));
+                }
+                const cfg = catalog.config || {};
+                const doc = await createCatalogPdf(processedArtworks, {
+                    title: catalog.title,
+                    date: catalog.date,
+                    artistName: cfg.artistName,
+                    subtitle: cfg.subtitle,
+                    updateText: cfg.updateText,
+                    legalNote: cfg.legalNote,
+                    showPrices: cfg.cfgPrices,
+                    showDims: cfg.cfgDims,
+                    showLocation: cfg.cfgLocation,
+                    showProveedor: cfg.cfgProveedor,
+                    showFicha: cfg.cfgFicha
+                });
+                const fileName = `CATALOGO_${(catalog.title || cfg.artistName || 'RTBROK').replace(/[^a-z0-9áéíóúñ_-]+/gi, '_')}.pdf`;
+                doc.save(fileName);
+                showNotification('PDF generado y descargado.');
+            } catch (error) {
+                console.error('Error generando PDF del catálogo:', error);
+                showNotification(error.message || 'No fue posible generar el PDF.');
+            } finally {
+                if (card && original) {
+                    card.disabled = false;
+                    card.classList.remove('opacity-60', 'cursor-wait');
+                    card.innerHTML = original;
+                    lucide.createIcons();
+                }
+            }
+        }
 
         // ============================================================
         // CHAT
