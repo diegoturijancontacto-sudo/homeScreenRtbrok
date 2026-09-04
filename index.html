@@ -507,9 +507,15 @@
                     <h3 id="detail-title" class="font-bold text-lg text-white">Nombre de la Obra</h3>
                     <p id="detail-subtitle" class="text-xs text-zinc-400 mt-0.5">Autor · Ubicación</p>
                 </div>
-                <button onclick="closeArtworkDetail()" class="text-zinc-500 hover:text-white transition p-1">
-                    <i data-lucide="x" class="w-6 h-6"></i>
-                </button>
+                <div class="flex items-center gap-2">
+                    <button id="share-artwork-whatsapp" type="button" onclick="shareArtworkToWhatsApp()" class="inline-flex items-center gap-1.5 border border-emerald-700/60 bg-emerald-950/40 px-3 py-2 text-xs font-medium text-emerald-300 transition hover:border-emerald-500 hover:text-emerald-100" aria-label="Compartir obra por WhatsApp">
+                        <i data-lucide="share-2" class="w-4 h-4"></i>
+                        WhatsApp
+                    </button>
+                    <button onclick="closeArtworkDetail()" class="text-zinc-500 hover:text-white transition p-1" aria-label="Cerrar detalle de obra">
+                        <i data-lucide="x" class="w-6 h-6"></i>
+                    </button>
+                </div>
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -1385,7 +1391,7 @@
         async function fetchCatalogArtworks(selectedIds) {
             // La fuente de verdad para las obras es ENDPOINT_ARTWORKS. No usamos
             // sólo appData.artworks, porque la galería puede no haber terminado de cargar.
-            const response = await fetch(ENDPOINT_ARTWORKS, { cache: 'no-store' });
+            const response = await fetch(`${ENDPOINT_ARTWORKS}?endpoint=obras`, { cache: 'no-store' });
             if (!response.ok) throw new Error('No fue posible consultar las obras del catálogo.');
             const records = getArtworkRecords(await response.json());
             const byId = new Map(records.map(artwork => [String(artwork.id || '').trim(), artwork]));
@@ -1509,7 +1515,8 @@
                 if (!selectedIds.length) throw new Error('Este catálogo no tiene obras asignadas.');
                 const selectedArtworks = await fetchCatalogArtworks(selectedIds);
                 if (!selectedArtworks.length) {
-                    throw new Error('No se pudo recuperar la información de las obras asignadas desde el registro de obras.');
+                    const idsPreview = selectedIds.slice(0, 2).join(', ');
+                    throw new Error(`Las ${selectedIds.length} obras del catálogo no existen en el endpoint de obras actual (ej.: ${idsPreview}).`);
                 }
 
                 const processedArtworks = [];
@@ -2101,9 +2108,135 @@
         // ============================================================
         // ARTWORK DETAIL MODAL
         // ============================================================
+        let activeDetailArtwork = null;
+
+        function formatArtworkPrice(artwork) {
+            const price = artwork.precio_venta || artwork.precio_lista;
+            return price ? `$${Number(price).toLocaleString()} ${artwork.tipo_moneda || 'MXN'}` : 'No disponible';
+        }
+
+        function artworkTechnicalSheetRows(artwork) {
+            const measures = [
+                artwork.ancho && `Ancho: ${artwork.ancho} m`,
+                artwork.alto && `Alto: ${artwork.alto} m`,
+                artwork.largo && `Largo: ${artwork.largo} m`
+            ].filter(Boolean).join(' · ') || 'No especificadas';
+            return [
+                ['Autor', artwork.autor || 'No especificado'],
+                ['Tipo de obra', artwork.tipo_obra || 'No especificado'],
+                ['Ubicación', artwork.ubicacion || 'No especificada'],
+                ['Estatus', artwork.estatus || 'Consolidación'],
+                ['Superficie', artwork.superficie ? `${artwork.superficie} m²` : 'No especificada'],
+                ['Medidas', measures],
+                ['Precio', formatArtworkPrice(artwork)],
+                ['Cliente', artwork.cliente || 'No especificado'],
+                ['Provenance', artwork.provenance || 'No especificado'],
+                ['Etiquetas', Array.isArray(artwork.tags) && artwork.tags.length ? artwork.tags.join(', ') : 'Sin etiquetas'],
+                ['Observaciones', artwork.observaciones || 'Sin observaciones']
+            ];
+        }
+
+        function wrapCanvasText(context, value, maxWidth) {
+            const words = String(value).split(/\s+/);
+            const lines = [];
+            let line = '';
+            words.forEach(word => {
+                const candidate = line ? `${line} ${word}` : word;
+                if (line && context.measureText(candidate).width > maxWidth) {
+                    lines.push(line);
+                    line = word;
+                } else line = candidate;
+            });
+            if (line) lines.push(line);
+            return lines;
+        }
+
+        function loadArtworkImage(url) {
+            return new Promise((resolve, reject) => {
+                const image = new Image();
+                image.crossOrigin = 'anonymous';
+                image.onload = () => resolve(image);
+                image.onerror = reject;
+                image.src = url;
+            });
+        }
+
+        async function createArtworkShareCard(artwork) {
+            const width = 1600, padding = 100, contentWidth = width - (padding * 2);
+            const image = await loadArtworkImage(resolveImageUrl(artwork.adjuntos, artwork.nombre_obra));
+            const imageHeight = Math.min(900, Math.max(500, Math.round(contentWidth * (image.naturalHeight / image.naturalWidth))));
+            const rows = artworkTechnicalSheetRows(artwork);
+            const canvas = document.createElement('canvas');
+            const context = canvas.getContext('2d');
+            context.font = '36px Arial';
+            const preparedRows = rows.map(([label, value]) => ({ label, lines: wrapCanvasText(context, value, contentWidth - 320) }));
+            const detailHeight = preparedRows.reduce((total, row) => total + Math.max(68, row.lines.length * 44 + 24), 0);
+            canvas.width = width;
+            canvas.height = padding + 122 + imageHeight + 80 + 56 + detailHeight + padding;
+
+            context.fillStyle = '#09090b';
+            context.fillRect(0, 0, canvas.width, canvas.height);
+            context.fillStyle = '#a1a1aa';
+            context.font = 'bold 26px Arial';
+            context.fillText('FICHA TÉCNICA', padding, padding + 26);
+            context.fillStyle = '#ffffff';
+            context.font = 'bold 62px Arial';
+            context.fillText(wrapCanvasText(context, artwork.nombre_obra || 'Sin título', contentWidth)[0], padding, padding + 92);
+
+            const imageY = padding + 122;
+            const sourceRatio = image.naturalWidth / image.naturalHeight, targetRatio = contentWidth / imageHeight;
+            let sx = 0, sy = 0, sw = image.naturalWidth, sh = image.naturalHeight;
+            if (sourceRatio > targetRatio) { sw = image.naturalHeight * targetRatio; sx = (image.naturalWidth - sw) / 2; }
+            else { sh = image.naturalWidth / targetRatio; sy = (image.naturalHeight - sh) / 2; }
+            context.drawImage(image, sx, sy, sw, sh, padding, imageY, contentWidth, imageHeight);
+
+            let y = imageY + imageHeight + 76;
+            context.fillStyle = '#ffffff';
+            context.font = 'bold 38px Arial';
+            context.fillText('Detalles de la obra', padding, y);
+            y += 56;
+            preparedRows.forEach(row => {
+                const rowHeight = Math.max(68, row.lines.length * 44 + 24);
+                context.strokeStyle = '#27272a';
+                context.beginPath(); context.moveTo(padding, y + rowHeight); context.lineTo(width - padding, y + rowHeight); context.stroke();
+                context.fillStyle = '#a1a1aa'; context.font = 'bold 25px Arial';
+                context.fillText(row.label.toUpperCase(), padding, y + 35);
+                context.fillStyle = '#e4e4e7'; context.font = '36px Arial';
+                row.lines.forEach((line, index) => context.fillText(line, padding + 310, y + 38 + (index * 44)));
+                y += rowHeight;
+            });
+            return new Promise(resolve => canvas.toBlob(resolve, 'image/png'));
+        }
+
+        window.shareArtworkToWhatsApp = async function() {
+            if (!activeDetailArtwork) return;
+            const button = document.getElementById('share-artwork-whatsapp');
+            const originalContent = button.innerHTML;
+            button.disabled = true;
+            button.innerHTML = '<i data-lucide="loader-circle" class="w-4 h-4 animate-spin"></i> Preparando…';
+            lucide.createIcons();
+            try {
+                const card = await createArtworkShareCard(activeDetailArtwork);
+                if (!card) throw new Error('No fue posible generar la ficha para compartir.');
+                const safeName = (activeDetailArtwork.nombre_obra || 'obra').replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '') || 'obra';
+                const file = new File([card], `${safeName}-ficha-tecnica.png`, { type: 'image/png' });
+                if (!navigator.share || (navigator.canShare && !navigator.canShare({ files: [file] }))) {
+                    throw new Error('Este navegador no permite enviar imágenes directamente a WhatsApp.');
+                }
+                await navigator.share({ files: [file] });
+            } catch (error) {
+                if (error.name !== 'AbortError') showNotification(error.message || 'No fue posible compartir la ficha.');
+            } finally {
+                button.disabled = false;
+                button.innerHTML = originalContent;
+                lucide.createIcons();
+            }
+        };
+
         window.openArtworkDetail = function(artworkId) {
             const artwork = appData.artworks.find(a => a.id === artworkId);
             if (!artwork) return;
+            activeDetailArtwork = artwork;
 
             const modal = document.getElementById('artwork-detail-modal');
             modal.classList.remove('hidden');
@@ -2120,9 +2253,7 @@
             document.getElementById('detail-status').textContent = artwork.estatus || 'Consolidación';
             document.getElementById('detail-type').textContent = artwork.tipo_obra || 'No especificado';
             document.getElementById('detail-area').textContent = artwork.superficie ? `${artwork.superficie} m²` : 'No especificada';
-            document.getElementById('detail-price').textContent = artwork.precio_venta ?
-                `$${artwork.precio_venta.toLocaleString()} ${artwork.tipo_moneda || 'MXN'}` :
-                (artwork.precio_lista ? `$${artwork.precio_lista.toLocaleString()} ${artwork.tipo_moneda || 'MXN'}` : 'No disponible');
+            document.getElementById('detail-price').textContent = formatArtworkPrice(artwork);
 
             const measures = [];
             if (artwork.ancho) measures.push(`Ancho: ${artwork.ancho}m`);
@@ -2169,6 +2300,7 @@
             const modal = document.getElementById('artwork-detail-modal');
             modal.classList.add('hidden');
             modal.classList.remove('flex');
+            activeDetailArtwork = null;
             document.body.style.overflow = 'auto';
         };
 
