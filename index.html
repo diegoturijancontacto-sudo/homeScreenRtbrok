@@ -4,6 +4,73 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RTBROK Workspace</title>
+    
+    <!-- DETECCIÓN DE DISPOSITIVO MÓVIL Y REDIRECCIÓN -->
+    <script>
+        // Detección de dispositivo móvil y redirección
+        (function() {
+            // Función para detectar si es móvil
+            function isMobileDevice() {
+                // Verificar por ancho de pantalla
+                if (window.innerWidth <= 768) return true;
+                
+                // Verificar por user agent
+                const userAgent = navigator.userAgent || navigator.vendor || window.opera;
+                const mobileRegex = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile/i;
+                return mobileRegex.test(userAgent.toLowerCase());
+            }
+
+            // Función para obtener la ruta base (sin el nombre del archivo)
+            function getBasePath() {
+                const path = window.location.pathname;
+                const lastSlash = path.lastIndexOf('/');
+                if (lastSlash === -1) return './';
+                return path.substring(0, lastSlash + 1);
+            }
+
+            // Función para redirigir si es móvil y no estamos ya en mobile.html
+            function redirectIfMobile() {
+                // Verificar si ya estamos en mobile.html
+                const currentPath = window.location.pathname;
+                const isMobilePage = currentPath.includes('mobile.html') || 
+                                    currentPath.endsWith('/mobile') ||
+                                    currentPath.includes('/movil/') ||
+                                    currentPath.includes('mobile');
+                
+                if (isMobilePage) return;
+                
+                // Verificar si es móvil
+                if (isMobileDevice()) {
+                    // Obtener la URL base
+                    const basePath = getBasePath();
+                    // Construir la URL de destino
+                    const mobileUrl = basePath + 'mobile.html';
+                    // Redirigir
+                    window.location.href = mobileUrl;
+                }
+            }
+
+            // Ejecutar la redirección
+            redirectIfMobile();
+
+            // Escuchar cambios de tamaño para redirigir si la ventana se reduce a móvil
+            let resizeTimeout;
+            window.addEventListener('resize', function() {
+                clearTimeout(resizeTimeout);
+                resizeTimeout = setTimeout(() => {
+                    redirectIfMobile();
+                }, 300);
+            });
+
+            // Escuchar cambios en el estado de la página (para navegación SPA)
+            window.addEventListener('pageshow', function(event) {
+                if (event.persisted) {
+                    redirectIfMobile();
+                }
+            });
+        })();
+    </script>
+
     <script src="https://cdn.tailwindcss.com">
     </script>
     <script src="https://unpkg.com/lucide@latest">
