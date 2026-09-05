@@ -297,42 +297,6 @@
             background: #2a2a2a;
             border-radius: 4px;
         }
-
-        /* Estilos para el chat y tareas en móvil */
-        .chat-message {
-            font-size: 12px;
-            padding: 6px 10px;
-            border-radius: 8px;
-            max-width: 85%;
-            word-break: break-word;
-        }
-        .chat-message-sent {
-            background: #1a1a2e;
-            border: 1px solid #2a2a4e;
-            color: #e2e8f0;
-            align-self: flex-end;
-        }
-        .chat-message-received {
-            background: #0a0a0a;
-            border: 1px solid #1a1a1a;
-            color: #c8d0dc;
-            align-self: flex-start;
-        }
-        .task-item-mobile {
-            border-bottom: 1px solid #141414;
-            padding: 10px 4px;
-        }
-        .task-item-mobile:last-child {
-            border-bottom: none;
-        }
-        .status-badge-mobile {
-            font-size: 8px;
-            padding: 2px 8px;
-            border-radius: 12px;
-            font-weight: 600;
-            text-transform: uppercase;
-            letter-spacing: 0.3px;
-        }
     </style>
 </head>
 <body>
@@ -403,58 +367,6 @@
                             <span>Obras</span>
                             <span class="badge" id="artworksCount">0</span>
                         </button>
-                    </div>
-                </section>
-
-                <!-- Widget de Tareas (similar a index.html) -->
-                <section class="bg-zinc-950 border border-zinc-900 p-3 rounded-lg">
-                    <div class="flex items-center justify-between mb-2">
-                        <div class="flex items-center gap-1 bg-black p-1 border border-zinc-800 rounded">
-                            <button onclick="switchTaskWidgetTab('equipo')" id="widget-tab-equipo" class="px-2 py-0.5 text-[9px] font-semibold bg-indigo-600 text-white transition rounded">Equipo</button>
-                            <button onclick="switchTaskWidgetTab('yo')" id="widget-tab-yo" class="px-2 py-0.5 text-[9px] font-medium text-slate-400 hover:text-white transition rounded">Yo</button>
-                        </div>
-                        <div class="flex items-center gap-1">
-                            <span id="widget-title" class="font-semibold text-[10px] text-slate-200">Equipo</span>
-                            <button onclick="openAddTaskModal()" id="btn-add-task-equipo" class="p-1 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 hover:text-indigo-300 transition rounded">
-                                <i data-lucide="plus" class="w-3 h-3"></i>
-                            </button>
-                        </div>
-                    </div>
-                    <div id="widget-tasks-equipo-pane" class="max-h-48 overflow-y-auto">
-                        <!-- Renderizado por JS -->
-                    </div>
-                    <div id="widget-tasks-yo-pane" class="max-h-48 overflow-y-auto hidden">
-                        <div class="flex gap-1 mb-2">
-                            <input type="text" id="new-local-task-input" placeholder="Nueva tarea personal..." class="flex-1 bg-zinc-900 border border-zinc-700 px-2 py-1 text-[10px] text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 rounded">
-                            <button onclick="addLocalTask()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-2 py-1 text-[9px] font-medium transition rounded">Añadir</button>
-                        </div>
-                        <div id="widget-tasks-yo-list"></div>
-                    </div>
-                </section>
-
-                <!-- Widget de Chat (similar a index.html) -->
-                <section class="bg-zinc-950 border border-zinc-900 p-3 rounded-lg">
-                    <div class="flex items-center justify-between mb-2">
-                        <div class="flex items-center gap-2">
-                            <div class="w-6 h-6 bg-zinc-900 border border-zinc-800 flex items-center justify-center text-[8px] font-bold text-zinc-300 rounded">RT</div>
-                            <div>
-                                <h4 class="text-[10px] font-bold text-slate-100 flex items-center gap-1">
-                                    RTBROK <span class="w-1.5 h-1.5 bg-emerald-500 inline-block rounded-full"></span>
-                                </h4>
-                                <p class="text-[8px] text-zinc-400 flex items-center gap-1">
-                                    <span>Enviando como: </span>
-                                    <span id="chat-sender-display" class="text-indigo-400 font-medium">Sin seleccionar</span>
-                                </p>
-                            </div>
-                        </div>
-                        <button onclick="openChatSenderModal()" class="p-1 hover:text-white hover:bg-zinc-900 transition rounded" title="Cambiar remitente">
-                            <i data-lucide="user-check" class="w-3.5 h-3.5 text-zinc-400"></i>
-                        </button>
-                    </div>
-                    <div id="widget-chat-messages" class="max-h-36 overflow-y-auto flex flex-col gap-1 py-1"></div>
-                    <div class="flex items-center gap-1 mt-1 pt-1 border-t border-zinc-900">
-                        <input type="text" id="widget-chat-input" onkeydown="if(event.key==='Enter') sendWidgetChatMessage()" placeholder="Escribe un mensaje..." class="flex-1 bg-zinc-900 border border-zinc-800 px-2 py-1.5 text-[10px] text-slate-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-700 rounded">
-                        <button onclick="sendWidgetChatMessage()" class="text-zinc-400 hover:text-white p-1"><i data-lucide="send" class="w-3.5 h-3.5"></i></button>
                     </div>
                 </section>
 
@@ -655,7 +567,7 @@
         </div>
     </div>
 
-    <!-- MODAL: Seleccionar remitente chat -->
+    <!-- MODAL: Seleccionar remitente chat (ya no se usa pero se mantiene por si acaso) -->
     <div id="chatSenderModal" class="fixed inset-0 detail-overlay z-50 hidden flex items-center justify-center p-3">
         <div class="bg-zinc-950 border border-zinc-900 w-full max-w-xs p-4 rounded-2xl">
             <div class="flex items-center justify-between border-b border-zinc-900 pb-3 mb-3">
@@ -706,8 +618,6 @@
         // ============================================================
         const ENDPOINT_TASKS = 'https://script.google.com/macros/s/AKfycbxmPBIboe_Evn45ZHjtkjydbmlPRMuSax_sEiTc2iN8cqqi2i4-Pf_lOd6875cQXEd_yg/exec';
         const ENDPOINT_ARTWORKS = 'https://script.google.com/macros/s/AKfycbxyBzZ7duM3pKtobXHj8A2NgFpIarP5WPS71TKTH2uFMOXXL8rzo68-blixF8kgCwvl8w/exec';
-        const ENDPOINT_CHAT = 'https://script.google.com/macros/s/AKfycbzU6YqBsWekqjP-SOV1_LCV_GQnO1ZX9Gl0Th-U2dwTx2yJe0x1MmmnovRwT0qAYui6/exec';
-        const CHAT_API_URL = 'https://bot-yy1q.onrender.com/send';
 
         // ============================================================
         // ESTADO GLOBAL
@@ -718,12 +628,8 @@
             proyectos: [],
             subproyectos: [],
             responsables: [],
-            messages: []
         };
 
-        let localTasks = JSON.parse(localStorage.getItem('rtbrok_local_tasks') || '[]');
-        let currentChatSender = localStorage.getItem('rtbrok_chat_sender') || null;
-        let pendingChatMessage = null;
         let taskFlow = { authenticatedUser: null };
         const tabsOrder = ['dashboard', 'tasks', 'artworks'];
         let currentTabIdx = 0;
@@ -822,10 +728,7 @@
         };
 
         function initApp() {
-            updateChatSenderUI();
             fetchAllData();
-            setInterval(fetchChatMessages, 8000);
-            renderLocalTasks();
 
             const savedLocalUser = sessionStorage.getItem('currentUser');
             if (savedLocalUser) {
@@ -836,7 +739,6 @@
 
             const now = new Date();
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-            // Actualizar fecha si existe el elemento
             const dateEl = document.getElementById('current-date');
             if (dateEl) dateEl.textContent = now.toLocaleDateString('es-ES', options);
         }
@@ -929,50 +831,6 @@
                 renderTasksTable();
             }
         };
-
-        // ============================================================
-        // TAREAS PERSONALES (LocalStorage)
-        // ============================================================
-        window.addLocalTask = function() {
-            const input = document.getElementById('new-local-task-input');
-            const text = input.value.trim();
-            if (!text) return;
-            localTasks.push({ id: Date.now(), text, completed: false });
-            localStorage.setItem('rtbrok_local_tasks', JSON.stringify(localTasks));
-            input.value = '';
-            renderLocalTasks();
-        };
-
-        window.toggleLocalTask = function(id) {
-            localTasks = localTasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
-            localStorage.setItem('rtbrok_local_tasks', JSON.stringify(localTasks));
-            renderLocalTasks();
-        };
-
-        window.deleteLocalTask = function(id) {
-            localTasks = localTasks.filter(t => t.id !== id);
-            localStorage.setItem('rtbrok_local_tasks', JSON.stringify(localTasks));
-            renderLocalTasks();
-        };
-
-        function renderLocalTasks() {
-            const container = document.getElementById('widget-tasks-yo-list');
-            if (!container) return;
-            if (!localTasks || localTasks.length === 0) {
-                container.innerHTML = `<p class="text-[10px] text-slate-500 text-center py-3">No tienes tareas personales.</p>`;
-                return;
-            }
-            container.innerHTML = localTasks.map(t => `
-                <div class="flex items-center justify-between py-1.5 border-b border-zinc-800/50 last:border-0">
-                    <div class="flex items-center gap-2 overflow-hidden cursor-pointer" onclick="toggleLocalTask(${t.id})">
-                        <input type="checkbox" ${t.completed ? 'checked' : ''} class="border-zinc-700 bg-zinc-900 text-indigo-600 focus:ring-0 cursor-pointer w-3 h-3">
-                        <span class="text-[10px] text-slate-200 truncate ${t.completed ? 'line-through text-slate-500' : ''}">${t.text}</span>
-                    </div>
-                    <button onclick="deleteLocalTask(${t.id})" class="text-slate-500 hover:text-rose-400 transition p-0.5"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
-                </div>
-            `).join('');
-            lucide.createIcons();
-        }
 
         // ============================================================
         // UTILIDADES
@@ -1074,113 +932,22 @@
                     appData.artworks = getMockArtworks();
                 }
 
-                renderDashboardWidgets();
                 renderTasksTable();
                 renderArtworks();
                 renderFullArtworksGrid();
                 renderDirectorsList();
                 populateProjectSelect();
                 populateResponsibleSelect();
-                fetchChatMessages();
                 updateArtworksCount();
                 lucide.createIcons();
             } catch (e) {
                 appData.tasks = getMockTasks();
                 appData.artworks = getMockArtworks();
-                renderDashboardWidgets();
                 renderTasksTable();
                 renderArtworks();
                 renderFullArtworksGrid();
                 renderDirectorsList();
                 updateArtworksCount();
-                lucide.createIcons();
-            }
-        }
-
-        // ============================================================
-        // TAREAS - WIDGET
-        // ============================================================
-        window.switchTaskWidgetTab = function(tab) {
-            const btnEq = document.getElementById('widget-tab-equipo');
-            const btnYo = document.getElementById('widget-tab-yo');
-            const paneEq = document.getElementById('widget-tasks-equipo-pane');
-            const paneYo = document.getElementById('widget-tasks-yo-pane');
-            const title = document.getElementById('widget-title');
-
-            if (tab === 'equipo') {
-                btnEq.className = 'px-2 py-0.5 text-[9px] font-semibold bg-indigo-600 text-white transition rounded';
-                btnYo.className = 'px-2 py-0.5 text-[9px] font-medium text-slate-400 hover:text-white transition rounded';
-                paneEq.classList.remove('hidden');
-                paneEq.style.display = 'block';
-                paneYo.classList.add('hidden');
-                title.textContent = 'Equipo';
-                document.getElementById('btn-add-task-equipo').classList.remove('hidden');
-            } else {
-                btnYo.className = 'px-2 py-0.5 text-[9px] font-semibold bg-indigo-600 text-white transition rounded';
-                btnEq.className = 'px-2 py-0.5 text-[9px] font-medium text-slate-400 hover:text-white transition rounded';
-                paneYo.classList.remove('hidden');
-                paneYo.style.display = 'block';
-                paneEq.classList.add('hidden');
-                title.textContent = 'Personal';
-                document.getElementById('btn-add-task-equipo').classList.add('hidden');
-            }
-            lucide.createIcons();
-        };
-
-        function renderDashboardWidgets() {
-            const tasksContainer = document.getElementById('widget-tasks-equipo-pane');
-
-            const pendingTasks = [...appData.tasks]
-                .filter(t => {
-                    const status = (t.estatus || '').toLowerCase();
-                    return status !== 'completado' && status !== 'completada';
-                })
-                .reverse()
-                .slice(0, 5);
-
-            if (pendingTasks.length === 0) {
-                tasksContainer.innerHTML = `<p class="text-[10px] text-slate-500 text-center py-3">No hay tareas pendientes.</p>`;
-            } else {
-                let html = pendingTasks.map(t => {
-                    const responsableName = getResponsableNameById(t.id_responsable);
-                    const st = (t.estatus || 'pendiente').toLowerCase();
-
-                    let actionButtons = '';
-                    if (st === 'pendiente') {
-                        actionButtons =
-                            `<button onclick="requestStatusChange('${t.id}', 'en_curso')" class="px-1.5 py-0.5 text-[8px] font-semibold bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/30 transition rounded flex items-center gap-0.5"><i data-lucide="play" class="w-2.5 h-2.5"></i> Iniciar</button>`;
-                    } else if (st === 'en_curso') {
-                        actionButtons = `
-                            <div class="flex items-center gap-0.5">
-                                <button onclick="requestStatusChange('${t.id}', 'pendiente')" class="px-1 py-0.5 text-[8px] font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 transition rounded" title="Pausar"><i data-lucide="pause" class="w-2.5 h-2.5"></i></button>
-                                <button onclick="requestStatusChange('${t.id}', 'en_revision')" class="px-1 py-0.5 text-[8px] font-semibold bg-amber-600/20 hover:bg-amber-600/40 text-amber-400 border border-amber-500/30 transition rounded flex items-center gap-0.5"><i data-lucide="file-search" class="w-2.5 h-2.5"></i> Rev</button>
-                            </div>
-                        `;
-                    } else if (st === 'en_revision') {
-                        actionButtons =
-                            `<button onclick="requestStatusChange('${t.id}', 'completado')" class="px-1.5 py-0.5 text-[8px] font-semibold bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 transition rounded flex items-center gap-0.5"><i data-lucide="check" class="w-2.5 h-2.5"></i> Aprobar</button>`;
-                    }
-
-                    return `
-                        <div class="flex items-center justify-between py-1.5 border-b border-zinc-800/50 last:border-0 gap-1">
-                            <div class="flex items-center gap-1.5 overflow-hidden flex-1 min-w-0">
-                                <span class="w-1.5 h-1.5 rounded-full shrink-0 ${getStatusDotColor(t.estatus)}"></span>
-                                <div class="truncate">
-                                    <p class="text-[9px] font-medium text-slate-200 truncate" title="${escapeHtml(t.detalles || t.descripcion || 'Sin descripción')}">${t.detalles || t.descripcion || 'Sin descripción'}</p>
-                                    <p class="text-[7px] text-slate-400">
-                                        ${t.asignacion || 'S/A'} · ${responsableName}
-                                    </p>
-                                </div>
-                            </div>
-                            <div class="flex items-center gap-0.5 shrink-0">
-                                <span class="text-[7px] px-1 py-0.5 ${getStatusBadgeColor(t.estatus)} rounded">${t.estatus || 'pendiente'}</span>
-                                ${actionButtons}
-                            </div>
-                        </div>
-                    `;
-                }).join('');
-
-                tasksContainer.innerHTML = html;
                 lucide.createIcons();
             }
         }
@@ -1255,7 +1022,6 @@
         window.openActionLoginModal = function() {
             const modal = document.getElementById('actionLoginModal');
             if (!modal) {
-                // Crear modal simple si no existe
                 showNotification('Necesitas iniciar sesión para esta acción');
                 openLoginModal();
                 return;
@@ -1319,7 +1085,6 @@
             const oldStatus = tarea.estatus;
             tarea.estatus = newStatus;
 
-            renderDashboardWidgets();
             renderTasksTable();
             showNotification(`Actualizado por ${user.nombre}: ${oldStatus || 'pendiente'} ➔ ${newStatus}`);
 
@@ -1335,190 +1100,6 @@
                 });
             } catch (e) {
                 console.error('Error actualizando estado:', e);
-            }
-        }
-
-        // ============================================================
-        // CHAT
-        // ============================================================
-        async function fetchChatMessages() {
-            try {
-                const res = await fetch(`${ENDPOINT_CHAT}?action=getMessages`);
-                const messages = await res.json();
-                if (Array.isArray(messages) && messages.length > 0) {
-                    appData.messages = messages;
-                } else {
-                    throw new Error('Empty');
-                }
-            } catch (e) {
-                appData.messages = [
-                    { timestamp: new Date().toISOString(), user: 'RTBROK', message: 'Bienvenido a RTBROK Mobile' },
-                    { timestamp: new Date().toISOString(), user: 'Sistema', message: 'Conectado correctamente' }
-                ];
-            }
-            renderChatMessages();
-        }
-
-        function renderChatMessages() {
-            const container = document.getElementById('widget-chat-messages');
-            if (!container) return;
-
-            container.innerHTML = appData.messages.slice(-8).map((m) => {
-                const isMe = m.user === currentChatSender || m.user === 'RTBROK';
-                const isSystem = m.user === 'Sistema' || m.user === 'RTBROK';
-                return `
-                    <div class="flex flex-col ${isMe && !isSystem ? 'items-end' : 'items-start'} gap-0.5">
-                        <div class="text-[7px] text-zinc-500 font-medium flex items-center gap-1">
-                            ${m.user}
-                            ${m.sending ? '<span class="text-amber-400 text-[6px] animate-pulse">● Enviando...</span>' : ''}
-                            ${m.error ? '<span class="text-rose-400 text-[6px]">● Error</span>' : ''}
-                        </div>
-                        <div class="chat-message ${isMe && !isSystem ? 'chat-message-sent' : 'chat-message-received'}">
-                            ${m.message}
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            container.scrollTop = container.scrollHeight;
-        }
-
-        window.sendWidgetChatMessage = async function() {
-            const input = document.getElementById('widget-chat-input');
-            const message = input.value.trim();
-            if (!message) return;
-
-            if (!currentChatSender) {
-                pendingChatMessage = message;
-                openChatSenderModal();
-                input.placeholder = 'Selecciona un remitente...';
-                input.style.borderColor = 'rgba(251, 191, 36, 0.5)';
-                return;
-            }
-
-            input.placeholder = 'Escribe un mensaje...';
-            input.style.borderColor = '';
-
-            const formattedMessage = `[${currentChatSender}]: ${message}`;
-
-            try {
-                const encodedMessage = encodeURIComponent(formattedMessage);
-                const url = `${CHAT_API_URL}?number=120363406622431210@g.us&message=${encodedMessage}`;
-
-                const tempMessage = {
-                    timestamp: new Date().toISOString(),
-                    user: currentChatSender,
-                    message: message,
-                    sending: true
-                };
-                appData.messages.push(tempMessage);
-                renderChatMessages();
-
-                await fetch(url, { method: 'GET', mode: 'no-cors' });
-
-                input.value = '';
-
-                const lastMessageIndex = appData.messages.length - 1;
-                if (appData.messages[lastMessageIndex] && appData.messages[lastMessageIndex].sending) {
-                    appData.messages[lastMessageIndex].sending = false;
-                    renderChatMessages();
-                }
-
-                try {
-                    const chatPayload = {
-                        action: 'sendMessage',
-                        user: currentChatSender,
-                        message: message
-                    };
-                    await fetch(ENDPOINT_CHAT, {
-                        method: 'POST',
-                        mode: 'no-cors',
-                        headers: { 'Content-Type': 'application/json' },
-                        body: JSON.stringify(chatPayload)
-                    });
-                } catch (e) {
-                    console.log('Mensaje enviado mediante API.');
-                }
-
-            } catch (error) {
-                console.error('Error al enviar mensaje:', error);
-                const lastMessage = appData.messages[appData.messages.length - 1];
-                if (lastMessage) {
-                    lastMessage.error = true;
-                    lastMessage.sending = false;
-                    renderChatMessages();
-                }
-            }
-        };
-
-        window.setChatSender = function(name) {
-            currentChatSender = name;
-            localStorage.setItem('rtbrok_chat_sender', name);
-            closeChatSenderModal();
-            updateChatSenderUI();
-
-            const input = document.getElementById('widget-chat-input');
-            if (input) {
-                input.placeholder = 'Escribe un mensaje...';
-                input.style.borderColor = '';
-            }
-
-            if (pendingChatMessage) {
-                const message = pendingChatMessage;
-                pendingChatMessage = null;
-                const pendingContainer = document.getElementById('pendingMsgContainer');
-                if (pendingContainer) pendingContainer.classList.add('hidden');
-
-                setTimeout(() => {
-                    const input = document.getElementById('widget-chat-input');
-                    if (input) {
-                        input.value = message;
-                        sendWidgetChatMessage();
-                    }
-                }, 100);
-            }
-        };
-
-        window.openChatSenderModal = function() {
-            const modal = document.getElementById('chatSenderModal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-
-            const pendingContainer = document.getElementById('pendingMsgContainer');
-            const pendingText = document.getElementById('pendingMsgText');
-
-            if (pendingChatMessage) {
-                pendingContainer.classList.remove('hidden');
-                pendingText.textContent = `"${pendingChatMessage.substring(0, 30)}${pendingChatMessage.length > 30 ? '...' : ''}"`;
-            } else {
-                pendingContainer.classList.add('hidden');
-            }
-
-            lucide.createIcons();
-        };
-
-        window.closeChatSenderModal = function() {
-            document.getElementById('chatSenderModal').classList.add('hidden');
-            document.getElementById('chatSenderModal').classList.remove('flex');
-
-            if (pendingChatMessage) {
-                const input = document.getElementById('widget-chat-input');
-                if (input && !input.value) {
-                    input.value = pendingChatMessage;
-                    input.placeholder = 'Selecciona un remitente...';
-                    input.style.borderColor = 'rgba(251, 191, 36, 0.5)';
-                    pendingChatMessage = null;
-                }
-            }
-
-            const pendingContainer = document.getElementById('pendingMsgContainer');
-            if (pendingContainer) pendingContainer.classList.add('hidden');
-        };
-
-        function updateChatSenderUI() {
-            const displayElement = document.getElementById('chat-sender-display');
-            if (displayElement) {
-                displayElement.textContent = currentChatSender || 'Sin seleccionar';
-                displayElement.className = currentChatSender ? 'text-indigo-400 font-medium' : 'text-amber-400 font-medium';
             }
         }
 
@@ -2044,7 +1625,6 @@
                 closeArtworkDetail();
                 closeLoginModal();
                 closeTaskModal();
-                closeChatSenderModal();
                 closeActionLoginModal();
             }
         });
