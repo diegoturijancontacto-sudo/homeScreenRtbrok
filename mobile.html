@@ -1,12 +1,11 @@
 <!DOCTYPE html>
-<html lang="es" class="h-full">
+<html lang="es">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>RTBROK Workspace Mobile</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
+    <title>RTBROK Mobile</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script src="https://unpkg.com/lucide@latest"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
@@ -31,76 +30,207 @@
         }
     </script>
     <style>
-        body {
-            font-family: 'Inter', sans-serif;
-            background-color: #000000;
+        * {
             -webkit-tap-highlight-color: transparent;
         }
-        /* Ocultar barra de scroll para el menú inferior horizontal */
-        .hide-scrollbar::-webkit-scrollbar {
-            display: none;
-        }
-        .hide-scrollbar {
-            -ms-overflow-style: none;
-            scrollbar-width: none;
-        }
-        .modal-overlay {
-            background: rgba(0, 0, 0, 0.85);
-            backdrop-filter: blur(8px);
+        body {
+            font-family: 'Inter', sans-serif;
+            background: #000;
+            color: #f1f5f9;
+            overflow: hidden;
+            height: 100vh;
+            width: 100vw;
+            position: fixed;
+            top: 0;
+            left: 0;
+            user-select: none;
         }
 
-        /* Modal Content Scroll */
-        .detail-modal .modal-content {
-            max-height: 85vh;
-            overflow-y: auto;
+        ::-webkit-scrollbar {
+            width: 2px;
         }
-        .detail-modal .modal-content::-webkit-scrollbar {
-            width: 4px;
+        ::-webkit-scrollbar-track {
+            background: transparent;
         }
-        .detail-modal .modal-content::-webkit-scrollbar-thumb {
-            background: rgba(156, 163, 175, 0.3);
+        ::-webkit-scrollbar-thumb {
+            background: rgba(255, 255, 255, 0.1);
             border-radius: 4px;
         }
 
-        /* Galería móvil (3 columnas) */
-        .gallery-grid {
+        .grid-3 {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
+            gap: 6px;
+            width: 100%;
+            padding: 0 4px;
+        }
+
+        .grid-3 .action-btn {
+            aspect-ratio: 1 / 1;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            background: #0a0a0a;
+            border: 1px solid #171717;
+            border-radius: 14px;
+            transition: all 0.15s ease;
+            padding: 8px 0;
+            width: 100%;
+            text-align: center;
             gap: 4px;
         }
 
-        .artwork-item {
+        .grid-3 .action-btn:active {
+            transform: scale(0.94);
+            background: #141414;
+            border-color: #2a2a2a;
+        }
+
+        .grid-3 .action-btn i {
+            font-size: 24px;
+            color: #e2e8f0;
+            margin-bottom: 2px;
+        }
+
+        .grid-3 .action-btn span {
+            font-size: 9px;
+            font-weight: 500;
+            letter-spacing: 0.3px;
+            color: #94a3b8;
+            line-height: 1.2;
+            max-width: 100%;
+            word-break: break-word;
+        }
+
+        .grid-3 .action-btn .badge {
+            background: rgba(99, 102, 241, 0.15);
+            color: #818cf8;
+            font-size: 7px;
+            font-weight: 600;
+            padding: 2px 6px;
+            border-radius: 20px;
+            letter-spacing: 0.2px;
+            border: 1px solid rgba(99, 102, 241, 0.1);
+            margin-top: 2px;
+        }
+
+        .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            display: inline-block;
+            margin-right: 4px;
+        }
+
+        .artwork-grid {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
+            width: 100%;
+        }
+
+        .artwork-grid .art-item {
             aspect-ratio: 1;
+            background: #0a0a0a;
+            border: 1px solid #141414;
             overflow: hidden;
             position: relative;
-            background: #0a0a0a;
-            border: 1px solid #1a1a1a;
-            border-radius: 4px;
+            border-radius: 2px;
         }
-        .artwork-item img {
+
+        .artwork-grid .art-item img {
             width: 100%;
             height: 100%;
             object-fit: cover;
-            transition: transform 0.5s ease;
-        }
-        .artwork-item .status-badge {
-            position: absolute;
-            top: 6px;
-            right: 6px;
-            background: rgba(0,0,0,0.85);
-            backdrop-filter: blur(4px);
-            padding: 2px 6px;
-            font-size: 8px;
-            font-weight: 600;
-            text-transform: uppercase;
-            border-radius: 2px;
-        }
-        /* Sin hover-info para ocultar título y autor */
-        .artwork-item .hover-info {
-            display: none;
+            transition: transform 0.25s ease;
         }
 
-        /* Loading Overlay */
+        .artwork-grid .art-item:active img {
+            transform: scale(1.02);
+        }
+
+        .artwork-grid .art-item .art-badge {
+            position: absolute;
+            top: 4px;
+            right: 4px;
+            background: rgba(0, 0, 0, 0.75);
+            backdrop-filter: blur(4px);
+            padding: 1px 6px;
+            font-size: 7px;
+            font-weight: 600;
+            letter-spacing: 0.3px;
+            color: #a1a1aa;
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            border-radius: 2px;
+        }
+
+        .artwork-grid .art-item .promo-tag {
+            position: absolute;
+            bottom: 4px;
+            left: 4px;
+            background: rgba(0, 0, 0, 0.7);
+            backdrop-filter: blur(2px);
+            padding: 1px 5px;
+            font-size: 6px;
+            font-weight: 500;
+            color: #c084fc;
+            border: 1px solid rgba(192, 132, 252, 0.15);
+            border-radius: 2px;
+            display: flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        .bottom-nav {
+            background: #000;
+            border-top: 1px solid #171717;
+            padding: 8px 6px 12px;
+            padding-bottom: env(safe-area-inset-bottom, 12px);
+            display: flex;
+            align-items: center;
+            justify-content: space-around;
+            flex-shrink: 0;
+        }
+
+        .bottom-nav .nav-item {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            gap: 1px;
+            background: transparent;
+            border: none;
+            color: #6b7280;
+            font-size: 9px;
+            font-weight: 500;
+            padding: 4px 8px;
+            transition: color 0.15s;
+            border-radius: 8px;
+        }
+
+        .bottom-nav .nav-item:active {
+            color: #e2e8f0;
+            background: rgba(255, 255, 255, 0.04);
+        }
+
+        .bottom-nav .nav-item i {
+            font-size: 20px;
+            margin-bottom: 1px;
+        }
+
+        .bottom-nav .nav-item.active {
+            color: #e2e8f0;
+        }
+
+        .user-avatar-xs {
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            border: 1px solid #2a2a2a;
+            object-fit: cover;
+            cursor: pointer;
+        }
+
         .loading-overlay {
             position: fixed;
             inset: 0;
@@ -110,292 +240,324 @@
             align-items: center;
             justify-content: center;
             z-index: 9999;
-            transition: opacity 0.5s ease;
+            transition: opacity 0.4s ease;
         }
         .loading-overlay.hidden {
             opacity: 0;
             pointer-events: none;
         }
         .loading-spinner {
-            width: 36px;
-            height: 36px;
-            border: 3px solid rgba(255,255,255,0.1);
-            border-top-color: #fff;
+            width: 32px;
+            height: 32px;
+            border: 2.5px solid rgba(255, 255, 255, 0.06);
+            border-top-color: #f1f5f9;
             border-radius: 50%;
-            animation: spin 0.8s linear infinite;
+            animation: spin 0.7s linear infinite;
         }
         @keyframes spin {
-            to { transform: rotate(360deg); }
+            to {
+                transform: rotate(360deg);
+            }
+        }
+        .loading-text {
+            margin-top: 14px;
+            color: #52525b;
+            font-size: 10px;
+            letter-spacing: 0.15em;
+            font-weight: 400;
+        }
+
+        /* Detail modal compacto */
+        .detail-overlay {
+            background: rgba(0, 0, 0, 0.88);
+            backdrop-filter: blur(8px);
+            animation: fadeIn 0.2s ease;
+        }
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: scale(0.96);
+            }
+            to {
+                opacity: 1;
+                transform: scale(1);
+            }
+        }
+        .detail-card {
+            max-height: 92vh;
+            overflow-y: auto;
+            background: #0c0c0c;
+            border: 1px solid #1f1f1f;
+            border-radius: 16px;
+        }
+        .detail-card::-webkit-scrollbar {
+            width: 2px;
+        }
+        .detail-card::-webkit-scrollbar-thumb {
+            background: #2a2a2a;
+            border-radius: 4px;
         }
     </style>
 </head>
-<body class="flex flex-col h-full bg-black text-slate-100 overflow-hidden select-none">
+<body>
 
     <!-- Overlay de carga -->
     <div id="loadingOverlay" class="loading-overlay">
         <div class="loading-spinner"></div>
-        <div class="mt-4 text-[10px] text-zinc-500 tracking-widest uppercase">Verificando sesión</div>
+        <div class="loading-text">RTBROK MOBILE</div>
     </div>
 
-    <!-- Top Header -->
-    <header class="w-full px-4 py-3 flex items-center justify-between border-b border-zinc-900 bg-black/90 backdrop-blur-sm shrink-0 z-30">
-        <div class="flex items-center gap-3">
-            <div class="w-8 h-8 bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white font-bold text-[10px] shadow-inner rounded-sm">
-                RT
+    <!-- App principal -->
+    <div class="flex flex-col h-full w-full bg-black">
+
+        <!-- Top Bar -->
+        <header class="flex items-center justify-between px-4 py-3 border-b border-[#171717] flex-shrink-0 bg-black">
+            <div class="flex items-center gap-2">
+                <div class="w-8 h-8 bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white font-bold text-[10px] rounded-md">RT</div>
+                <h1 class="font-bold text-sm tracking-[0.2em] bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">R T B R O K</h1>
             </div>
-            <h1 class="font-bold text-base tracking-[0.2em] bg-gradient-to-r from-white via-slate-200 to-slate-500 bg-clip-text text-transparent">R T B R O K</h1>
-        </div>
-
-        <div class="flex items-center gap-3">
-            <!-- Botón de Búsqueda (Opcional, abre input o link externo) -->
-            <button onclick="document.getElementById('search-container').classList.toggle('hidden')" class="text-zinc-400 hover:text-white p-1">
-                <i data-lucide="search" class="w-5 h-5"></i>
-            </button>
-
-            <!-- Perfil / Login -->
-            <div id="userAvatarContainer" class="hidden">
-                <img id="headerUserAvatar" src="" alt="User" class="w-8 h-8 rounded-full border border-zinc-700 object-cover cursor-pointer" onclick="handleUserClick()">
-            </div>
-            <button id="loginBtn" onclick="openLoginModal()" class="w-8 h-8 bg-zinc-900 hover:bg-zinc-800 rounded-full flex items-center justify-center text-zinc-400 transition">
-                <i data-lucide="user" class="w-4 h-4"></i>
-            </button>
-        </div>
-    </header>
-
-    <!-- Barra de búsqueda colapsable móvil -->
-    <div id="search-container" class="hidden w-full px-4 py-2 bg-zinc-950 border-b border-zinc-900">
-        <form id="search-form" onsubmit="handleSearch(event)" class="relative flex items-center w-full">
-            <span class="absolute left-3 text-zinc-500"><i data-lucide="search" class="w-4 h-4"></i></span>
-            <input type="text" id="search-input" placeholder="Buscar en Google..." class="w-full bg-zinc-900 border border-zinc-800 rounded-full pl-9 pr-14 py-2 text-xs text-slate-100 focus:outline-none focus:border-zinc-700">
-            <button type="submit" class="absolute right-1 bg-zinc-800 text-zinc-300 rounded-full px-3 py-1 text-[10px] font-medium">Ir</button>
-        </form>
-    </div>
-
-    <!-- Main Content Area -->
-    <main class="flex-1 overflow-y-auto pb-20 w-full relative">
-
-        <!-- VISTA: OBRAS -->
-        <div id="tab-artworks" class="flex flex-col gap-4 p-4 w-full">
-            <div class="flex items-center justify-between mb-2">
-                <div>
-                    <h2 class="font-bold text-sm text-white">Catálogo de Obras</h2>
-                    <p class="text-[10px] text-zinc-400 mt-0.5">Inventario y galería visual</p>
-                </div>
-                <div class="p-2 bg-zinc-900 rounded text-zinc-300"><i data-lucide="image" class="w-4 h-4"></i></div>
-            </div>
-
-            <div id="artworks-grid-container" class="gallery-grid w-full">
-                <!-- Se inyectan las obras aquí -->
-            </div>
-        </div>
-
-        <!-- VISTA: CATÁLOGOS PDF -->
-        <div id="tab-catalogs" class="hidden flex-col gap-4 p-4 w-full">
-            <div class="flex items-center justify-between mb-2">
-                <div>
-                    <h2 class="font-bold text-sm text-white">Catálogos Generados</h2>
-                    <p id="catalogs-count" class="text-[10px] text-zinc-400 mt-0.5">Cargando...</p>
-                </div>
-                <button type="button" onclick="refreshCatalogs()" class="p-2 bg-zinc-900 hover:bg-zinc-800 rounded text-zinc-300 transition">
-                    <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+            <div class="flex items-center gap-2">
+                <span id="headerUserName" class="text-[10px] text-zinc-400 hidden sm:inline">Usuario</span>
+                <img id="sidebarUserAvatar" src="" alt="User" class="user-avatar-xs" onclick="handleUserClick()" />
+                <button onclick="openLoginModal()" class="text-zinc-500 p-1.5 hover:text-white transition">
+                    <i data-lucide="settings" class="w-4 h-4"></i>
                 </button>
             </div>
+        </header>
 
-            <div id="catalogs-list" class="flex flex-col gap-3">
-                <p class="text-xs text-zinc-500 text-center py-10">Cargando catálogos disponibles...</p>
-            </div>
-        </div>
+        <!-- Scrollable contenido principal -->
+        <main class="flex-1 overflow-y-auto overflow-x-hidden pb-1 px-2">
 
-    </main>
-
-    <!-- Barra Inferior de Navegación (Accesos directos) -->
-    <nav class="fixed bottom-0 w-full bg-black/95 backdrop-blur-md border-t border-zinc-900 pb-[env(safe-area-inset-bottom)] z-40">
-        <div class="flex items-center px-2 py-2 overflow-x-auto hide-scrollbar gap-1 justify-between sm:justify-center sm:gap-6">
-
-            <!-- Vistas Internas -->
-            <button onclick="switchTab('artworks')" id="nav-artworks" class="flex flex-col items-center justify-center w-[60px] shrink-0 text-white gap-1 transition">
-                <i data-lucide="image" class="w-5 h-5"></i>
-                <span class="text-[9px] font-medium">Obras</span>
-            </button>
-            <button onclick="switchTab('catalogs')" id="nav-catalogs" class="flex flex-col items-center justify-center w-[60px] shrink-0 text-zinc-500 hover:text-white gap-1 transition">
-                <i data-lucide="file-text" class="w-5 h-5"></i>
-                <span class="text-[9px] font-medium">Catálogos</span>
-            </button>
-
-            <!-- Separador -->
-            <div class="w-px h-8 bg-zinc-800 shrink-0 mx-1"></div>
-
-            <!-- Accesos Directos Externos -->
-            <a href="https://www.instagram.com/" target="_blank" class="flex flex-col items-center justify-center w-[50px] shrink-0 text-zinc-400 hover:text-white gap-1 transition">
-                <i class="fab fa-instagram text-lg mb-[1px]"></i>
-                <span class="text-[8px]">Instagram</span>
-            </a>
-            <a href="https://diegoturijancontacto-sudo.github.io/Finanzas/mobile/" target="_blank" class="flex flex-col items-center justify-center w-[50px] shrink-0 text-zinc-400 hover:text-white gap-1 transition">
-                <i data-lucide="database" class="w-4 h-4"></i>
-                <span class="text-[8px]">BD</span>
-            </a>
-            <a href="https://drive.google.com" target="_blank" class="flex flex-col items-center justify-center w-[50px] shrink-0 text-zinc-400 hover:text-white gap-1 transition">
-                <i data-lucide="hard-drive" class="w-4 h-4"></i>
-                <span class="text-[8px]">Drive</span>
-            </a>
-            <a href="https://frontline-zeta-ecru.vercel.app/movil/" target="_blank" class="flex flex-col items-center justify-center w-[50px] shrink-0 text-zinc-400 hover:text-white gap-1 transition">
-                <i data-lucide="book-open" class="w-4 h-4"></i>
-                <span class="text-[8px]">Gen. Cat</span>
-            </a>
-            <a href="https://docs.google.com/forms/d/e/1FAIpQLSdC-_if3uzNyq3BuU3YhlUD1ONInOwe4Cv_G4MM1PJrnsDRuw/viewform?usp=header" target="_blank" class="flex flex-col items-center justify-center w-[50px] shrink-0 text-zinc-400 hover:text-white gap-1 transition">
-                <i data-lucide="award" class="w-4 h-4"></i>
-                <span class="text-[8px]">Certificados</span>
-            </a>
-        </div>
-    </nav>
-
-    <!-- MODAL: Detalles de Obra (Móvil) -->
-    <div id="artwork-detail-modal" class="fixed inset-0 modal-overlay z-50 hidden flex flex-col items-center justify-end sm:justify-center p-0 sm:p-4">
-        <!-- Contenedor adaptado para deslizar desde abajo en móviles -->
-        <div class="bg-zinc-950 border-t sm:border border-zinc-800 w-full sm:max-w-md h-[90vh] sm:h-auto rounded-t-xl sm:rounded-md detail-modal modal-content shadow-2xl flex flex-col relative">
-
-            <!-- Header Modal -->
-            <div class="sticky top-0 bg-zinc-950/95 backdrop-blur-sm z-10 border-b border-zinc-900 p-4 rounded-t-xl flex items-start justify-between">
-                <div class="pr-4">
-                    <h3 id="detail-title" class="font-bold text-base text-white leading-tight">Nombre de la Obra</h3>
-                    <p id="detail-subtitle" class="text-[10px] text-zinc-400 mt-1">Autor · Ubicación</p>
+            <!-- Cuadrícula de accesos directos (3 columnas) -->
+            <section class="py-3">
+                <div class="grid-3">
+                    <!-- Instagram -->
+                    <a href="https://www.instagram.com/" target="_blank" class="action-btn">
+                        <i class="fab fa-instagram fa-lg"></i>
+                        <span>Instagram</span>
+                    </a>
+                    <!-- Base de datos -->
+                    <a href="https://diegoturijancontacto-sudo.github.io/Finanzas/mobile/" target="_blank" class="action-btn">
+                        <i data-lucide="database" class="w-6 h-6"></i>
+                        <span>Base de datos</span>
+                    </a>
+                    <!-- Drive -->
+                    <a href="https://drive.google.com" target="_blank" class="action-btn">
+                        <i data-lucide="hard-drive" class="w-6 h-6"></i>
+                        <span>Drive</span>
+                    </a>
+                    <!-- Generador de Catálogos -->
+                    <a href="https://frontline-zeta-ecru.vercel.app/movil/" target="_blank" class="action-btn">
+                        <i data-lucide="book-open" class="w-6 h-6"></i>
+                        <span>Catálogos</span>
+                        <span class="badge">PDF</span>
+                    </a>
+                    <!-- Generador de Certificados -->
+                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSdC-_if3uzNyq3BuU3YhlUD1ONInOwe4Cv_G4MM1PJrnsDRuw/viewform?usp=header" target="_blank" class="action-btn">
+                        <i data-lucide="file-text" class="w-6 h-6"></i>
+                        <span>Certificados</span>
+                        <span class="badge">form</span>
+                    </a>
+                    <!-- Obras (abre galería) -->
+                    <button onclick="switchTab('artworks')" class="action-btn">
+                        <i data-lucide="image" class="w-6 h-6"></i>
+                        <span>Obras</span>
+                        <span class="badge" id="artworksCount">0</span>
+                    </button>
                 </div>
-                <button onclick="closeArtworkDetail()" class="text-zinc-500 hover:text-white p-1 bg-zinc-900 rounded-full shrink-0">
+            </section>
+
+            <!-- Galería de obras (grid 3 columnas) -->
+            <section class="pb-4">
+                <div class="flex items-center justify-between mb-2 px-1">
+                    <h2 class="text-xs font-medium text-zinc-300 tracking-wider">OBRAS RECIENTES</h2>
+                    <span class="text-[9px] text-zinc-500" id="totalArtworksLabel">0 obras</span>
+                </div>
+                <div id="artworksGrid" class="artwork-grid">
+                    <!-- Renderizado por JS -->
+                </div>
+                <div class="flex justify-center mt-4">
+                    <button id="showMoreBtn" onclick="showMoreArtworks()" class="text-[10px] text-zinc-400 border border-zinc-800 px-5 py-2 rounded-full hover:border-zinc-600 transition flex items-center gap-2">
+                        <i data-lucide="plus" class="w-3 h-3"></i> Mostrar más
+                    </button>
+                </div>
+            </section>
+
+        </main>
+
+        <!-- Bottom Navigation (Accesos rápidos) -->
+        <nav class="bottom-nav">
+            <button class="nav-item active" onclick="switchTab('dashboard')">
+                <i data-lucide="layout-grid"></i>
+                <span>Inicio</span>
+            </button>
+            <button class="nav-item" onclick="switchTab('artworks')">
+                <i data-lucide="image"></i>
+                <span>Obras</span>
+            </button>
+            <button class="nav-item" onclick="openAddTaskModal()">
+                <i data-lucide="plus-circle"></i>
+                <span>Nuevo</span>
+            </button>
+            <button class="nav-item" onclick="openChatSenderModal()">
+                <i data-lucide="message-square"></i>
+                <span>Chat</span>
+            </button>
+            <button class="nav-item" onclick="openLoginModal()">
+                <i data-lucide="user"></i>
+                <span>Perfil</span>
+            </button>
+        </nav>
+    </div>
+
+    <!-- MODAL: Detalle de obra (compacto) -->
+    <div id="artworkDetailModal" class="fixed inset-0 detail-overlay z-50 hidden flex items-center justify-center p-3">
+        <div class="detail-card w-full max-w-sm p-4">
+            <div class="flex items-start justify-between border-b border-zinc-900 pb-3 mb-3">
+                <div class="flex-1 min-w-0 pr-2">
+                    <h3 id="detailTitle" class="font-bold text-sm text-white truncate">Obra</h3>
+                    <p id="detailSubtitle" class="text-[10px] text-zinc-400 truncate">Autor · Ubicación</p>
+                </div>
+                <button onclick="closeArtworkDetail()" class="text-zinc-500 hover:text-white p-1">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
-
-            <!-- Cuerpo Modal -->
-            <div class="p-4 overflow-y-auto flex-1 pb-10">
-                <!-- Imagen -->
-                <div class="w-full bg-zinc-900 rounded-md overflow-hidden mb-5">
-                    <img id="detail-image" src="" alt="Obra" class="w-full h-auto max-h-[300px] object-cover">
+            <div class="flex flex-col gap-3">
+                <div class="bg-zinc-900 rounded-md overflow-hidden">
+                    <img id="detailImage" src="" alt="Obra" class="w-full h-auto max-h-56 object-cover">
                 </div>
-
-                <!-- Botones Acciones -->
-                <div class="flex items-center gap-2 mb-5">
-                    <button id="toggle-artwork-promotion" type="button" onclick="toggleArtworkPromotion()" class="flex-1 flex items-center justify-center gap-1.5 bg-zinc-900 border border-zinc-800 rounded-md py-2 text-xs font-medium text-zinc-300">
-                        <i data-lucide="megaphone" class="w-3.5 h-3.5"></i> Promocionar
-                    </button>
-                    <button id="share-artwork-whatsapp" type="button" onclick="shareArtworkToWhatsApp()" class="flex-1 flex items-center justify-center gap-1.5 bg-emerald-950/40 border border-emerald-700/60 rounded-md py-2 text-xs font-medium text-emerald-400">
+                <div class="grid grid-cols-2 gap-2 text-xs">
+                    <div><span class="text-[9px] text-zinc-500">Estatus</span><p id="detailStatus" class="font-medium text-slate-200">-</p></div>
+                    <div><span class="text-[9px] text-zinc-500">Tipo</span><p id="detailType" class="font-medium text-slate-200">-</p></div>
+                    <div><span class="text-[9px] text-zinc-500">Superficie</span><p id="detailArea" class="font-medium text-slate-200">-</p></div>
+                    <div><span class="text-[9px] text-zinc-500">Precio</span><p id="detailPrice" class="font-medium text-emerald-400">-</p></div>
+                </div>
+                <div class="text-xs">
+                    <span class="text-[9px] text-zinc-500">Medidas</span>
+                    <p id="detailMeasures" class="text-slate-300">-</p>
+                </div>
+                <div class="flex flex-wrap gap-1.5" id="detailTags"></div>
+                <div class="flex gap-3 pt-2 border-t border-zinc-900">
+                    <button onclick="shareArtworkWhatsApp()" class="flex-1 bg-emerald-950/40 border border-emerald-700/50 text-emerald-300 text-[10px] font-medium py-2 rounded flex items-center justify-center gap-1.5">
                         <i data-lucide="share-2" class="w-3.5 h-3.5"></i> WhatsApp
                     </button>
-                </div>
-
-                <!-- Ficha Técnica Grid -->
-                <div class="grid grid-cols-2 gap-y-4 gap-x-3 mb-5">
-                    <div>
-                        <p class="text-[9px] text-zinc-500 uppercase tracking-wider mb-0.5">Estatus</p>
-                        <p id="detail-status" class="text-xs font-medium text-slate-200">-</p>
-                    </div>
-                    <div>
-                        <p class="text-[9px] text-zinc-500 uppercase tracking-wider mb-0.5">Tipo</p>
-                        <p id="detail-type" class="text-xs font-medium text-slate-200">-</p>
-                    </div>
-                    <div>
-                        <p class="text-[9px] text-zinc-500 uppercase tracking-wider mb-0.5">Precio</p>
-                        <p id="detail-price" class="text-xs font-bold text-emerald-400">-</p>
-                    </div>
-                    <div>
-                        <p class="text-[9px] text-zinc-500 uppercase tracking-wider mb-0.5">Superficie</p>
-                        <p id="detail-area" class="text-xs text-slate-300">-</p>
-                    </div>
-                </div>
-
-                <div class="space-y-4 border-t border-zinc-900 pt-4">
-                    <div>
-                        <p class="text-[9px] text-zinc-500 uppercase tracking-wider mb-0.5">Medidas</p>
-                        <p id="detail-measures" class="text-xs text-slate-300">-</p>
-                    </div>
-                    <div>
-                        <p class="text-[9px] text-zinc-500 uppercase tracking-wider mb-0.5">Cliente</p>
-                        <p id="detail-client" class="text-xs text-slate-300">-</p>
-                    </div>
-                    <div>
-                        <p class="text-[9px] text-zinc-500 uppercase tracking-wider mb-0.5">Provenance</p>
-                        <p id="detail-provenance" class="text-xs text-slate-300">-</p>
-                    </div>
-                    <div>
-                        <p class="text-[9px] text-zinc-500 uppercase tracking-wider mb-1">Etiquetas</p>
-                        <div id="detail-tags" class="flex flex-wrap gap-1.5"></div>
-                    </div>
-                    <div>
-                        <p class="text-[9px] text-zinc-500 uppercase tracking-wider mb-0.5">Observaciones</p>
-                        <p id="detail-observations" class="text-xs text-slate-400 italic">-</p>
-                    </div>
-                </div>
-
-                <!-- Archivos -->
-                <div class="mt-5 pt-4 border-t border-zinc-900 grid grid-cols-2 gap-3">
-                    <div>
-                        <p class="text-[9px] text-zinc-500 uppercase tracking-wider mb-1">Documentos</p>
-                        <div id="detail-documents" class="space-y-1"></div>
-                    </div>
-                    <div>
-                        <p class="text-[9px] text-zinc-500 uppercase tracking-wider mb-1">Adjuntos</p>
-                        <div id="detail-attachments" class="space-y-1"></div>
-                    </div>
+                    <button onclick="toggleArtworkPromotion()" id="togglePromotionBtn" class="flex-1 border border-zinc-700 bg-zinc-900 text-zinc-300 text-[10px] font-medium py-2 rounded flex items-center justify-center gap-1.5">
+                        <i data-lucide="megaphone" class="w-3.5 h-3.5"></i> Promocionar
+                    </button>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- MODAL: Identificar Responsable para Acciones -->
-    <div id="action-login-modal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-zinc-950 border border-zinc-900 rounded-md w-full max-w-sm p-5 flex flex-col gap-4 shadow-2xl">
-            <div class="flex items-center justify-between border-b border-zinc-900 pb-3">
-                <div>
-                    <h3 class="font-bold text-sm text-slate-100 flex items-center gap-2">
-                        <i data-lucide="shield-check" class="w-4 h-4 text-fuchsia-400"></i> Autorización
-                    </h3>
-                    <p class="text-[10px] text-slate-400 mt-0.5">Selecciona tu usuario directivo</p>
-                </div>
-                <button onclick="closeActionLoginModal()" class="text-zinc-500 hover:text-white p-1"><i data-lucide="x" class="w-4 h-4"></i></button>
-            </div>
-            <div id="action-users-list" class="flex flex-col gap-2 max-h-60 overflow-y-auto">
-                <div class="text-center text-zinc-500 text-xs py-4">Cargando directivos...</div>
-            </div>
-        </div>
-    </div>
-
-    <!-- MODAL: Login -->
-    <div id="login-modal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-zinc-950 border border-zinc-900 rounded-md w-full max-w-sm p-5 flex flex-col gap-4 shadow-2xl">
-            <div class="flex items-center justify-between border-b border-zinc-900 pb-3">
+    <!-- MODAL: Login / Usuario -->
+    <div id="loginModal" class="fixed inset-0 detail-overlay z-50 hidden flex items-center justify-center p-4">
+        <div class="bg-zinc-950 border border-zinc-900 w-full max-w-xs p-5 rounded-2xl">
+            <div class="flex items-center justify-between border-b border-zinc-900 pb-3 mb-4">
                 <h3 class="font-bold text-sm text-slate-100 flex items-center gap-2">
-                    <i data-lucide="user" class="w-4 h-4 text-white"></i> Cuenta
+                    <i data-lucide="shield" class="w-4 h-4"></i> Usuario
                 </h3>
-                <button onclick="closeLoginModal()" class="text-zinc-500 hover:text-white p-1"><i data-lucide="x" class="w-4 h-4"></i></button>
+                <button onclick="closeLoginModal()" class="text-zinc-500 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
-
-            <div id="firebaseUserOption" class="hidden flex flex-col gap-3">
-                <div class="flex items-center gap-3 p-3 bg-zinc-900 rounded-md border border-zinc-800">
-                    <img id="modalUserAvatar" src="" alt="avatar" class="w-10 h-10 rounded-full border border-zinc-700 object-cover">
+            <div id="firebaseUserOption" class="hidden flex flex-col gap-2 mb-3">
+                <div class="flex items-center gap-3 p-2 bg-zinc-900 border border-zinc-800 rounded-lg">
+                    <img id="modalUserAvatar" src="" alt="avatar" class="w-9 h-9 rounded-full border border-zinc-700">
                     <div class="flex-1 min-w-0">
-                        <p id="modalUserName" class="text-sm font-semibold text-white truncate">Usuario</p>
+                        <p id="modalUserName" class="text-sm font-medium text-white truncate">Usuario</p>
                         <p id="modalUserEmail" class="text-[10px] text-zinc-400 truncate">email</p>
                     </div>
+                    <button onclick="useFirebaseUser()" class="text-[10px] bg-indigo-600 text-white px-3 py-1.5 rounded">Usar</button>
                 </div>
-                <button onclick="logoutFirebase()" class="w-full text-xs bg-rose-500/10 text-rose-400 border border-rose-500/20 py-2 rounded-md font-medium">
-                    Cerrar sesión de Google
+                <button onclick="logoutFirebase()" class="text-[10px] text-rose-400 text-center">Cerrar sesión</button>
+            </div>
+            <div id="loginUsersList" class="flex flex-col gap-2 max-h-52 overflow-y-auto">
+                <div class="text-center text-zinc-500 text-xs py-4">Cargando...</div>
+            </div>
+            <button onclick="goToLoginPage()" class="w-full mt-3 text-[10px] text-zinc-400 hover:text-white py-2 border-t border-zinc-900 flex items-center justify-center gap-2">
+                <i data-lucide="log-in" class="w-3.5 h-3.5"></i> Iniciar con Google
+            </button>
+        </div>
+    </div>
+
+    <!-- MODAL: Nueva tarea (light) -->
+    <div id="taskModal" class="fixed inset-0 detail-overlay z-50 hidden flex items-center justify-center p-3">
+        <div class="bg-zinc-950 border border-zinc-900 w-full max-w-sm p-4 rounded-2xl">
+            <div class="flex items-center justify-between border-b border-zinc-900 pb-3 mb-3">
+                <h3 class="font-bold text-sm text-white flex items-center gap-2">
+                    <i data-lucide="plus-circle" class="w-4 h-4 text-indigo-400"></i> Nueva tarea
+                </h3>
+                <button onclick="closeTaskModal()" class="text-zinc-500 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="flex flex-col gap-3">
+                <div>
+                    <label class="text-[10px] font-medium text-zinc-400">Proyecto</label>
+                    <select id="projectSelect" class="w-full bg-zinc-900 border border-zinc-800 px-3 py-2 text-xs text-slate-200 rounded focus:border-indigo-500 outline-none">
+                        <option value="">Seleccionar...</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[10px] font-medium text-zinc-400">Subproyecto</label>
+                    <select id="subprojectSelect" class="w-full bg-zinc-900 border border-zinc-800 px-3 py-2 text-xs text-slate-200 rounded focus:border-indigo-500 outline-none" disabled>
+                        <option value="">Primero selecciona proyecto</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[10px] font-medium text-zinc-400">Responsable</label>
+                    <select id="responsibleSelect" class="w-full bg-zinc-900 border border-zinc-800 px-3 py-2 text-xs text-slate-200 rounded focus:border-indigo-500 outline-none">
+                        <option value="">Seleccionar...</option>
+                    </select>
+                </div>
+                <div>
+                    <label class="text-[10px] font-medium text-zinc-400">Detalles</label>
+                    <input type="text" id="taskDetails" placeholder="Ej: Revisar documentación..." class="w-full bg-zinc-900 border border-zinc-800 px-3 py-2 text-xs text-slate-100 placeholder-zinc-500 rounded focus:border-indigo-500 outline-none">
+                </div>
+                <div class="grid grid-cols-2 gap-2">
+                    <div>
+                        <label class="text-[10px] font-medium text-zinc-400">Prioridad</label>
+                        <select id="taskPriority" class="w-full bg-zinc-900 border border-zinc-800 px-2 py-2 text-xs text-slate-200 rounded focus:border-indigo-500 outline-none">
+                            <option value="baja">Baja</option>
+                            <option value="media" selected>Media</option>
+                            <option value="alta">Alta</option>
+                            <option value="urgente">Urgente</option>
+                        </select>
+                    </div>
+                    <div>
+                        <label class="text-[10px] font-medium text-zinc-400">Límite</label>
+                        <input type="date" id="taskDeadline" class="w-full bg-zinc-900 border border-zinc-800 px-2 py-2 text-xs text-slate-200 rounded focus:border-indigo-500 outline-none">
+                    </div>
+                </div>
+                <button onclick="confirmAddTask()" class="bg-indigo-600 hover:bg-indigo-500 text-white py-2.5 text-xs font-semibold rounded flex items-center justify-center gap-2 transition">
+                    <i data-lucide="plus" class="w-4 h-4"></i> Crear tarea
                 </button>
             </div>
+        </div>
+    </div>
 
-            <!-- Botón para ir a login.html (si no hay sesión) -->
-            <div id="loginGoToOption" class="pt-2">
-                <button onclick="goToLoginPage()" class="w-full bg-white text-black text-xs font-semibold py-2.5 rounded-md flex items-center justify-center gap-2">
-                    <svg xmlns="http://www.w3.org/2000/svg" width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                        <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
-                        <polyline points="10 17 15 12 10 7"/>
-                        <line x1="15" y1="12" x2="3" y2="12"/>
-                    </svg>
-                    Iniciar sesión con Google
-                </button>
+    <!-- MODAL: Seleccionar remitente chat -->
+    <div id="chatSenderModal" class="fixed inset-0 detail-overlay z-50 hidden flex items-center justify-center p-3">
+        <div class="bg-zinc-950 border border-zinc-900 w-full max-w-xs p-4 rounded-2xl">
+            <div class="flex items-center justify-between border-b border-zinc-900 pb-3 mb-3">
+                <h3 class="font-bold text-sm text-white flex items-center gap-2">
+                    <i data-lucide="user-check" class="w-4 h-4"></i> Remitente
+                </h3>
+                <button onclick="closeChatSenderModal()" class="text-zinc-500 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+            </div>
+            <div class="grid grid-cols-2 gap-2">
+                <button onclick="setChatSender('Isabel')" class="p-3 bg-zinc-900 border border-zinc-800 rounded text-xs font-medium text-slate-200 hover:border-zinc-600 transition">Isabel</button>
+                <button onclick="setChatSender('Santiago')" class="p-3 bg-zinc-900 border border-zinc-800 rounded text-xs font-medium text-slate-200 hover:border-zinc-600 transition">Santiago</button>
+                <button onclick="setChatSender('Diego')" class="p-3 bg-zinc-900 border border-zinc-800 rounded text-xs font-medium text-slate-200 hover:border-zinc-600 transition">Diego</button>
+                <button onclick="setChatSender('José Manuel')" class="p-3 bg-zinc-900 border border-zinc-800 rounded text-xs font-medium text-slate-200 hover:border-zinc-600 transition">José Manuel</button>
+            </div>
+            <div id="pendingMsgContainer" class="hidden mt-3 text-amber-400 text-[10px] bg-amber-500/10 border border-amber-500/20 p-2 rounded flex items-center gap-2">
+                <i data-lucide="message-square" class="w-3 h-3"></i>
+                <span id="pendingMsgText">Mensaje pendiente</span>
             </div>
         </div>
     </div>
 
     <script type="module">
+        // ============================================================
+        // FIREBASE AUTH
+        // ============================================================
         import { initializeApp } from 'firebase/app';
         import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
 
@@ -414,112 +576,143 @@
 
         let firebaseUser = null;
         let authChecked = false;
-        let localRoleUser = null;
 
-        // URLs Base
+        // ============================================================
+        // ESTADO GLOBAL
+        // ============================================================
+        let artworks = [];
+        let responsables = [];
+        let proyectos = [];
+        let subproyectos = [];
+        let localTasks = JSON.parse(localStorage.getItem('rtbrok_local_tasks') || '[]');
+        let currentChatSender = localStorage.getItem('rtbrok_chat_sender') || null;
+        let pendingChatMessage = null;
+        let displayedArtworks = 9;
+        const ARTWORKS_PER_PAGE = 9;
+
         const ENDPOINT_ARTWORKS = 'https://script.google.com/macros/s/AKfycbxyBzZ7duM3pKtobXHj8A2NgFpIarP5WPS71TKTH2uFMOXXL8rzo68-blixF8kgCwvl8w/exec';
-        const ENDPOINT_CATALOGS = 'https://script.google.com/macros/s/AKfycbx1wIgADNvhYVbo9nNduz-jtz9s1pkvsZGXL3r6rmfjcWK0NWLFLHuw9zE5B21PF2OXow/exec';
         const ENDPOINT_TASKS = 'https://script.google.com/macros/s/AKfycbxmPBIboe_Evn45ZHjtkjydbmlPRMuSax_sEiTc2iN8cqqi2i4-Pf_lOd6875cQXEd_yg/exec';
 
-        let appData = {
-            artworks: [],
-            catalogs: [],
-            responsables: []
-        };
+        // ============================================================
+        // UTILIDADES
+        // ============================================================
+        function resolveImageUrl(adjuntos, fallback) {
+            if (Array.isArray(adjuntos) && adjuntos.length > 0 && adjuntos[0]?.url) {
+                let raw = adjuntos[0].url;
+                if (raw.includes('drive.google.com')) {
+                    const match = raw.match(/\/d\/([a-zA-Z0-9_-]+)/) || raw.match(/id=([a-zA-Z0-9_-]+)/);
+                    if (match) return `https://lh3.googleusercontent.com/d/${match[1]}=w400`;
+                }
+                return raw;
+            }
+            return `https://placehold.co/400x400/18181b/71717a?text=${encodeURIComponent(fallback || 'Obra')}`;
+        }
 
-        let activeDetailArtwork = null;
-        let pendingArtworkPromotion = null;
-        const tabsOrder = ['artworks', 'catalogs'];
+        function escapeHtml(str) {
+            return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+        }
 
+        function showNotification(msg) {
+            const el = document.createElement('div');
+            el.className = 'fixed bottom-20 left-1/2 -translate-x-1/2 bg-zinc-900 border border-indigo-600/30 px-5 py-2.5 rounded-full shadow-2xl z-[100] text-xs text-slate-200 flex items-center gap-2';
+            el.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 text-indigo-400"></i> ${msg}`;
+            document.body.appendChild(el);
+            lucide.createIcons();
+            setTimeout(() => { el.style.opacity = '0';
+                setTimeout(() => el.remove(), 300); }, 2200);
+        }
+
+        // ============================================================
+        // INICIO
+        // ============================================================
         window.onload = function() {
             const overlay = document.getElementById('loadingOverlay');
+            overlay.classList.remove('hidden');
 
-            const savedUser = sessionStorage.getItem('firebaseUser');
-            if (savedUser) {
+            // Rescatar usuario de sessionStorage
+            const saved = sessionStorage.getItem('firebaseUser');
+            if (saved) {
                 try {
-                    firebaseUser = JSON.parse(savedUser);
+                    firebaseUser = JSON.parse(saved);
                     updateUserUI(firebaseUser);
-                } catch (e) {}
-            }
-
-            const localSavedUser = sessionStorage.getItem('currentUser');
-            if(localSavedUser){
-                try { localRoleUser = JSON.parse(localSavedUser); } catch(e){}
+                } catch (_) {}
             }
 
             onAuthStateChanged(auth, (user) => {
                 authChecked = true;
                 if (user) {
-                    firebaseUser = {
-                        uid: user.uid,
-                        displayName: user.displayName,
-                        email: user.email,
-                        photoURL: user.photoURL
-                    };
-                    sessionStorage.setItem('firebaseUser', JSON.stringify(firebaseUser));
-                    updateUserUI(firebaseUser);
-
-                    if(!localRoleUser){
-                        localRoleUser = { id: firebaseUser.uid, nombre: firebaseUser.displayName, rol: 'director' };
-                        sessionStorage.setItem('currentUser', JSON.stringify(localRoleUser));
-                    }
-
-                    overlay.classList.add('hidden');
-                    initApp();
+                    const data = { uid: user.uid, displayName: user.displayName, email: user.email,
+                    photoURL: user.photoURL };
+                    firebaseUser = data;
+                    sessionStorage.setItem('firebaseUser', JSON.stringify(data));
+                    updateUserUI(data);
                 } else {
-                    firebaseUser = null;
-                    if(sessionStorage.getItem('firebaseUser')) {
-                       firebaseUser = JSON.parse(sessionStorage.getItem('firebaseUser'));
-                       updateUserUI(firebaseUser);
-                       overlay.classList.add('hidden');
-                       initApp();
-                       return;
+                    const savedUser = sessionStorage.getItem('firebaseUser');
+                    if (savedUser) {
+                        try { firebaseUser = JSON.parse(savedUser);
+                            updateUserUI(firebaseUser); } catch (_) {}
+                    } else {
+                        updateUserUI(null);
                     }
-                    sessionStorage.removeItem('firebaseUser');
-                    updateUserUI(null);
-                    window.location.href = 'login.html';
                 }
+                overlay.classList.add('hidden');
+                initApp();
             });
 
             setTimeout(() => {
-                if (!authChecked) window.location.href = 'login.html';
+                if (!authChecked) {
+                    window.location.href = 'login.html';
+                }
             }, 3000);
         };
 
         function initApp() {
-            fetchAllData();
-            lucide.createIcons();
+            fetchArtworks();
+            fetchResponsables();
+            fetchProjects();
+            renderLocalTasks();
+            updateChatSenderUI();
+
+            const today = new Date();
+            const weekLater = new Date(today);
+            weekLater.setDate(today.getDate() + 7);
+            document.getElementById('taskDeadline').value = weekLater.toISOString().split('T')[0];
+
+            // Mostrar total de obras
+            updateArtworksCount();
         }
 
+        // ============================================================
+        // FUNCIONES DE USUARIO
+        // ============================================================
         function updateUserUI(user) {
-            const avatarContainer = document.getElementById('userAvatarContainer');
-            const headerAvatar = document.getElementById('headerUserAvatar');
-            const loginBtn = document.getElementById('loginBtn');
-
+            const avatar = document.getElementById('sidebarUserAvatar');
+            const nameEl = document.getElementById('headerUserName');
             if (user) {
-                avatarContainer.classList.remove('hidden');
-                loginBtn.classList.add('hidden');
-                headerAvatar.src = user.photoURL || 'https://ui-avatars.com/api/?background=2d2d2d&color=fff&size=32&name=' + encodeURIComponent(user.displayName || 'User');
-
+                avatar.src = user.photoURL || `https://ui-avatars.com/api/?background=2d2d2d&color=fff&size=32&name=${encodeURIComponent(user.displayName || 'User')}`;
+                avatar.title = user.displayName || 'Usuario';
+                nameEl.textContent = user.displayName || 'Usuario';
+                nameEl.classList.remove('hidden');
+                document.getElementById('firebaseUserOption').classList.remove('hidden');
                 const modalAvatar = document.getElementById('modalUserAvatar');
                 const modalName = document.getElementById('modalUserName');
                 const modalEmail = document.getElementById('modalUserEmail');
-                if (modalAvatar) modalAvatar.src = headerAvatar.src;
+                if (modalAvatar) modalAvatar.src = user.photoURL ||
+                    `https://ui-avatars.com/api/?background=2d2d2d&color=fff&size=36&name=${encodeURIComponent(user.displayName || 'User')}`;
                 if (modalName) modalName.textContent = user.displayName || 'Usuario';
                 if (modalEmail) modalEmail.textContent = user.email || '';
-
-                document.getElementById('firebaseUserOption').classList.remove('hidden');
-                document.getElementById('loginGoToOption').classList.add('hidden');
             } else {
-                avatarContainer.classList.add('hidden');
-                loginBtn.classList.remove('hidden');
+                avatar.src = 'https://ui-avatars.com/api/?background=2d2d2d&color=fff&size=32&name=User';
+                avatar.title = 'Iniciar sesión';
+                nameEl.textContent = 'Invitado';
+                nameEl.classList.remove('hidden');
                 document.getElementById('firebaseUserOption').classList.add('hidden');
-                document.getElementById('loginGoToOption').classList.remove('hidden');
             }
         }
 
         window.handleUserClick = function() {
-            openLoginModal();
+            if (firebaseUser) openLoginModal();
+            else goToLoginPage();
         };
 
         window.goToLoginPage = function() {
@@ -527,427 +720,480 @@
             window.location.href = 'login.html';
         };
 
+        window.useFirebaseUser = function() {
+            if (firebaseUser) {
+                const userData = { id: firebaseUser.uid, nombre: firebaseUser.displayName || 'Usuario',
+                    email: firebaseUser.email || '', rol: 'director' };
+                sessionStorage.setItem('currentUser', JSON.stringify(userData));
+                closeLoginModal();
+                showNotification(`Sesión como ${userData.nombre}`);
+            }
+        };
+
         window.logoutFirebase = function() {
             signOut(auth).then(() => {
-                sessionStorage.clear();
-                window.location.href = 'login.html';
+                sessionStorage.removeItem('firebaseUser');
+                sessionStorage.removeItem('currentUser');
+                showNotification('Sesión cerrada');
+                updateUserUI(null);
+                setTimeout(() => window.location.href = 'login.html', 400);
             });
         };
 
-        // Navigation
-        window.switchTab = function(tabName) {
-            tabsOrder.forEach(t => {
-                const el = document.getElementById(`tab-${t}`);
-                const navBtn = document.getElementById(`nav-${t}`);
-                if (t === tabName) {
-                    el.classList.replace('hidden', 'flex');
-                    if(navBtn) {
-                        navBtn.classList.remove('text-zinc-500');
-                        navBtn.classList.add('text-white');
-                    }
-                } else {
-                    el.classList.replace('flex', 'hidden');
-                    if(navBtn) {
-                        navBtn.classList.remove('text-white');
-                        navBtn.classList.add('text-zinc-500');
-                    }
-                }
-            });
-        };
-
-        window.handleSearch = function(e) {
-            e.preventDefault();
-            const q = document.getElementById('search-input').value.trim();
-            if (q) window.open(`https://www.google.com/search?q=${encodeURIComponent(q)}`, '_blank');
-        };
-
-        function showNotification(message) {
-            const existing = document.querySelector('.rtbrok-notification');
-            if (existing) existing.remove();
-
-            const div = document.createElement('div');
-            div.className = 'rtbrok-notification fixed top-16 left-1/2 -translate-x-1/2 bg-zinc-900 border border-zinc-700 rounded-md px-4 py-2 shadow-2xl z-[100] flex items-center gap-2 w-11/12 max-w-sm';
-            div.innerHTML = `
-                <i data-lucide="info" class="w-4 h-4 text-white"></i>
-                <span class="text-[11px] text-white font-medium">${message}</span>
-            `;
-            document.body.appendChild(div);
-            lucide.createIcons();
-
-            setTimeout(() => {
-                div.style.opacity = '0';
-                div.style.transition = 'opacity 0.3s';
-                setTimeout(() => div.remove(), 300);
-            }, 2500);
-        }
-
-        // Fetch Data
-        async function fetchAllData() {
+        // ============================================================
+        // FETCH DATA
+        // ============================================================
+        async function fetchArtworks() {
             try {
-                const [resA, resC, resT] = await Promise.all([
-                    fetch(ENDPOINT_ARTWORKS).catch(() => null),
-                    fetch(`${ENDPOINT_CATALOGS}?action=list`).catch(() => null),
-                    fetch(ENDPOINT_TASKS).catch(() => null)
-                ]);
+                const res = await fetch(ENDPOINT_ARTWORKS);
+                const data = await res.json();
+                artworks = data.registrosObra || data.data || [];
+            } catch (_) {
+                artworks = getMockArtworks();
+            }
+            renderArtworks();
+            updateArtworksCount();
+        }
 
-                if (resA) {
-                    const dataA = await resA.json();
-                    appData.artworks = dataA.registrosObra || dataA.data || getMockArtworks();
-                } else {
-                    appData.artworks = getMockArtworks();
-                }
-
-                if (resT) {
-                    const dataT = await resT.json();
-                    appData.responsables = dataT.responsables || [];
-                }
-
-                await setCatalogsFromResponse(resC);
-
-                renderFullArtworksGrid();
-                renderCatalogsList();
-                lucide.createIcons();
-            } catch (e) {
-                appData.artworks = getMockArtworks();
-                renderFullArtworksGrid();
-                renderCatalogsList('Error al cargar.');
+        async function fetchResponsables() {
+            try {
+                const res = await fetch(ENDPOINT_TASKS);
+                const data = await res.json();
+                responsables = data.responsables || [];
+                populateResponsibleSelect();
+                renderLoginUsers();
+            } catch (_) {
+                responsables = [];
+                populateResponsibleSelect();
+                renderLoginUsers();
             }
         }
 
-        function resolveImageUrl(adjuntos, fallbackName) {
-            if (Array.isArray(adjuntos) && adjuntos.length > 0 && adjuntos[0].url) {
-                let rawUrl = adjuntos[0].url;
-                if (rawUrl.includes('drive.google.com')) {
-                    const matchId = rawUrl.match(/\/d\/([a-zA-Z0-9_-]+)/) || rawUrl.match(/id=([a-zA-Z0-9_-]+)/);
-                    if (matchId && matchId[1]) return `https://lh3.googleusercontent.com/d/${matchId[1]}=w800`;
-                }
-                return rawUrl;
+        async function fetchProjects() {
+            try {
+                const res = await fetch(ENDPOINT_TASKS);
+                const data = await res.json();
+                proyectos = data.proyectos || [];
+                subproyectos = data.subproyectos || [];
+                populateProjectSelect();
+            } catch (_) {
+                proyectos = [];
+                subproyectos = [];
+                populateProjectSelect();
             }
-            return `https://placehold.co/400x400/18181b/71717a?text=${encodeURIComponent(fallbackName || 'Obra')}`;
         }
 
-        // Render Artworks
-        function renderFullArtworksGrid() {
-            const container = document.getElementById('artworks-grid-container');
-            if (!container) return;
+        // ============================================================
+        // RENDER ARTWORKS (grid 3 columnas)
+        // ============================================================
+        function renderArtworks() {
+            const grid = document.getElementById('artworksGrid');
+            const sorted = [...artworks].sort((a, b) => new Date(b.fecha_registro || 0) - new Date(a.fecha_registro || 0));
+            const toShow = sorted.slice(0, displayedArtworks);
 
-            if (appData.artworks.length === 0) {
-                container.innerHTML = `<p class="text-xs text-slate-500 text-center col-span-full py-10">No hay obras registradas.</p>`;
+            if (toShow.length === 0) {
+                grid.innerHTML =
+                    `<div class="col-span-3 text-center text-zinc-500 text-xs py-8">No hay obras registradas</div>`;
                 return;
             }
 
-            const sortedArtworks = [...appData.artworks].sort((a, b) => {
-                const dateA = a.fecha_registro ? new Date(a.fecha_registro) : new Date(0);
-                const dateB = b.fecha_registro ? new Date(b.fecha_registro) : new Date(0);
-                return dateB - dateA;
-            });
-
-            container.innerHTML = sortedArtworks.map(a => {
-                const imgUrl = resolveImageUrl(a.adjuntos, a.nombre_obra);
-                const statusColor = {
-                    'Consolidación': 'border-amber-500/30 text-amber-400',
-                    'Bodega': 'border-blue-500/30 text-blue-400',
-                    'Vendida': 'border-emerald-500/30 text-emerald-400'
-                } [a.estatus] || 'border-zinc-500/30 text-zinc-400';
-
-                const promoIcon = a.promocionar ?
-                    `<div class="absolute top-1.5 left-1.5 bg-fuchsia-500 text-white rounded-full p-1 shadow-md"><i data-lucide="megaphone" class="w-2.5 h-2.5"></i></div>` : '';
-
+            grid.innerHTML = toShow.map(a => {
+                const img = resolveImageUrl(a.adjuntos, a.nombre_obra);
+                const statusColor = { 'Consolidación': 'border-amber-500/30 text-amber-400', 'Bodega': 'border-blue-500/30 text-blue-400',
+                    'Vendida': 'border-emerald-500/30 text-emerald-400' } [a.estatus] || 'border-zinc-500/30 text-zinc-400';
                 return `
-                    <div class="artwork-item" onclick="openArtworkDetail('${a.id}')">
-                        <img src="${imgUrl}" alt="${a.nombre_obra || 'Obra'}" loading="lazy"
+                    <div class="art-item" onclick="openArtworkDetail('${a.id}')">
+                        <img src="${img}" alt="${a.nombre_obra || 'Obra'}" loading="lazy"
                              onerror="this.onerror=null; this.src='https://placehold.co/400x400/18181b/71717a?text=Obra';">
-                        <div class="status-badge ${statusColor}">${a.estatus || 'Consolidación'}</div>
-                        ${promoIcon}
+                        <div class="art-badge ${statusColor}">${a.estatus || 'Consolidación'}</div>
+                        ${a.promocionar ? `<div class="promo-tag"><i data-lucide="megaphone" class="w-2.5 h-2.5"></i> Promo</div>` : ''}
                     </div>
                 `;
             }).join('');
 
+            // Mostrar/ocultar botón "Mostrar más"
+            const btn = document.getElementById('showMoreBtn');
+            if (displayedArtworks >= sorted.length) {
+                btn.style.display = 'none';
+            } else {
+                btn.style.display = 'flex';
+            }
+
             lucide.createIcons();
         }
 
-        // Modals / Details
-        window.openArtworkDetail = function(artworkId) {
-            const artwork = appData.artworks.find(a => a.id === artworkId);
-            if (!artwork) return;
-            activeDetailArtwork = artwork;
+        window.showMoreArtworks = function() {
+            displayedArtworks += ARTWORKS_PER_PAGE;
+            renderArtworks();
+        };
 
-            const modal = document.getElementById('artwork-detail-modal');
+        function updateArtworksCount() {
+            const el = document.getElementById('artworksCount');
+            const label = document.getElementById('totalArtworksLabel');
+            if (el) el.textContent = artworks.length;
+            if (label) label.textContent = `${artworks.length} obras`;
+        }
+
+        // ============================================================
+        // DETALLE DE OBRA (modal)
+        // ============================================================
+        let activeArtwork = null;
+
+        window.openArtworkDetail = function(id) {
+            const a = artworks.find(el => el.id === id);
+            if (!a) return;
+            activeArtwork = a;
+
+            const modal = document.getElementById('artworkDetailModal');
             modal.classList.remove('hidden');
             modal.classList.add('flex');
 
-            document.getElementById('detail-title').textContent = artwork.nombre_obra || 'Sin título';
-            document.getElementById('detail-subtitle').textContent = `${artwork.autor || 'Autor'} · ${artwork.ubicacion || 'Sin Ubicación'}`;
+            document.getElementById('detailTitle').textContent = a.nombre_obra || 'Sin título';
+            document.getElementById('detailSubtitle').textContent = `${a.autor || 'Autor desconocido'} · ${a.ubicacion || ''}`;
+            document.getElementById('detailImage').src = resolveImageUrl(a.adjuntos, a.nombre_obra);
+            document.getElementById('detailStatus').textContent = a.estatus || 'Consolidación';
+            document.getElementById('detailType').textContent = a.tipo_obra || 'No especificado';
+            document.getElementById('detailArea').textContent = a.superficie ? `${a.superficie} m²` : 'N/A';
+            const price = a.precio_venta || a.precio_lista;
+            document.getElementById('detailPrice').textContent = price ? `$${Number(price).toLocaleString()} ${a.tipo_moneda || 'MXN'}` :
+                'N/D';
+            const measures = [a.ancho && `Ancho: ${a.ancho}m`, a.alto && `Alto: ${a.alto}m`, a.largo && `Largo: ${a.largo}m`]
+                .filter(Boolean).join(' · ') || 'No especificadas';
+            document.getElementById('detailMeasures').textContent = measures;
 
-            const imgUrl = resolveImageUrl(artwork.adjuntos, artwork.nombre_obra);
-            document.getElementById('detail-image').src = imgUrl;
-
-            document.getElementById('detail-status').textContent = artwork.estatus || 'Consolidación';
-            document.getElementById('detail-type').textContent = artwork.tipo_obra || 'N/A';
-            document.getElementById('detail-area').textContent = artwork.superficie ? `${artwork.superficie} m²` : 'N/A';
-
-            const price = artwork.precio_venta || artwork.precio_lista;
-            document.getElementById('detail-price').textContent = price ? `$${Number(price).toLocaleString()} ${artwork.tipo_moneda || 'MXN'}` : 'N/A';
-
-            updateArtworkPromotionButton(artwork);
-
-            const measures = [
-                artwork.ancho && `W: ${artwork.ancho}m`,
-                artwork.alto && `H: ${artwork.alto}m`,
-                artwork.largo && `L: ${artwork.largo}m`
-            ].filter(Boolean);
-            document.getElementById('detail-measures').textContent = measures.length ? measures.join(' | ') : 'N/A';
-
-            document.getElementById('detail-client').textContent = artwork.cliente || 'N/A';
-            document.getElementById('detail-provenance').textContent = artwork.provenance || 'N/A';
-            document.getElementById('detail-observations').textContent = artwork.observaciones || 'Ninguna';
-
-            const tagsContainer = document.getElementById('detail-tags');
-            if (Array.isArray(artwork.tags) && artwork.tags.length > 0) {
-                tagsContainer.innerHTML = artwork.tags.map(tag =>
-                    `<span class="px-2 py-0.5 text-[9px] bg-zinc-800 rounded-sm text-zinc-300">${tag}</span>`
-                ).join('');
+            const tags = document.getElementById('detailTags');
+            if (Array.isArray(a.tags) && a.tags.length) {
+                tags.innerHTML = a.tags.map(t => `<span class="px-2 py-0.5 text-[9px] bg-zinc-800 border border-zinc-700 text-zinc-300 rounded">${t}</span>`)
+                    .join('');
             } else {
-                tagsContainer.innerHTML = '<span class="text-[9px] text-zinc-600">Sin etiquetas</span>';
+                tags.innerHTML = '<span class="text-[10px] text-zinc-500">Sin etiquetas</span>';
             }
 
-            const formatLinks = (arr, icon) => Array.isArray(arr) && arr.length > 0
-                ? arr.map(x => `<a href="${x.url}" target="_blank" class="text-[10px] text-blue-400 truncate block">${icon} ${x.nombre || x.name || 'Archivo'}</a>`).join('')
-                : '<span class="text-[10px] text-zinc-600">Ninguno</span>';
-
-            document.getElementById('detail-documents').innerHTML = formatLinks(artwork.documentos, '📄');
-            document.getElementById('detail-attachments').innerHTML = formatLinks(artwork.adjuntos, '📎');
-
+            // Botón promocionar
+            const promoBtn = document.getElementById('togglePromotionBtn');
+            const isPromoted = a.promocionar === true;
+            promoBtn.className = isPromoted ?
+                'flex-1 border border-fuchsia-400/40 bg-fuchsia-500/10 text-fuchsia-200 text-[10px] font-medium py-2 rounded flex items-center justify-center gap-1.5' :
+                'flex-1 border border-zinc-700 bg-zinc-900 text-zinc-300 text-[10px] font-medium py-2 rounded flex items-center justify-center gap-1.5';
+            promoBtn.innerHTML = isPromoted ?
+                `<i data-lucide="megaphone-off" class="w-3.5 h-3.5"></i> Quitar promo` :
+                `<i data-lucide="megaphone" class="w-3.5 h-3.5"></i> Promocionar`;
             lucide.createIcons();
+
             document.body.style.overflow = 'hidden';
         };
 
         window.closeArtworkDetail = function() {
-            document.getElementById('artwork-detail-modal').classList.add('hidden');
-            document.getElementById('artwork-detail-modal').classList.remove('flex');
-            activeDetailArtwork = null;
+            document.getElementById('artworkDetailModal').classList.add('hidden');
+            document.getElementById('artworkDetailModal').classList.remove('flex');
+            activeArtwork = null;
             document.body.style.overflow = 'auto';
         };
 
-        // Promotion Auth
-        function updateArtworkPromotionButton(artwork) {
-            const btn = document.getElementById('toggle-artwork-promotion');
-            if (!btn) return;
-            const isPromoted = artwork.promocionar === true;
-            btn.className = isPromoted
-                ? 'flex-1 flex items-center justify-center gap-1.5 bg-fuchsia-500/20 border border-fuchsia-500/50 rounded-md py-2 text-xs font-medium text-fuchsia-300'
-                : 'flex-1 flex items-center justify-center gap-1.5 bg-zinc-900 border border-zinc-800 rounded-md py-2 text-xs font-medium text-zinc-300';
-            btn.innerHTML = isPromoted
-                ? '<i data-lucide="megaphone-off" class="w-3.5 h-3.5"></i> Quitar Promoción'
-                : '<i data-lucide="megaphone" class="w-3.5 h-3.5"></i> Promocionar';
+        window.toggleArtworkPromotion = function() {
+            if (!activeArtwork) return;
+            const newVal = !activeArtwork.promocionar;
+            // Actualización local (simulada)
+            activeArtwork.promocionar = newVal;
+            const promoBtn = document.getElementById('togglePromotionBtn');
+            promoBtn.className = newVal ?
+                'flex-1 border border-fuchsia-400/40 bg-fuchsia-500/10 text-fuchsia-200 text-[10px] font-medium py-2 rounded flex items-center justify-center gap-1.5' :
+                'flex-1 border border-zinc-700 bg-zinc-900 text-zinc-300 text-[10px] font-medium py-2 rounded flex items-center justify-center gap-1.5';
+            promoBtn.innerHTML = newVal ?
+                `<i data-lucide="megaphone-off" class="w-3.5 h-3.5"></i> Quitar promo` :
+                `<i data-lucide="megaphone" class="w-3.5 h-3.5"></i> Promocionar`;
             lucide.createIcons();
+            renderArtworks();
+            showNotification(newVal ? 'Obra promocionada' : 'Promoción retirada');
+        };
+
+        window.shareArtworkWhatsApp = function() {
+            if (!activeArtwork) return;
+            const text =
+                `*${activeArtwork.nombre_obra || 'Sin título'}*\nAutor: ${activeArtwork.autor || 'N/A'}\nUbicación: ${activeArtwork.ubicacion || 'N/A'}\nEstatus: ${activeArtwork.estatus || 'Consolidación'}\nPrecio: ${activeArtwork.precio_venta || activeArtwork.precio_lista || 'N/D'}`;
+            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+        };
+
+        // ============================================================
+        // TAREAS (modal simplificado)
+        // ============================================================
+        window.openAddTaskModal = function() {
+            const modal = document.getElementById('taskModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            populateProjectSelect();
+            populateResponsibleSelect();
+            lucide.createIcons();
+        };
+
+        window.closeTaskModal = function() {
+            document.getElementById('taskModal').classList.add('hidden');
+            document.getElementById('taskModal').classList.remove('flex');
+        };
+
+        function populateProjectSelect() {
+            const sel = document.getElementById('projectSelect');
+            sel.innerHTML = '<option value="">Seleccionar proyecto...</option>';
+            proyectos.forEach(p => {
+                const opt = document.createElement('option');
+                opt.value = p.id;
+                opt.textContent = `${p.asignacion || ''} - ${p.nombre}`;
+                sel.appendChild(opt);
+            });
+            sel.onchange = function() {
+                const pid = this.value;
+                const subSel = document.getElementById('subprojectSelect');
+                if (pid) {
+                    const subs = subproyectos.filter(sp => sp.id_proyecto === pid);
+                    subSel.disabled = false;
+                    subSel.innerHTML = '<option value="">Seleccionar subproyecto...</option>';
+                    subs.forEach(sp => {
+                        const opt = document.createElement('option');
+                        opt.value = sp.id;
+                        opt.textContent = `${sp.asignacion || ''} - ${sp.nombre}`;
+                        subSel.appendChild(opt);
+                    });
+                } else {
+                    subSel.disabled = true;
+                    subSel.innerHTML = '<option value="">Primero selecciona proyecto</option>';
+                }
+            };
         }
 
-        window.toggleArtworkPromotion = function() {
-            if (!activeDetailArtwork) return;
-            pendingArtworkPromotion = {
-                artworkId: activeDetailArtwork.id,
-                promocionar: !activeDetailArtwork.promocionar
+        function populateResponsibleSelect() {
+            const sel = document.getElementById('responsibleSelect');
+            sel.innerHTML = '<option value="">Seleccionar responsable...</option>';
+            responsables.forEach(r => {
+                const opt = document.createElement('option');
+                opt.value = r.id;
+                const badge = r.rol ? ` [${r.rol}]` : '';
+                opt.textContent = `${r.nombre || 'Sin nombre'}${badge}`;
+                sel.appendChild(opt);
+            });
+        }
+
+        window.confirmAddTask = function() {
+            const project = document.getElementById('projectSelect').value;
+            const subproject = document.getElementById('subprojectSelect').value;
+            const responsible = document.getElementById('responsibleSelect').value;
+            const details = document.getElementById('taskDetails').value.trim();
+            const priority = document.getElementById('taskPriority').value;
+            const deadline = document.getElementById('taskDeadline').value;
+
+            if (!project || !subproject || !responsible || !details) {
+                showNotification('Completa todos los campos');
+                return;
+            }
+
+            const taskId = 'T_' + Date.now().toString(36).toUpperCase();
+            const payload = {
+                action: 'tarea_add',
+                data: {
+                    id: taskId,
+                    id_subproyecto: subproject,
+                    id_responsable: responsible,
+                    prioridad: priority,
+                    estatus: 'pendiente',
+                    detalles: details,
+                    descripcion: '',
+                    fecha_limite: deadline || ''
+                }
             };
 
-            const role = (localRoleUser?.rol || '').toLowerCase();
-            if (localRoleUser && (role === 'director' || role === 'supervisor')) {
-                executeArtworkPromotion(pendingArtworkPromotion.artworkId, pendingArtworkPromotion.promocionar, localRoleUser);
+            fetch(ENDPOINT_TASKS, {
+                method: 'POST',
+                mode: 'no-cors',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify(payload)
+            }).then(() => {
+                showNotification('Tarea creada');
+                closeTaskModal();
+                document.getElementById('taskDetails').value = '';
+            }).catch(() => {
+                showNotification('Error al crear tarea');
+            });
+        };
+
+        // ============================================================
+        // CHAT (remitente)
+        // ============================================================
+        window.openChatSenderModal = function() {
+            const modal = document.getElementById('chatSenderModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            const pendingContainer = document.getElementById('pendingMsgContainer');
+            const pendingText = document.getElementById('pendingMsgText');
+            if (pendingChatMessage) {
+                pendingContainer.classList.remove('hidden');
+                pendingText.textContent = `"${pendingChatMessage.substring(0, 30)}${pendingChatMessage.length > 30 ? '...' : ''}"`;
             } else {
-                openActionLoginModal();
+                pendingContainer.classList.add('hidden');
             }
-        };
-
-        window.openActionLoginModal = function() {
-            const container = document.getElementById('action-users-list');
-            const directors = appData.responsables.filter(r => ['director', 'supervisor'].includes((r.rol || '').toLowerCase()));
-
-            if(directors.length === 0){
-                container.innerHTML = '<div class="text-[10px] text-zinc-500 text-center">No se encontraron perfiles con permisos.</div>';
-            } else {
-                container.innerHTML = directors.map(d => `
-                    <button onclick="selectUserForAction('${d.id}', '${d.nombre}', '${d.rol}')" class="flex items-center gap-3 p-2.5 bg-zinc-900 border border-zinc-800 rounded mb-2 w-full text-left">
-                        <div class="w-8 h-8 bg-zinc-800 rounded-full flex items-center justify-center text-[10px] font-bold">${d.nombre.charAt(0)}</div>
-                        <div>
-                            <p class="text-xs text-white font-medium">${d.nombre}</p>
-                            <p class="text-[9px] text-zinc-400">${d.rol}</p>
-                        </div>
-                    </button>
-                `).join('');
-            }
-            document.getElementById('action-login-modal').classList.remove('hidden');
-            document.getElementById('action-login-modal').classList.add('flex');
-        };
-
-        window.closeActionLoginModal = function() {
-            document.getElementById('action-login-modal').classList.add('hidden');
-            document.getElementById('action-login-modal').classList.remove('flex');
-            pendingArtworkPromotion = null;
-        };
-
-        window.selectUserForAction = function(id, nombre, rol) {
-            localRoleUser = { id, nombre, rol };
-            sessionStorage.setItem('currentUser', JSON.stringify(localRoleUser));
-            closeActionLoginModal();
-            if(pendingArtworkPromotion){
-                executeArtworkPromotion(pendingArtworkPromotion.artworkId, pendingArtworkPromotion.promocionar, localRoleUser);
-            }
-        };
-
-        async function executeArtworkPromotion(artworkId, promocionar, user) {
-            const artwork = appData.artworks.find(a => a.id === artworkId);
-            if (!artwork) return;
-
-            const btn = document.getElementById('toggle-artwork-promotion');
-            const originalContent = btn.innerHTML;
-            btn.disabled = true;
-            btn.innerHTML = '<i data-lucide="loader-circle" class="w-3.5 h-3.5 animate-spin"></i> Guardando';
             lucide.createIcons();
+        };
 
-            try {
-                await fetch(ENDPOINT_ARTWORKS, {
-                    method: 'POST', mode: 'no-cors',
-                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
-                    body: JSON.stringify({ action: 'registro_obra_promocionar_toggle', data: { id_obra: artworkId, id_actor: user.id, promocionar } })
-                });
+        window.closeChatSenderModal = function() {
+            document.getElementById('chatSenderModal').classList.add('hidden');
+            document.getElementById('chatSenderModal').classList.remove('flex');
+        };
 
-                artwork.promocionar = promocionar;
-                if (activeDetailArtwork?.id === artworkId) {
-                    activeDetailArtwork.promocionar = promocionar;
-                    updateArtworkPromotionButton(activeDetailArtwork);
-                }
-                renderFullArtworksGrid();
-                showNotification(promocionar ? 'Promoción activada' : 'Promoción retirada');
-            } catch (error) {
-                showNotification('Error al actualizar');
-                if (btn) btn.innerHTML = originalContent;
-            } finally {
-                pendingArtworkPromotion = null;
-                if (btn) btn.disabled = false;
-                lucide.createIcons();
+        window.setChatSender = function(name) {
+            currentChatSender = name;
+            localStorage.setItem('rtbrok_chat_sender', name);
+            closeChatSenderModal();
+            updateChatSenderUI();
+            if (pendingChatMessage) {
+                const msg = pendingChatMessage;
+                pendingChatMessage = null;
+                document.getElementById('pendingMsgContainer').classList.add('hidden');
+                // Enviar mensaje simulado
+                showNotification(`Mensaje enviado como ${name}`);
             }
+        };
+
+        function updateChatSenderUI() {
+            // No hay UI de chat en la vista principal, solo guardamos el estado
         }
 
-        // WhatsApp Share
-        window.shareArtworkToWhatsApp = async function() {
-            if (!activeDetailArtwork) return;
-            const btn = document.getElementById('share-artwork-whatsapp');
-            const originalHtml = btn.innerHTML;
-            btn.innerHTML = '<i data-lucide="loader-circle" class="w-3.5 h-3.5 animate-spin"></i> Preparando...';
-            lucide.createIcons();
-
-            try {
-                const imgUrl = resolveImageUrl(activeDetailArtwork.adjuntos, activeDetailArtwork.nombre_obra);
-                const res = await fetch(imgUrl);
-                const blob = await res.blob();
-                const file = new File([blob], 'obra.jpg', { type: blob.type });
-
-                const text = `*${activeDetailArtwork.nombre_obra || 'Obra'}*\nAutor: ${activeDetailArtwork.autor || 'N/A'}\nPrecio: ${document.getElementById('detail-price').textContent}\nUbicación: ${activeDetailArtwork.ubicacion || 'N/A'}`;
-
-                if (navigator.canShare && navigator.canShare({ files: [file] })) {
-                    await navigator.share({ files: [file], text: text });
-                } else {
-                    throw new Error('No soportado');
-                }
-            } catch (e) {
-                if(e.name !== 'AbortError') showNotification('No es posible compartir directamente.');
-            } finally {
-                btn.innerHTML = originalHtml;
-                lucide.createIcons();
-            }
-        };
-
-        // Catalogs
-        async function setCatalogsFromResponse(response) {
-            if (!response) { appData.catalogs = []; return; }
-            try {
-                const payload = await response.json();
-                appData.catalogs = Array.isArray(payload.data) ? payload.data : [];
-            } catch (e) {
-                appData.catalogs = [];
-            }
-        }
-
-        function renderCatalogsList(errorMsg = '') {
-            const container = document.getElementById('catalogs-list');
-            const count = document.getElementById('catalogs-count');
-
-            if (errorMsg) {
-                count.textContent = 'Error';
-                container.innerHTML = `<p class="text-xs text-rose-400 text-center py-6">${errorMsg}</p>`;
-                return;
-            }
-
-            const cat = appData.catalogs;
-            count.textContent = `${cat.length} elementos`;
-
-            if (!cat.length) {
-                container.innerHTML = '<p class="text-xs text-zinc-500 text-center py-6">No hay catálogos.</p>';
-                return;
-            }
-
-            container.innerHTML = cat.map(c => {
-                return `
-                    <div class="bg-zinc-900 border border-zinc-800 rounded-md p-3 flex flex-col gap-2">
-                        <div class="flex items-start justify-between">
-                            <div class="pr-2">
-                                <h4 class="text-xs font-bold text-white leading-tight">${c.title || 'Sin Título'}</h4>
-                                <p class="text-[9px] text-zinc-400 mt-0.5">${c.config?.artistName || 'Variado'}</p>
-                            </div>
-                            <span class="text-[9px] bg-zinc-950 border border-zinc-800 px-1.5 py-0.5 rounded shrink-0">${c.selectedWorksCount || 0} Obras</span>
-                        </div>
-                        <div class="flex items-center justify-between border-t border-zinc-800/50 pt-2 mt-1">
-                            <span class="text-[9px] text-zinc-500">${c.date || ''}</span>
-                            <button onclick="downloadCatalogPdf('${c.id}')" id="btn-cat-${c.id}" class="text-[10px] flex items-center gap-1 text-white bg-indigo-600 hover:bg-indigo-500 px-2 py-1 rounded transition">
-                                <i data-lucide="download" class="w-3 h-3"></i> PDF
-                            </button>
-                        </div>
-                    </div>
-                `;
-            }).join('');
-            lucide.createIcons();
-        }
-
-        window.refreshCatalogs = async function() {
-            document.getElementById('catalogs-list').innerHTML = '<p class="text-xs text-zinc-500 text-center py-6">Actualizando...</p>';
-            const res = await fetch(`${ENDPOINT_CATALOGS}?action=list`).catch(() => null);
-            await setCatalogsFromResponse(res);
-            renderCatalogsList(!res ? 'Error de red' : '');
-        };
-
-        // Modal Login
+        // ============================================================
+        // LOGIN MODAL
+        // ============================================================
         window.openLoginModal = function() {
-            document.getElementById('login-modal').classList.remove('hidden');
-            document.getElementById('login-modal').classList.add('flex');
+            document.getElementById('loginModal').classList.remove('hidden');
+            document.getElementById('loginModal').classList.add('flex');
+            renderLoginUsers();
+            if (firebaseUser) {
+                const avatar = document.getElementById('modalUserAvatar');
+                const name = document.getElementById('modalUserName');
+                const email = document.getElementById('modalUserEmail');
+                if (avatar) avatar.src = firebaseUser.photoURL ||
+                    `https://ui-avatars.com/api/?background=2d2d2d&color=fff&size=36&name=${encodeURIComponent(firebaseUser.displayName || 'User')}`;
+                if (name) name.textContent = firebaseUser.displayName || 'Usuario';
+                if (email) email.textContent = firebaseUser.email || '';
+                document.getElementById('firebaseUserOption').classList.remove('hidden');
+            } else {
+                document.getElementById('firebaseUserOption').classList.add('hidden');
+            }
+            lucide.createIcons();
         };
 
         window.closeLoginModal = function() {
-            document.getElementById('login-modal').classList.add('hidden');
-            document.getElementById('login-modal').classList.remove('flex');
+            document.getElementById('loginModal').classList.add('hidden');
+            document.getElementById('loginModal').classList.remove('flex');
         };
 
-        // Generación PDFs Mock (La lógica completa requiere fetch de las obras detallado, adaptado de tu código anterior)
-        window.downloadCatalogPdf = async function(id) {
-            showNotification('Generando PDF en el dispositivo... (Mock)');
-            const btn = document.getElementById(`btn-cat-${id}`);
-            if(btn) btn.innerHTML = '<i data-lucide="loader-circle" class="w-3 h-3 animate-spin"></i>';
-            lucide.createIcons();
+        function renderLoginUsers() {
+            const container = document.getElementById('loginUsersList');
+            const directors = responsables.filter(r => r.rol && r.rol.toLowerCase() === 'director');
+            if (directors.length === 0) {
+                container.innerHTML =
+                    `<div class="text-center text-zinc-500 text-xs py-4">No hay directores registrados</div>`;
+                return;
+            }
+            container.innerHTML = directors.map(d => `
+                <button onclick="selectDirector('${d.id}', '${d.nombre}')" class="flex items-center gap-3 p-2.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-indigo-500/50 rounded w-full text-left transition">
+                    <div class="w-8 h-8 bg-indigo-600/30 flex items-center justify-center text-indigo-400 font-bold text-xs rounded">${d.nombre ? d.nombre.charAt(0).toUpperCase() : '?'}</div>
+                    <div>
+                        <p class="text-xs font-medium text-slate-200">${d.nombre || 'Sin nombre'}</p>
+                        <p class="text-[9px] text-zinc-400">${d.email || ''} • ${d.rol || 'Director'}</p>
+                    </div>
+                </button>
+            `).join('');
+        }
 
-            setTimeout(() => {
-                showNotification('Descarga finalizada (Simulada).');
-                if(btn) btn.innerHTML = '<i data-lucide="download" class="w-3 h-3"></i> PDF';
-                lucide.createIcons();
-            }, 1500);
+        window.selectDirector = function(id, nombre) {
+            const userData = { id, nombre, rol: 'director' };
+            sessionStorage.setItem('currentUser', JSON.stringify(userData));
+            closeLoginModal();
+            showNotification(`Sesión como ${nombre}`);
         };
 
-        // Mock data
+        // ============================================================
+        // TAREAS PERSONALES (localStorage)
+        // ============================================================
+        function renderLocalTasks() {
+            // No se usa en la vista móvil, pero mantenemos la función
+        }
+
+        // ============================================================
+        // NAVEGACIÓN ENTRE TABS (solo obras e inicio)
+        // ============================================================
+        window.switchTab = function(tab) {
+            const navItems = document.querySelectorAll('.nav-item');
+            navItems.forEach(el => el.classList.remove('active'));
+            if (tab === 'dashboard') {
+                document.querySelector('.nav-item:first-child')?.classList.add('active');
+                // Mostrar inicio (ya visible)
+            } else if (tab === 'artworks') {
+                document.querySelector('.nav-item:nth-child(2)')?.classList.add('active');
+                // Scroll a la galería
+                document.querySelector('main')?.scrollTo({ top: 0, behavior: 'smooth' });
+            }
+        };
+
+        // ============================================================
+        // MOCK DATA
+        // ============================================================
         function getMockArtworks() {
             return [
-                { id: 'm1', nombre_obra: 'Residencia Minimalista', autor: 'Carlos Mendoza', estatus: 'Consolidación', adjuntos: [{url: 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=500'}], precio_lista: 1200000, promocionar: true, tags: ['moderno'] },
-                { id: 'm2', nombre_obra: 'Torre Corporativa', autor: 'Sofía Valdés', estatus: 'Bodega', adjuntos: [{url: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=500'}], precio_lista: 5000000, tags: ['comercial'] },
-                { id: 'm3', nombre_obra: 'Pabellón Botánico', autor: 'Estudio Arq', estatus: 'Vendida', adjuntos: [{url: 'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=500'}], precio_venta: 2100000 }
+                { id: 'm1', nombre_obra: 'Residencia Minimalista', autor: 'Carlos Mendoza', ubicacion: 'Puebla',
+                    estatus: 'Consolidación', tipo_obra: 'Residencial', superficie: 250, precio_lista: 1200000,
+                    fecha_registro: '2025-01-15', adjuntos: [{ url: 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=400' }],
+                    tags: ['moderno', 'minimalista'], ancho: 12, alto: 6, largo: 15, tipo_moneda: 'MXN',
+                promocionar: true },
+                { id: 'm2', nombre_obra: 'Torre Corporativa', autor: 'Sofía Valdés', ubicacion: 'CDMX',
+                    estatus: 'Bodega', tipo_obra: 'Comercial', superficie: 1500, precio_lista: 5000000,
+                    fecha_registro: '2025-02-20', adjuntos: [{ url: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=400' }],
+                    tags: ['corporativo'], ancho: 25, alto: 80, largo: 25, tipo_moneda: 'MXN', promocionar: false },
+                { id: 'm3', nombre_obra: 'Pabellón Botánico', autor: 'Estudio Arquitectura', ubicacion: 'Monterrey',
+                    estatus: 'Vendida', tipo_obra: 'Cultural', superficie: 800, precio_lista: 2200000,
+                    fecha_registro: '2024-11-10', adjuntos: [{ url: 'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=400' }],
+                    tags: ['público'], ancho: 30, alto: 12, largo: 30, tipo_moneda: 'MXN', promocionar: false },
+                { id: 'm4', nombre_obra: 'Casa del Bosque', autor: 'Grupo Z', ubicacion: 'Valle de Bravo',
+                    estatus: 'Consolidación', tipo_obra: 'Residencial', superficie: 180, precio_lista: 850000,
+                    fecha_registro: '2025-03-01', adjuntos: [{ url: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=400' }],
+                    tags: ['sustentable'], ancho: 10, alto: 4, largo: 12, tipo_moneda: 'MXN', promocionar: false },
+                { id: 'm5', nombre_obra: 'Edificio Multifamiliar', autor: 'Arquitectos Asociados',
+                    ubicacion: 'Guadalajara', estatus: 'Consolidación', tipo_obra: 'Residencial', superficie: 320,
+                    precio_lista: 1800000, fecha_registro: '2025-03-15', adjuntos: [{ url: 'https://images.unsplash.com/photo-1574362848149-11496d93a7c7?w=400' }],
+                    tags: ['multifamiliar'], ancho: 18, alto: 20, largo: 15, tipo_moneda: 'MXN', promocionar: false },
+                { id: 'm6', nombre_obra: 'Centro Cultural', autor: 'Mónica Torres', ubicacion: 'Querétaro',
+                    estatus: 'Bodega', tipo_obra: 'Cultural', superficie: 1200, precio_lista: 3500000,
+                    fecha_registro: '2024-12-01', adjuntos: [{ url: 'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=400' }],
+                    tags: ['cultural'], ancho: 40, alto: 10, largo: 30, tipo_moneda: 'MXN', promocionar: false },
+                { id: 'm7', nombre_obra: 'Oficinas Creativas', autor: 'Estudio NOMADA', ubicacion: 'CDMX',
+                    estatus: 'Vendida', tipo_obra: 'Comercial', superficie: 450, precio_lista: 2800000,
+                    fecha_registro: '2024-09-20', adjuntos: [{ url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400' }],
+                    tags: ['creativo'], ancho: 15, alto: 4, largo: 20, tipo_moneda: 'USD', promocionar: true },
+                { id: 'm8', nombre_obra: 'Casa de Campo', autor: 'Ignacio Ramírez', ubicacion: 'San Miguel de Allende',
+                    estatus: 'Consolidación', tipo_obra: 'Residencial', superficie: 350, precio_lista: 950000,
+                    fecha_registro: '2025-02-10', adjuntos: [{ url: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400' }],
+                    tags: ['colonial'], ancho: 14, alto: 5, largo: 16, tipo_moneda: 'MXN', promocionar: false },
+                { id: 'm9', nombre_obra: 'Torre de Oficinas', autor: 'Arquitectura Moderna', ubicacion: 'Monterrey',
+                    estatus: 'Bodega', tipo_obra: 'Comercial', superficie: 2000, precio_lista: 8000000,
+                    fecha_registro: '2024-08-15', adjuntos: [{ url: 'https://images.unsplash.com/photo-1486718448742-163732cd1544?w=400' }],
+                    tags: ['corporativo'], ancho: 30, alto: 100, largo: 30, tipo_moneda: 'MXN', promocionar: false },
+                { id: 'm10', nombre_obra: 'Vivienda Sustentable', autor: 'EcoArquitectos', ubicacion: 'Puebla',
+                    estatus: 'Consolidación', tipo_obra: 'Residencial', superficie: 200, precio_lista: 720000,
+                    fecha_registro: '2025-03-20', adjuntos: [{ url: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400' }],
+                    tags: ['LEED'], ancho: 10, alto: 4, largo: 12, tipo_moneda: 'MXN', promocionar: false },
             ];
         }
+
+        // ============================================================
+        // INICIALIZAR LUCIDE
+        // ============================================================
+        setTimeout(() => lucide.createIcons(), 200);
+
+        // Cerrar modales con escape
+        document.addEventListener('keydown', (e) => {
+            if (e.key === 'Escape') {
+                closeArtworkDetail();
+                closeLoginModal();
+                closeTaskModal();
+                closeChatSenderModal();
+            }
+        });
     </script>
 </body>
 </html>
