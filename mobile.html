@@ -1727,11 +1727,77 @@
             }
         }
 
-        window.shareArtworkWhatsApp = function() {
+        function getArtworkWhatsAppDescription(artwork) {
+            const withoutLinks = (value) => String(value || '')
+                .replace(/(?:https?:\/\/|www\.)\S+/gi, '')
+                .replace(/\s{2,}/g, ' ')
+                .trim();
+            const measures = [
+                artwork.ancho && `Ancho: ${artwork.ancho} m`,
+                artwork.alto && `Alto: ${artwork.alto} m`,
+                artwork.largo && `Largo: ${artwork.largo} m`
+            ].filter(Boolean).join(' · ') || 'No especificadas';
+            const rows = [
+                ['Autor', artwork.autor || 'No especificado'],
+                ['Tipo de obra', artwork.tipo_obra || 'No especificado'],
+                ['Ubicación', artwork.ubicacion || 'No especificada'],
+                ['Estatus', artwork.estatus || 'Consolidación'],
+                ['Superficie', artwork.superficie ? `${artwork.superficie} m²` : 'No especificada'],
+                ['Medidas', measures],
+                ['Precio', artwork.precio_venta || artwork.precio_lista
+                    ? `$${Number(artwork.precio_venta || artwork.precio_lista).toLocaleString()} ${artwork.tipo_moneda || 'MXN'}`
+                    : 'No disponible'],
+                ['Cliente', artwork.cliente || 'No especificado'],
+                ['Provenance', artwork.provenance || 'No especificado'],
+                ['Etiquetas', Array.isArray(artwork.tags) && artwork.tags.length ? artwork.tags.join(', ') : 'Sin etiquetas'],
+                ['Observaciones', artwork.observaciones || 'Sin observaciones']
+            ];
+            return [
+                `*${withoutLinks(artwork.nombre_obra) || 'Sin título'}*`,
+                'Ficha técnica',
+                '',
+                ...rows.map(([label, value]) => `*${withoutLinks(label)}:* ${withoutLinks(value) || 'No especificado'}`)
+            ].join('\n');
+        }
+
+        async function getArtworkImageFile(artwork) {
+            const response = await fetch(resolveImageUrl(artwork.adjuntos, artwork.nombre_obra));
+            if (!response.ok) throw new Error('No fue posible obtener la imagen de la obra.');
+            const image = await response.blob();
+            if (!image.type.startsWith('image/')) throw new Error('El archivo principal de la obra no es una imagen.');
+            const safeName = (artwork.nombre_obra || 'obra')
+                .replace(/[^a-z0-9]+/gi, '-').replace(/^-|-$/g, '') || 'obra';
+            const extension = image.type.split('/')[1]?.replace('jpeg', 'jpg') || 'jpg';
+            return new File([image], `${safeName}.${extension}`, { type: image.type });
+        }
+
+        window.shareArtworkWhatsApp = async function() {
             if (!activeArtwork) return;
-            const text =
-                `*${activeArtwork.nombre_obra || 'Sin título'}*\nAutor: ${activeArtwork.autor || 'N/A'}\nUbicación: ${activeArtwork.ubicacion || 'N/A'}\nEstatus: ${activeArtwork.estatus || 'Consolidación'}\nPrecio: ${activeArtwork.precio_venta || activeArtwork.precio_lista || 'N/D'}`;
-            window.open(`https://api.whatsapp.com/send?text=${encodeURIComponent(text)}`, '_blank');
+            const button = document.querySelector('#artworkDetailModal button[onclick="shareArtworkWhatsApp()"]');
+            const originalContent = button?.innerHTML;
+            if (button) {
+                button.disabled = true;
+                button.innerHTML = '<i data-lucide="loader-circle" class="w-3.5 h-3.5 animate-spin"></i> Preparando…';
+                lucide.createIcons();
+            }
+            try {
+                const file = await getArtworkImageFile(activeArtwork);
+                if (!navigator.share || (navigator.canShare && !navigator.canShare({ files: [file] }))) {
+                    throw new Error('Este navegador no permite enviar imágenes directamente a WhatsApp.');
+                }
+                await navigator.share({
+                    files: [file],
+                    text: getArtworkWhatsAppDescription(activeArtwork)
+                });
+            } catch (error) {
+                if (error.name !== 'AbortError') showNotification(error.message || 'No fue posible compartir la obra.');
+            } finally {
+                if (button) {
+                    button.disabled = false;
+                    button.innerHTML = originalContent || '<i data-lucide="share-2" class="w-3.5 h-3.5"></i> WhatsApp';
+                    lucide.createIcons();
+                }
+            }
         };
 
         // ============================================================
