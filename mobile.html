@@ -297,6 +297,42 @@
             background: #2a2a2a;
             border-radius: 4px;
         }
+
+        /* Estilos para el chat y tareas en móvil */
+        .chat-message {
+            font-size: 12px;
+            padding: 6px 10px;
+            border-radius: 8px;
+            max-width: 85%;
+            word-break: break-word;
+        }
+        .chat-message-sent {
+            background: #1a1a2e;
+            border: 1px solid #2a2a4e;
+            color: #e2e8f0;
+            align-self: flex-end;
+        }
+        .chat-message-received {
+            background: #0a0a0a;
+            border: 1px solid #1a1a1a;
+            color: #c8d0dc;
+            align-self: flex-start;
+        }
+        .task-item-mobile {
+            border-bottom: 1px solid #141414;
+            padding: 10px 4px;
+        }
+        .task-item-mobile:last-child {
+            border-bottom: none;
+        }
+        .status-badge-mobile {
+            font-size: 8px;
+            padding: 2px 8px;
+            border-radius: 12px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.3px;
+        }
     </style>
 </head>
 <body>
@@ -328,60 +364,147 @@
         <!-- Scrollable contenido principal -->
         <main class="flex-1 overflow-y-auto overflow-x-hidden pb-1 px-2">
 
-            <!-- Cuadrícula de accesos directos (3 columnas) -->
-            <section class="py-3">
-                <div class="grid-3">
-                    <!-- Instagram -->
-                    <a href="https://www.instagram.com/" target="_blank" class="action-btn">
-                        <i class="fab fa-instagram fa-lg"></i>
-                        <span>Instagram</span>
-                    </a>
-                    <!-- Base de datos -->
-                    <a href="https://diegoturijancontacto-sudo.github.io/Finanzas/mobile/" target="_blank" class="action-btn">
-                        <i data-lucide="database" class="w-6 h-6"></i>
-                        <span>Base de datos</span>
-                    </a>
-                    <!-- Drive -->
-                    <a href="https://drive.google.com" target="_blank" class="action-btn">
-                        <i data-lucide="hard-drive" class="w-6 h-6"></i>
-                        <span>Drive</span>
-                    </a>
-                    <!-- Generador de Catálogos -->
-                    <a href="https://frontline-zeta-ecru.vercel.app/movil/" target="_blank" class="action-btn">
-                        <i data-lucide="book-open" class="w-6 h-6"></i>
-                        <span>Catálogos</span>
-                        <span class="badge">PDF</span>
-                    </a>
-                    <!-- Generador de Certificados -->
-                    <a href="https://docs.google.com/forms/d/e/1FAIpQLSdC-_if3uzNyq3BuU3YhlUD1ONInOwe4Cv_G4MM1PJrnsDRuw/viewform?usp=header" target="_blank" class="action-btn">
-                        <i data-lucide="file-text" class="w-6 h-6"></i>
-                        <span>Certificados</span>
-                        <span class="badge">form</span>
-                    </a>
-                    <!-- Obras (abre galería) -->
-                    <button onclick="switchTab('artworks')" class="action-btn">
-                        <i data-lucide="image" class="w-6 h-6"></i>
-                        <span>Obras</span>
-                        <span class="badge" id="artworksCount">0</span>
-                    </button>
-                </div>
-            </section>
+            <!-- TAB: DASHBOARD -->
+            <div id="tab-dashboard" class="flex flex-col gap-4 w-full">
 
-            <!-- Galería de obras (grid 3 columnas) -->
-            <section class="pb-4">
-                <div class="flex items-center justify-between mb-2 px-1">
-                    <h2 class="text-xs font-medium text-zinc-300 tracking-wider">OBRAS RECIENTES</h2>
-                    <span class="text-[9px] text-zinc-500" id="totalArtworksLabel">0 obras</span>
-                </div>
-                <div id="artworksGrid" class="artwork-grid">
-                    <!-- Renderizado por JS -->
-                </div>
-                <div class="flex justify-center mt-4">
-                    <button id="showMoreBtn" onclick="showMoreArtworks()" class="text-[10px] text-zinc-400 border border-zinc-800 px-5 py-2 rounded-full hover:border-zinc-600 transition flex items-center gap-2">
-                        <i data-lucide="plus" class="w-3 h-3"></i> Mostrar más
+                <!-- Cuadrícula de accesos directos (3 columnas) -->
+                <section class="py-3">
+                    <div class="grid-3">
+                        <!-- Instagram -->
+                        <a href="https://www.instagram.com/" target="_blank" class="action-btn">
+                            <i class="fab fa-instagram fa-lg"></i>
+                            <span>Instagram</span>
+                        </a>
+                        <!-- Base de datos -->
+                        <a href="https://diegoturijancontacto-sudo.github.io/Finanzas/mobile/" target="_blank" class="action-btn">
+                            <i data-lucide="database" class="w-6 h-6"></i>
+                            <span>Base de datos</span>
+                        </a>
+                        <!-- Drive -->
+                        <a href="https://drive.google.com" target="_blank" class="action-btn">
+                            <i data-lucide="hard-drive" class="w-6 h-6"></i>
+                            <span>Drive</span>
+                        </a>
+                        <!-- Generador de Catálogos -->
+                        <a href="https://frontline-zeta-ecru.vercel.app/movil/" target="_blank" class="action-btn">
+                            <i data-lucide="book-open" class="w-6 h-6"></i>
+                            <span>Catálogos</span>
+                            <span class="badge">PDF</span>
+                        </a>
+                        <!-- Generador de Certificados -->
+                        <a href="https://docs.google.com/forms/d/e/1FAIpQLSdC-_if3uzNyq3BuU3YhlUD1ONInOwe4Cv_G4MM1PJrnsDRuw/viewform?usp=header" target="_blank" class="action-btn">
+                            <i data-lucide="file-text" class="w-6 h-6"></i>
+                            <span>Certificados</span>
+                            <span class="badge">form</span>
+                        </a>
+                        <!-- Obras (abre galería) -->
+                        <button onclick="switchTab('artworks')" class="action-btn">
+                            <i data-lucide="image" class="w-6 h-6"></i>
+                            <span>Obras</span>
+                            <span class="badge" id="artworksCount">0</span>
+                        </button>
+                    </div>
+                </section>
+
+                <!-- Widget de Tareas (similar a index.html) -->
+                <section class="bg-zinc-950 border border-zinc-900 p-3 rounded-lg">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-1 bg-black p-1 border border-zinc-800 rounded">
+                            <button onclick="switchTaskWidgetTab('equipo')" id="widget-tab-equipo" class="px-2 py-0.5 text-[9px] font-semibold bg-indigo-600 text-white transition rounded">Equipo</button>
+                            <button onclick="switchTaskWidgetTab('yo')" id="widget-tab-yo" class="px-2 py-0.5 text-[9px] font-medium text-slate-400 hover:text-white transition rounded">Yo</button>
+                        </div>
+                        <div class="flex items-center gap-1">
+                            <span id="widget-title" class="font-semibold text-[10px] text-slate-200">Equipo</span>
+                            <button onclick="openAddTaskModal()" id="btn-add-task-equipo" class="p-1 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 hover:text-indigo-300 transition rounded">
+                                <i data-lucide="plus" class="w-3 h-3"></i>
+                            </button>
+                        </div>
+                    </div>
+                    <div id="widget-tasks-equipo-pane" class="max-h-48 overflow-y-auto">
+                        <!-- Renderizado por JS -->
+                    </div>
+                    <div id="widget-tasks-yo-pane" class="max-h-48 overflow-y-auto hidden">
+                        <div class="flex gap-1 mb-2">
+                            <input type="text" id="new-local-task-input" placeholder="Nueva tarea personal..." class="flex-1 bg-zinc-900 border border-zinc-700 px-2 py-1 text-[10px] text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 rounded">
+                            <button onclick="addLocalTask()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-2 py-1 text-[9px] font-medium transition rounded">Añadir</button>
+                        </div>
+                        <div id="widget-tasks-yo-list"></div>
+                    </div>
+                </section>
+
+                <!-- Widget de Chat (similar a index.html) -->
+                <section class="bg-zinc-950 border border-zinc-900 p-3 rounded-lg">
+                    <div class="flex items-center justify-between mb-2">
+                        <div class="flex items-center gap-2">
+                            <div class="w-6 h-6 bg-zinc-900 border border-zinc-800 flex items-center justify-center text-[8px] font-bold text-zinc-300 rounded">RT</div>
+                            <div>
+                                <h4 class="text-[10px] font-bold text-slate-100 flex items-center gap-1">
+                                    RTBROK <span class="w-1.5 h-1.5 bg-emerald-500 inline-block rounded-full"></span>
+                                </h4>
+                                <p class="text-[8px] text-zinc-400 flex items-center gap-1">
+                                    <span>Enviando como: </span>
+                                    <span id="chat-sender-display" class="text-indigo-400 font-medium">Sin seleccionar</span>
+                                </p>
+                            </div>
+                        </div>
+                        <button onclick="openChatSenderModal()" class="p-1 hover:text-white hover:bg-zinc-900 transition rounded" title="Cambiar remitente">
+                            <i data-lucide="user-check" class="w-3.5 h-3.5 text-zinc-400"></i>
+                        </button>
+                    </div>
+                    <div id="widget-chat-messages" class="max-h-36 overflow-y-auto flex flex-col gap-1 py-1"></div>
+                    <div class="flex items-center gap-1 mt-1 pt-1 border-t border-zinc-900">
+                        <input type="text" id="widget-chat-input" onkeydown="if(event.key==='Enter') sendWidgetChatMessage()" placeholder="Escribe un mensaje..." class="flex-1 bg-zinc-900 border border-zinc-800 px-2 py-1.5 text-[10px] text-slate-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-700 rounded">
+                        <button onclick="sendWidgetChatMessage()" class="text-zinc-400 hover:text-white p-1"><i data-lucide="send" class="w-3.5 h-3.5"></i></button>
+                    </div>
+                </section>
+
+                <!-- Galería de obras (grid 3 columnas) -->
+                <section class="pb-4">
+                    <div class="flex items-center justify-between mb-2 px-1">
+                        <h2 class="text-xs font-medium text-zinc-300 tracking-wider">OBRAS RECIENTES</h2>
+                        <span class="text-[9px] text-zinc-500" id="totalArtworksLabel">0 obras</span>
+                    </div>
+                    <div id="artworksGrid" class="artwork-grid">
+                        <!-- Renderizado por JS -->
+                    </div>
+                    <div class="flex justify-center mt-4">
+                        <button id="showMoreBtn" onclick="showMoreArtworks()" class="text-[10px] text-zinc-400 border border-zinc-800 px-5 py-2 rounded-full hover:border-zinc-600 transition flex items-center gap-2">
+                            <i data-lucide="plus" class="w-3 h-3"></i> Mostrar más
+                        </button>
+                    </div>
+                </section>
+            </div>
+
+            <!-- TAB: TASKS (Full View) -->
+            <div id="tab-tasks" class="hidden flex-col gap-3 w-full py-2">
+                <div class="flex items-center justify-between bg-zinc-950 border border-zinc-900 p-3 rounded-lg">
+                    <div class="flex items-center gap-2">
+                        <div class="p-2 bg-zinc-900 text-zinc-200 border border-zinc-800 rounded"><i data-lucide="check-square" class="w-4 h-4"></i></div>
+                        <div>
+                            <h2 class="font-bold text-xs text-white">Gestión de Tareas</h2>
+                            <p class="text-[8px] text-zinc-400">Proyectos y subtareas</p>
+                        </div>
+                    </div>
+                    <button onclick="openAddTaskModal()" class="bg-white hover:bg-zinc-200 text-black px-2 py-1.5 text-[9px] font-semibold transition rounded flex items-center gap-1">
+                        <i data-lucide="plus" class="w-3 h-3"></i> Nueva
                     </button>
                 </div>
-            </section>
+                <div id="tasks-table-container" class="bg-zinc-950 border border-zinc-900 p-2 rounded-lg space-y-1 max-h-[400px] overflow-y-auto"></div>
+            </div>
+
+            <!-- TAB: ARTWORKS (Full View) -->
+            <div id="tab-artworks" class="hidden flex-col gap-3 w-full py-2">
+                <div class="bg-zinc-950 border border-zinc-900 p-3 rounded-lg">
+                    <div class="flex items-center gap-2">
+                        <div class="p-2 bg-zinc-900 text-zinc-200 border border-zinc-800 rounded"><i data-lucide="image" class="w-4 h-4"></i></div>
+                        <div>
+                            <h2 class="font-bold text-xs text-white">Catálogo de Obras</h2>
+                            <p class="text-[8px] text-zinc-400">Registros y galería visual</p>
+                        </div>
+                    </div>
+                </div>
+                <div id="artworks-grid-container" class="artwork-grid w-full"></div>
+            </div>
 
         </main>
 
@@ -391,17 +514,17 @@
                 <i data-lucide="layout-grid"></i>
                 <span>Inicio</span>
             </button>
-            <button class="nav-item" onclick="switchTab('artworks')">
-                <i data-lucide="image"></i>
-                <span>Obras</span>
+            <button class="nav-item" onclick="switchTab('tasks')">
+                <i data-lucide="check-square"></i>
+                <span>Tareas</span>
             </button>
             <button class="nav-item" onclick="openAddTaskModal()">
                 <i data-lucide="plus-circle"></i>
                 <span>Nuevo</span>
             </button>
-            <button class="nav-item" onclick="openChatSenderModal()">
-                <i data-lucide="message-square"></i>
-                <span>Chat</span>
+            <button class="nav-item" onclick="switchTab('artworks')">
+                <i data-lucide="image"></i>
+                <span>Obras</span>
             </button>
             <button class="nav-item" onclick="openLoginModal()">
                 <i data-lucide="user"></i>
@@ -556,7 +679,7 @@
 
     <script type="module">
         // ============================================================
-        // FIREBASE AUTH
+        // FIREBASE AUTH - Módulo (igual que index.html)
         // ============================================================
         import { initializeApp } from 'firebase/app';
         import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
@@ -575,51 +698,63 @@
         const auth = getAuth(app);
 
         let firebaseUser = null;
+        let isFirebaseUser = false;
         let authChecked = false;
+
+        // ============================================================
+        // CONFIGURACIÓN Y CONSTANTES
+        // ============================================================
+        const ENDPOINT_TASKS = 'https://script.google.com/macros/s/AKfycbxmPBIboe_Evn45ZHjtkjydbmlPRMuSax_sEiTc2iN8cqqi2i4-Pf_lOd6875cQXEd_yg/exec';
+        const ENDPOINT_ARTWORKS = 'https://script.google.com/macros/s/AKfycbxyBzZ7duM3pKtobXHj8A2NgFpIarP5WPS71TKTH2uFMOXXL8rzo68-blixF8kgCwvl8w/exec';
+        const ENDPOINT_CHAT = 'https://script.google.com/macros/s/AKfycbzU6YqBsWekqjP-SOV1_LCV_GQnO1ZX9Gl0Th-U2dwTx2yJe0x1MmmnovRwT0qAYui6/exec';
+        const CHAT_API_URL = 'https://bot-yy1q.onrender.com/send';
 
         // ============================================================
         // ESTADO GLOBAL
         // ============================================================
-        let artworks = [];
-        let responsables = [];
-        let proyectos = [];
-        let subproyectos = [];
+        let appData = {
+            tasks: [],
+            artworks: [],
+            proyectos: [],
+            subproyectos: [],
+            responsables: [],
+            messages: []
+        };
+
         let localTasks = JSON.parse(localStorage.getItem('rtbrok_local_tasks') || '[]');
         let currentChatSender = localStorage.getItem('rtbrok_chat_sender') || null;
         let pendingChatMessage = null;
-        let displayedArtworks = 9;
+        let taskFlow = { authenticatedUser: null };
+        const tabsOrder = ['dashboard', 'tasks', 'artworks'];
+        let currentTabIdx = 0;
+
+        const INITIAL_ARTWORKS = 9;
         const ARTWORKS_PER_PAGE = 9;
-
-        const ENDPOINT_ARTWORKS = 'https://script.google.com/macros/s/AKfycbxyBzZ7duM3pKtobXHj8A2NgFpIarP5WPS71TKTH2uFMOXXL8rzo68-blixF8kgCwvl8w/exec';
-        const ENDPOINT_TASKS = 'https://script.google.com/macros/s/AKfycbxmPBIboe_Evn45ZHjtkjydbmlPRMuSax_sEiTc2iN8cqqi2i4-Pf_lOd6875cQXEd_yg/exec';
+        let displayedArtworksCount = INITIAL_ARTWORKS;
 
         // ============================================================
-        // UTILIDADES
+        // FUNCIÓN PARA REDIRIGIR AL LOGIN SI NO HAY SESIÓN
         // ============================================================
-        function resolveImageUrl(adjuntos, fallback) {
-            if (Array.isArray(adjuntos) && adjuntos.length > 0 && adjuntos[0]?.url) {
-                let raw = adjuntos[0].url;
-                if (raw.includes('drive.google.com')) {
-                    const match = raw.match(/\/d\/([a-zA-Z0-9_-]+)/) || raw.match(/id=([a-zA-Z0-9_-]+)/);
-                    if (match) return `https://lh3.googleusercontent.com/d/${match[1]}=w400`;
+        function redirectToLoginIfNeeded() {
+            if (authChecked && !firebaseUser) {
+                const savedUser = sessionStorage.getItem('firebaseUser');
+                if (!savedUser) {
+                    window.location.href = 'login.html';
+                    return true;
+                } else {
+                    try {
+                        const userData = JSON.parse(savedUser);
+                        firebaseUser = userData;
+                        isFirebaseUser = true;
+                        updateUserUI(userData);
+                        return false;
+                    } catch (e) {
+                        window.location.href = 'login.html';
+                        return true;
+                    }
                 }
-                return raw;
             }
-            return `https://placehold.co/400x400/18181b/71717a?text=${encodeURIComponent(fallback || 'Obra')}`;
-        }
-
-        function escapeHtml(str) {
-            return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-        }
-
-        function showNotification(msg) {
-            const el = document.createElement('div');
-            el.className = 'fixed bottom-20 left-1/2 -translate-x-1/2 bg-zinc-900 border border-indigo-600/30 px-5 py-2.5 rounded-full shadow-2xl z-[100] text-xs text-slate-200 flex items-center gap-2';
-            el.innerHTML = `<i data-lucide="check-circle" class="w-4 h-4 text-indigo-400"></i> ${msg}`;
-            document.body.appendChild(el);
-            lucide.createIcons();
-            setTimeout(() => { el.style.opacity = '0';
-                setTimeout(() => el.remove(), 300); }, 2200);
+            return false;
         }
 
         // ============================================================
@@ -629,34 +764,54 @@
             const overlay = document.getElementById('loadingOverlay');
             overlay.classList.remove('hidden');
 
-            // Rescatar usuario de sessionStorage
-            const saved = sessionStorage.getItem('firebaseUser');
-            if (saved) {
+            const savedUser = sessionStorage.getItem('firebaseUser');
+            if (savedUser) {
                 try {
-                    firebaseUser = JSON.parse(saved);
-                    updateUserUI(firebaseUser);
-                } catch (_) {}
+                    const userData = JSON.parse(savedUser);
+                    firebaseUser = userData;
+                    isFirebaseUser = true;
+                    updateUserUI(userData);
+                } catch (e) {}
             }
 
             onAuthStateChanged(auth, (user) => {
                 authChecked = true;
+
                 if (user) {
-                    const data = { uid: user.uid, displayName: user.displayName, email: user.email,
-                    photoURL: user.photoURL };
-                    firebaseUser = data;
-                    sessionStorage.setItem('firebaseUser', JSON.stringify(data));
-                    updateUserUI(data);
+                    const userData = {
+                        uid: user.uid,
+                        displayName: user.displayName,
+                        email: user.email,
+                        photoURL: user.photoURL,
+                        emailVerified: user.emailVerified
+                    };
+                    firebaseUser = userData;
+                    isFirebaseUser = true;
+                    sessionStorage.setItem('firebaseUser', JSON.stringify(userData));
+                    updateUserUI(userData);
+                    overlay.classList.add('hidden');
+                    initApp();
                 } else {
+                    firebaseUser = null;
+                    isFirebaseUser = false;
+
                     const savedUser = sessionStorage.getItem('firebaseUser');
                     if (savedUser) {
-                        try { firebaseUser = JSON.parse(savedUser);
-                            updateUserUI(firebaseUser); } catch (_) {}
-                    } else {
-                        updateUserUI(null);
+                        try {
+                            const userData = JSON.parse(savedUser);
+                            firebaseUser = userData;
+                            isFirebaseUser = true;
+                            updateUserUI(userData);
+                            overlay.classList.add('hidden');
+                            initApp();
+                            return;
+                        } catch (e) {}
                     }
+
+                    sessionStorage.removeItem('firebaseUser');
+                    updateUserUI(null);
+                    window.location.href = 'login.html';
                 }
-                overlay.classList.add('hidden');
-                initApp();
             });
 
             setTimeout(() => {
@@ -667,23 +822,27 @@
         };
 
         function initApp() {
-            fetchArtworks();
-            fetchResponsables();
-            fetchProjects();
-            renderLocalTasks();
             updateChatSenderUI();
+            fetchAllData();
+            setInterval(fetchChatMessages, 8000);
+            renderLocalTasks();
 
-            const today = new Date();
-            const weekLater = new Date(today);
-            weekLater.setDate(today.getDate() + 7);
-            document.getElementById('taskDeadline').value = weekLater.toISOString().split('T')[0];
+            const savedLocalUser = sessionStorage.getItem('currentUser');
+            if (savedLocalUser) {
+                try {
+                    taskFlow.authenticatedUser = JSON.parse(savedLocalUser);
+                } catch (e) {}
+            }
 
-            // Mostrar total de obras
-            updateArtworksCount();
+            const now = new Date();
+            const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
+            // Actualizar fecha si existe el elemento
+            const dateEl = document.getElementById('current-date');
+            if (dateEl) dateEl.textContent = now.toLocaleDateString('es-ES', options);
         }
 
         // ============================================================
-        // FUNCIONES DE USUARIO
+        // FUNCIONES DE USUARIO FIREBASE
         // ============================================================
         function updateUserUI(user) {
             const avatar = document.getElementById('sidebarUserAvatar');
@@ -722,11 +881,13 @@
 
         window.useFirebaseUser = function() {
             if (firebaseUser) {
-                const userData = { id: firebaseUser.uid, nombre: firebaseUser.displayName || 'Usuario',
+                const userData = { id: firebaseUser.uid, nombre: firebaseUser.displayName || 'Usuario Firebase',
                     email: firebaseUser.email || '', rol: 'director' };
+                taskFlow.authenticatedUser = userData;
                 sessionStorage.setItem('currentUser', JSON.stringify(userData));
                 closeLoginModal();
                 showNotification(`Sesión como ${userData.nombre}`);
+                renderDirectorsList();
             }
         };
 
@@ -736,60 +897,638 @@
                 sessionStorage.removeItem('currentUser');
                 showNotification('Sesión cerrada');
                 updateUserUI(null);
-                setTimeout(() => window.location.href = 'login.html', 400);
+                setTimeout(() => window.location.href = 'login.html', 500);
             });
         };
 
         // ============================================================
+        // FUNCIONES DE NAVEGACIÓN
+        // ============================================================
+        window.switchTab = function(tabName) {
+            currentTabIdx = tabsOrder.indexOf(tabName);
+            if (currentTabIdx === -1) currentTabIdx = 0;
+            tabsOrder.forEach(t => {
+                const el = document.getElementById(`tab-${t}`);
+                if (t === tabName) {
+                    el.classList.remove('hidden');
+                    el.classList.add('flex');
+                } else {
+                    el.classList.remove('flex');
+                    el.classList.add('hidden');
+                }
+            });
+            // Actualizar nav items
+            document.querySelectorAll('.nav-item').forEach((el, idx) => {
+                el.classList.toggle('active', idx === currentTabIdx);
+            });
+            lucide.createIcons();
+            if (tabName === 'artworks') {
+                renderFullArtworksGrid();
+            }
+            if (tabName === 'tasks') {
+                renderTasksTable();
+            }
+        };
+
+        // ============================================================
+        // TAREAS PERSONALES (LocalStorage)
+        // ============================================================
+        window.addLocalTask = function() {
+            const input = document.getElementById('new-local-task-input');
+            const text = input.value.trim();
+            if (!text) return;
+            localTasks.push({ id: Date.now(), text, completed: false });
+            localStorage.setItem('rtbrok_local_tasks', JSON.stringify(localTasks));
+            input.value = '';
+            renderLocalTasks();
+        };
+
+        window.toggleLocalTask = function(id) {
+            localTasks = localTasks.map(t => t.id === id ? { ...t, completed: !t.completed } : t);
+            localStorage.setItem('rtbrok_local_tasks', JSON.stringify(localTasks));
+            renderLocalTasks();
+        };
+
+        window.deleteLocalTask = function(id) {
+            localTasks = localTasks.filter(t => t.id !== id);
+            localStorage.setItem('rtbrok_local_tasks', JSON.stringify(localTasks));
+            renderLocalTasks();
+        };
+
+        function renderLocalTasks() {
+            const container = document.getElementById('widget-tasks-yo-list');
+            if (!container) return;
+            if (!localTasks || localTasks.length === 0) {
+                container.innerHTML = `<p class="text-[10px] text-slate-500 text-center py-3">No tienes tareas personales.</p>`;
+                return;
+            }
+            container.innerHTML = localTasks.map(t => `
+                <div class="flex items-center justify-between py-1.5 border-b border-zinc-800/50 last:border-0">
+                    <div class="flex items-center gap-2 overflow-hidden cursor-pointer" onclick="toggleLocalTask(${t.id})">
+                        <input type="checkbox" ${t.completed ? 'checked' : ''} class="border-zinc-700 bg-zinc-900 text-indigo-600 focus:ring-0 cursor-pointer w-3 h-3">
+                        <span class="text-[10px] text-slate-200 truncate ${t.completed ? 'line-through text-slate-500' : ''}">${t.text}</span>
+                    </div>
+                    <button onclick="deleteLocalTask(${t.id})" class="text-slate-500 hover:text-rose-400 transition p-0.5"><i data-lucide="trash-2" class="w-3 h-3"></i></button>
+                </div>
+            `).join('');
+            lucide.createIcons();
+        }
+
+        // ============================================================
+        // UTILIDADES
+        // ============================================================
+        function getResponsableNameById(responsableId) {
+            if (!responsableId) return 'Sin asignar';
+            const responsable = appData.responsables.find(r => r.id === responsableId);
+            return responsable ? responsable.nombre : 'Desconocido';
+        }
+
+        function getStatusBadgeColor(estatus) {
+            switch ((estatus || '').toLowerCase()) {
+                case 'completado':
+                case 'completada':
+                    return 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+                case 'en_curso':
+                    return 'bg-blue-500/10 text-blue-400 border border-blue-500/20';
+                case 'en_revision':
+                    return 'bg-amber-500/10 text-amber-400 border border-amber-500/20';
+                case 'bloqueada':
+                    return 'bg-rose-500/10 text-rose-400 border border-rose-500/20';
+                default:
+                    return 'bg-zinc-800 text-slate-400 border border-zinc-700';
+            }
+        }
+
+        function getStatusDotColor(estatus) {
+            switch ((estatus || '').toLowerCase()) {
+                case 'completado':
+                case 'completada':
+                    return 'bg-emerald-400';
+                case 'en_curso':
+                    return 'bg-blue-400';
+                case 'en_revision':
+                    return 'bg-amber-400';
+                case 'bloqueada':
+                    return 'bg-rose-400';
+                default:
+                    return 'bg-slate-400';
+            }
+        }
+
+        function escapeHtml(str) {
+            return String(str || '').replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+        }
+
+        function resolveImageUrl(adjuntos, fallbackName) {
+            if (Array.isArray(adjuntos) && adjuntos.length > 0 && adjuntos[0]?.url) {
+                let rawUrl = adjuntos[0].url;
+                if (rawUrl.includes('drive.google.com')) {
+                    const matchId = rawUrl.match(/\/d\/([a-zA-Z0-9_-]+)/) || rawUrl.match(/id=([a-zA-Z0-9_-]+)/);
+                    if (matchId && matchId[1]) return `https://lh3.googleusercontent.com/d/${matchId[1]}=w400`;
+                }
+                return rawUrl;
+            }
+            return `https://placehold.co/400x400/18181b/71717a?text=${encodeURIComponent(fallbackName || 'Obra')}`;
+        }
+
+        function showNotification(msg) {
+            const existing = document.querySelector('.rtbrok-notification');
+            if (existing) existing.remove();
+
+            const el = document.createElement('div');
+            el.className = 'rtbrok-notification fixed bottom-20 left-1/2 -translate-x-1/2 bg-zinc-900 border border-indigo-600/30 px-4 py-2 rounded-full shadow-2xl z-[100] text-[10px] text-slate-200 flex items-center gap-2';
+            el.innerHTML = `<i data-lucide="check-circle" class="w-3.5 h-3.5 text-indigo-400"></i> ${msg}`;
+            document.body.appendChild(el);
+            lucide.createIcons();
+            setTimeout(() => { el.style.opacity = '0';
+                setTimeout(() => el.remove(), 300); }, 2200);
+        }
+
+        // ============================================================
         // FETCH DATA
         // ============================================================
-        async function fetchArtworks() {
+        async function fetchAllData() {
             try {
-                const res = await fetch(ENDPOINT_ARTWORKS);
-                const data = await res.json();
-                artworks = data.registrosObra || data.data || [];
-            } catch (_) {
-                artworks = getMockArtworks();
-            }
-            renderArtworks();
-            updateArtworksCount();
-        }
+                const [resT, resA] = await Promise.all([
+                    fetch(ENDPOINT_TASKS).catch(() => null),
+                    fetch(ENDPOINT_ARTWORKS).catch(() => null)
+                ]);
 
-        async function fetchResponsables() {
-            try {
-                const res = await fetch(ENDPOINT_TASKS);
-                const data = await res.json();
-                responsables = data.responsables || [];
-                populateResponsibleSelect();
-                renderLoginUsers();
-            } catch (_) {
-                responsables = [];
-                populateResponsibleSelect();
-                renderLoginUsers();
-            }
-        }
+                if (resT) {
+                    const dataB = await resT.json();
+                    appData.tasks = dataB.tareas || getMockTasks();
+                    appData.proyectos = dataB.proyectos || [];
+                    appData.subproyectos = dataB.subproyectos || [];
+                    appData.responsables = dataB.responsables || [];
+                } else {
+                    appData.tasks = getMockTasks();
+                    appData.proyectos = [];
+                    appData.subproyectos = [];
+                    appData.responsables = [];
+                }
 
-        async function fetchProjects() {
-            try {
-                const res = await fetch(ENDPOINT_TASKS);
-                const data = await res.json();
-                proyectos = data.proyectos || [];
-                subproyectos = data.subproyectos || [];
+                if (resA) {
+                    const dataA = await resA.json();
+                    appData.artworks = dataA.registrosObra || dataA.data || getMockArtworks();
+                } else {
+                    appData.artworks = getMockArtworks();
+                }
+
+                renderDashboardWidgets();
+                renderTasksTable();
+                renderArtworks();
+                renderFullArtworksGrid();
+                renderDirectorsList();
                 populateProjectSelect();
-            } catch (_) {
-                proyectos = [];
-                subproyectos = [];
-                populateProjectSelect();
+                populateResponsibleSelect();
+                fetchChatMessages();
+                updateArtworksCount();
+                lucide.createIcons();
+            } catch (e) {
+                appData.tasks = getMockTasks();
+                appData.artworks = getMockArtworks();
+                renderDashboardWidgets();
+                renderTasksTable();
+                renderArtworks();
+                renderFullArtworksGrid();
+                renderDirectorsList();
+                updateArtworksCount();
+                lucide.createIcons();
             }
         }
 
         // ============================================================
-        // RENDER ARTWORKS (grid 3 columnas)
+        // TAREAS - WIDGET
+        // ============================================================
+        window.switchTaskWidgetTab = function(tab) {
+            const btnEq = document.getElementById('widget-tab-equipo');
+            const btnYo = document.getElementById('widget-tab-yo');
+            const paneEq = document.getElementById('widget-tasks-equipo-pane');
+            const paneYo = document.getElementById('widget-tasks-yo-pane');
+            const title = document.getElementById('widget-title');
+
+            if (tab === 'equipo') {
+                btnEq.className = 'px-2 py-0.5 text-[9px] font-semibold bg-indigo-600 text-white transition rounded';
+                btnYo.className = 'px-2 py-0.5 text-[9px] font-medium text-slate-400 hover:text-white transition rounded';
+                paneEq.classList.remove('hidden');
+                paneEq.style.display = 'block';
+                paneYo.classList.add('hidden');
+                title.textContent = 'Equipo';
+                document.getElementById('btn-add-task-equipo').classList.remove('hidden');
+            } else {
+                btnYo.className = 'px-2 py-0.5 text-[9px] font-semibold bg-indigo-600 text-white transition rounded';
+                btnEq.className = 'px-2 py-0.5 text-[9px] font-medium text-slate-400 hover:text-white transition rounded';
+                paneYo.classList.remove('hidden');
+                paneYo.style.display = 'block';
+                paneEq.classList.add('hidden');
+                title.textContent = 'Personal';
+                document.getElementById('btn-add-task-equipo').classList.add('hidden');
+            }
+            lucide.createIcons();
+        };
+
+        function renderDashboardWidgets() {
+            const tasksContainer = document.getElementById('widget-tasks-equipo-pane');
+
+            const pendingTasks = [...appData.tasks]
+                .filter(t => {
+                    const status = (t.estatus || '').toLowerCase();
+                    return status !== 'completado' && status !== 'completada';
+                })
+                .reverse()
+                .slice(0, 5);
+
+            if (pendingTasks.length === 0) {
+                tasksContainer.innerHTML = `<p class="text-[10px] text-slate-500 text-center py-3">No hay tareas pendientes.</p>`;
+            } else {
+                let html = pendingTasks.map(t => {
+                    const responsableName = getResponsableNameById(t.id_responsable);
+                    const st = (t.estatus || 'pendiente').toLowerCase();
+
+                    let actionButtons = '';
+                    if (st === 'pendiente') {
+                        actionButtons =
+                            `<button onclick="requestStatusChange('${t.id}', 'en_curso')" class="px-1.5 py-0.5 text-[8px] font-semibold bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/30 transition rounded flex items-center gap-0.5"><i data-lucide="play" class="w-2.5 h-2.5"></i> Iniciar</button>`;
+                    } else if (st === 'en_curso') {
+                        actionButtons = `
+                            <div class="flex items-center gap-0.5">
+                                <button onclick="requestStatusChange('${t.id}', 'pendiente')" class="px-1 py-0.5 text-[8px] font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 transition rounded" title="Pausar"><i data-lucide="pause" class="w-2.5 h-2.5"></i></button>
+                                <button onclick="requestStatusChange('${t.id}', 'en_revision')" class="px-1 py-0.5 text-[8px] font-semibold bg-amber-600/20 hover:bg-amber-600/40 text-amber-400 border border-amber-500/30 transition rounded flex items-center gap-0.5"><i data-lucide="file-search" class="w-2.5 h-2.5"></i> Rev</button>
+                            </div>
+                        `;
+                    } else if (st === 'en_revision') {
+                        actionButtons =
+                            `<button onclick="requestStatusChange('${t.id}', 'completado')" class="px-1.5 py-0.5 text-[8px] font-semibold bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 transition rounded flex items-center gap-0.5"><i data-lucide="check" class="w-2.5 h-2.5"></i> Aprobar</button>`;
+                    }
+
+                    return `
+                        <div class="flex items-center justify-between py-1.5 border-b border-zinc-800/50 last:border-0 gap-1">
+                            <div class="flex items-center gap-1.5 overflow-hidden flex-1 min-w-0">
+                                <span class="w-1.5 h-1.5 rounded-full shrink-0 ${getStatusDotColor(t.estatus)}"></span>
+                                <div class="truncate">
+                                    <p class="text-[9px] font-medium text-slate-200 truncate" title="${escapeHtml(t.detalles || t.descripcion || 'Sin descripción')}">${t.detalles || t.descripcion || 'Sin descripción'}</p>
+                                    <p class="text-[7px] text-slate-400">
+                                        ${t.asignacion || 'S/A'} · ${responsableName}
+                                    </p>
+                                </div>
+                            </div>
+                            <div class="flex items-center gap-0.5 shrink-0">
+                                <span class="text-[7px] px-1 py-0.5 ${getStatusBadgeColor(t.estatus)} rounded">${t.estatus || 'pendiente'}</span>
+                                ${actionButtons}
+                            </div>
+                        </div>
+                    `;
+                }).join('');
+
+                tasksContainer.innerHTML = html;
+                lucide.createIcons();
+            }
+        }
+
+        // ============================================================
+        // TAREAS - TABLA COMPLETA
+        // ============================================================
+        function renderTasksTable() {
+            const container = document.getElementById('tasks-table-container');
+            if (!container) return;
+            if (appData.tasks.length === 0) {
+                container.innerHTML = `<p class="text-[10px] text-slate-500 text-center py-4">No se encontraron tareas.</p>`;
+                return;
+            }
+            container.innerHTML = appData.tasks.map(t => {
+                const responsableName = getResponsableNameById(t.id_responsable);
+                const st = (t.estatus || 'pendiente').toLowerCase();
+
+                let actionButtons = '';
+                if (st === 'pendiente') {
+                    actionButtons =
+                        `<button onclick="requestStatusChange('${t.id}', 'en_curso')" class="px-1.5 py-0.5 text-[8px] font-semibold bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/30 transition rounded flex items-center gap-0.5"><i data-lucide="play" class="w-2.5 h-2.5"></i> Iniciar</button>`;
+                } else if (st === 'en_curso') {
+                    actionButtons = `
+                        <div class="flex items-center gap-0.5">
+                            <button onclick="requestStatusChange('${t.id}', 'pendiente')" class="px-1 py-0.5 text-[8px] font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 transition rounded" title="Pausar"><i data-lucide="pause" class="w-2.5 h-2.5"></i></button>
+                            <button onclick="requestStatusChange('${t.id}', 'en_revision')" class="px-1 py-0.5 text-[8px] font-semibold bg-amber-600/20 hover:bg-amber-600/40 text-amber-400 border border-amber-500/30 transition rounded flex items-center gap-0.5"><i data-lucide="file-search" class="w-2.5 h-2.5"></i> Rev</button>
+                        </div>
+                    `;
+                } else if (st === 'en_revision') {
+                    actionButtons =
+                        `<button onclick="requestStatusChange('${t.id}', 'completado')" class="px-1.5 py-0.5 text-[8px] font-semibold bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 transition rounded flex items-center gap-0.5"><i data-lucide="check" class="w-2.5 h-2.5"></i> Aprobar</button>`;
+                }
+
+                return `
+                    <div class="py-1.5 border-b border-zinc-800/50 last:border-0">
+                        <div class="flex items-start justify-between gap-1">
+                            <div class="flex-1 min-w-0">
+                                <div class="flex items-center gap-1 flex-wrap">
+                                    <span class="font-mono text-[8px] text-cyan-400 font-bold">${t.asignacion || 'S/A'}</span>
+                                    <span class="text-[7px] text-slate-400">${responsableName}</span>
+                                    <span class="text-[7px] px-1 py-0.5 ${getStatusBadgeColor(t.estatus)} rounded">${t.estatus || 'pendiente'}</span>
+                                </div>
+                                <p class="text-[9px] font-medium text-slate-200 truncate">${t.detalles || 'Sin detalles'}</p>
+                                <p class="text-[7px] text-slate-400 truncate">Límite: ${t.fecha_limite || 'N/A'}</p>
+                            </div>
+                            <div class="flex items-center gap-0.5 shrink-0">
+                                ${actionButtons}
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            lucide.createIcons();
+        }
+
+        // ============================================================
+        // TAREAS - ACCIONES DE ESTADO
+        // ============================================================
+        window.requestStatusChange = function(taskId, newStatus) {
+            if (!taskFlow.authenticatedUser) {
+                openActionLoginModal();
+                pendingStatusChange = { taskId, newStatus };
+                return;
+            }
+            executeStatusChange(taskId, newStatus, taskFlow.authenticatedUser);
+        };
+
+        let pendingStatusChange = null;
+        let pendingArtworkPromotion = null;
+
+        window.openActionLoginModal = function() {
+            const modal = document.getElementById('actionLoginModal');
+            if (!modal) {
+                // Crear modal simple si no existe
+                showNotification('Necesitas iniciar sesión para esta acción');
+                openLoginModal();
+                return;
+            }
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            renderActionUsersList();
+            lucide.createIcons();
+        };
+
+        function renderActionUsersList() {
+            const container = document.getElementById('action-users-list');
+            if (!container) return;
+            const users = appData.responsables.filter(r => ['director', 'supervisor'].includes((r.rol || '').toLowerCase()));
+            container.innerHTML = users.length ? users.map(r => `
+                <button onclick="selectUserForAction('${r.id}', '${r.nombre}', '${r.rol || 'responsable'}')"
+                        class="flex items-center gap-2 p-2 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-indigo-500/50 transition w-full text-left rounded">
+                    <div class="w-7 h-7 bg-indigo-600/30 flex items-center justify-center text-indigo-400 font-bold text-[10px] rounded">
+                        ${r.nombre ? r.nombre.charAt(0).toUpperCase() : '?'}
+                    </div>
+                    <div class="flex-1 min-w-0">
+                        <p class="text-[10px] font-medium text-slate-200 truncate">${r.nombre || 'Sin nombre'}</p>
+                        <p class="text-[8px] text-slate-400 truncate">${r.email || ''} ${r.rol ? '• ' + r.rol : ''}</p>
+                    </div>
+                    <span class="text-[8px] px-1.5 py-0.5 bg-zinc-800 text-slate-300 font-medium rounded">${r.rol || 'User'}</span>
+                </button>
+            `).join('') : `<div class="text-center text-zinc-500 text-[10px] py-4">No hay supervisores o directores disponibles.</div>`;
+        }
+
+        window.closeActionLoginModal = function() {
+            const modal = document.getElementById('actionLoginModal');
+            if (modal) {
+                modal.classList.add('hidden');
+                modal.classList.remove('flex');
+            }
+            pendingStatusChange = null;
+            pendingArtworkPromotion = null;
+        };
+
+        window.selectUserForAction = function(id, nombre, rol) {
+            taskFlow.authenticatedUser = { id, nombre, rol };
+            sessionStorage.setItem('currentUser', JSON.stringify({ id, name: nombre, role: rol }));
+            closeActionLoginModal();
+
+            if (pendingStatusChange) {
+                const { taskId, newStatus } = pendingStatusChange;
+                pendingStatusChange = null;
+                executeStatusChange(taskId, newStatus, taskFlow.authenticatedUser);
+            }
+            if (pendingArtworkPromotion) {
+                const { artworkId, promocionar } = pendingArtworkPromotion;
+                pendingArtworkPromotion = null;
+                executeArtworkPromotion(artworkId, promocionar, taskFlow.authenticatedUser);
+            }
+        };
+
+        async function executeStatusChange(taskId, newStatus, user) {
+            const tarea = appData.tasks.find(t => t.id === taskId);
+            if (!tarea) return;
+
+            const oldStatus = tarea.estatus;
+            tarea.estatus = newStatus;
+
+            renderDashboardWidgets();
+            renderTasksTable();
+            showNotification(`Actualizado por ${user.nombre}: ${oldStatus || 'pendiente'} ➔ ${newStatus}`);
+
+            try {
+                await fetch(ENDPOINT_TASKS, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'tarea_update',
+                        data: tarea
+                    })
+                });
+            } catch (e) {
+                console.error('Error actualizando estado:', e);
+            }
+        }
+
+        // ============================================================
+        // CHAT
+        // ============================================================
+        async function fetchChatMessages() {
+            try {
+                const res = await fetch(`${ENDPOINT_CHAT}?action=getMessages`);
+                const messages = await res.json();
+                if (Array.isArray(messages) && messages.length > 0) {
+                    appData.messages = messages;
+                } else {
+                    throw new Error('Empty');
+                }
+            } catch (e) {
+                appData.messages = [
+                    { timestamp: new Date().toISOString(), user: 'RTBROK', message: 'Bienvenido a RTBROK Mobile' },
+                    { timestamp: new Date().toISOString(), user: 'Sistema', message: 'Conectado correctamente' }
+                ];
+            }
+            renderChatMessages();
+        }
+
+        function renderChatMessages() {
+            const container = document.getElementById('widget-chat-messages');
+            if (!container) return;
+
+            container.innerHTML = appData.messages.slice(-8).map((m) => {
+                const isMe = m.user === currentChatSender || m.user === 'RTBROK';
+                const isSystem = m.user === 'Sistema' || m.user === 'RTBROK';
+                return `
+                    <div class="flex flex-col ${isMe && !isSystem ? 'items-end' : 'items-start'} gap-0.5">
+                        <div class="text-[7px] text-zinc-500 font-medium flex items-center gap-1">
+                            ${m.user}
+                            ${m.sending ? '<span class="text-amber-400 text-[6px] animate-pulse">● Enviando...</span>' : ''}
+                            ${m.error ? '<span class="text-rose-400 text-[6px]">● Error</span>' : ''}
+                        </div>
+                        <div class="chat-message ${isMe && !isSystem ? 'chat-message-sent' : 'chat-message-received'}">
+                            ${m.message}
+                        </div>
+                    </div>
+                `;
+            }).join('');
+            container.scrollTop = container.scrollHeight;
+        }
+
+        window.sendWidgetChatMessage = async function() {
+            const input = document.getElementById('widget-chat-input');
+            const message = input.value.trim();
+            if (!message) return;
+
+            if (!currentChatSender) {
+                pendingChatMessage = message;
+                openChatSenderModal();
+                input.placeholder = 'Selecciona un remitente...';
+                input.style.borderColor = 'rgba(251, 191, 36, 0.5)';
+                return;
+            }
+
+            input.placeholder = 'Escribe un mensaje...';
+            input.style.borderColor = '';
+
+            const formattedMessage = `[${currentChatSender}]: ${message}`;
+
+            try {
+                const encodedMessage = encodeURIComponent(formattedMessage);
+                const url = `${CHAT_API_URL}?number=120363406622431210@g.us&message=${encodedMessage}`;
+
+                const tempMessage = {
+                    timestamp: new Date().toISOString(),
+                    user: currentChatSender,
+                    message: message,
+                    sending: true
+                };
+                appData.messages.push(tempMessage);
+                renderChatMessages();
+
+                await fetch(url, { method: 'GET', mode: 'no-cors' });
+
+                input.value = '';
+
+                const lastMessageIndex = appData.messages.length - 1;
+                if (appData.messages[lastMessageIndex] && appData.messages[lastMessageIndex].sending) {
+                    appData.messages[lastMessageIndex].sending = false;
+                    renderChatMessages();
+                }
+
+                try {
+                    const chatPayload = {
+                        action: 'sendMessage',
+                        user: currentChatSender,
+                        message: message
+                    };
+                    await fetch(ENDPOINT_CHAT, {
+                        method: 'POST',
+                        mode: 'no-cors',
+                        headers: { 'Content-Type': 'application/json' },
+                        body: JSON.stringify(chatPayload)
+                    });
+                } catch (e) {
+                    console.log('Mensaje enviado mediante API.');
+                }
+
+            } catch (error) {
+                console.error('Error al enviar mensaje:', error);
+                const lastMessage = appData.messages[appData.messages.length - 1];
+                if (lastMessage) {
+                    lastMessage.error = true;
+                    lastMessage.sending = false;
+                    renderChatMessages();
+                }
+            }
+        };
+
+        window.setChatSender = function(name) {
+            currentChatSender = name;
+            localStorage.setItem('rtbrok_chat_sender', name);
+            closeChatSenderModal();
+            updateChatSenderUI();
+
+            const input = document.getElementById('widget-chat-input');
+            if (input) {
+                input.placeholder = 'Escribe un mensaje...';
+                input.style.borderColor = '';
+            }
+
+            if (pendingChatMessage) {
+                const message = pendingChatMessage;
+                pendingChatMessage = null;
+                const pendingContainer = document.getElementById('pendingMsgContainer');
+                if (pendingContainer) pendingContainer.classList.add('hidden');
+
+                setTimeout(() => {
+                    const input = document.getElementById('widget-chat-input');
+                    if (input) {
+                        input.value = message;
+                        sendWidgetChatMessage();
+                    }
+                }, 100);
+            }
+        };
+
+        window.openChatSenderModal = function() {
+            const modal = document.getElementById('chatSenderModal');
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+
+            const pendingContainer = document.getElementById('pendingMsgContainer');
+            const pendingText = document.getElementById('pendingMsgText');
+
+            if (pendingChatMessage) {
+                pendingContainer.classList.remove('hidden');
+                pendingText.textContent = `"${pendingChatMessage.substring(0, 30)}${pendingChatMessage.length > 30 ? '...' : ''}"`;
+            } else {
+                pendingContainer.classList.add('hidden');
+            }
+
+            lucide.createIcons();
+        };
+
+        window.closeChatSenderModal = function() {
+            document.getElementById('chatSenderModal').classList.add('hidden');
+            document.getElementById('chatSenderModal').classList.remove('flex');
+
+            if (pendingChatMessage) {
+                const input = document.getElementById('widget-chat-input');
+                if (input && !input.value) {
+                    input.value = pendingChatMessage;
+                    input.placeholder = 'Selecciona un remitente...';
+                    input.style.borderColor = 'rgba(251, 191, 36, 0.5)';
+                    pendingChatMessage = null;
+                }
+            }
+
+            const pendingContainer = document.getElementById('pendingMsgContainer');
+            if (pendingContainer) pendingContainer.classList.add('hidden');
+        };
+
+        function updateChatSenderUI() {
+            const displayElement = document.getElementById('chat-sender-display');
+            if (displayElement) {
+                displayElement.textContent = currentChatSender || 'Sin seleccionar';
+                displayElement.className = currentChatSender ? 'text-indigo-400 font-medium' : 'text-amber-400 font-medium';
+            }
+        }
+
+        // ============================================================
+        // ARTWORKS - RENDER
         // ============================================================
         function renderArtworks() {
             const grid = document.getElementById('artworksGrid');
-            const sorted = [...artworks].sort((a, b) => new Date(b.fecha_registro || 0) - new Date(a.fecha_registro || 0));
-            const toShow = sorted.slice(0, displayedArtworks);
+            const sorted = [...appData.artworks].sort((a, b) => new Date(b.fecha_registro || 0) - new Date(a.fecha_registro || 0));
+            const toShow = sorted.slice(0, displayedArtworksCount);
 
             if (toShow.length === 0) {
                 grid.innerHTML =
@@ -811,9 +1550,8 @@
                 `;
             }).join('');
 
-            // Mostrar/ocultar botón "Mostrar más"
             const btn = document.getElementById('showMoreBtn');
-            if (displayedArtworks >= sorted.length) {
+            if (displayedArtworksCount >= sorted.length) {
                 btn.style.display = 'none';
             } else {
                 btn.style.display = 'flex';
@@ -823,24 +1561,53 @@
         }
 
         window.showMoreArtworks = function() {
-            displayedArtworks += ARTWORKS_PER_PAGE;
+            displayedArtworksCount += ARTWORKS_PER_PAGE;
             renderArtworks();
+            renderFullArtworksGrid();
         };
+
+        function renderFullArtworksGrid() {
+            const container = document.getElementById('artworks-grid-container');
+            if (!container) return;
+
+            if (appData.artworks.length === 0) {
+                container.innerHTML = `<p class="text-[10px] text-slate-500 text-center col-span-3 py-8">No se encontraron obras.</p>`;
+                return;
+            }
+
+            const sorted = [...appData.artworks].sort((a, b) => new Date(b.fecha_registro || 0) - new Date(a.fecha_registro || 0));
+
+            container.innerHTML = sorted.map(a => {
+                const img = resolveImageUrl(a.adjuntos, a.nombre_obra);
+                const statusColor = { 'Consolidación': 'border-amber-500/30 text-amber-400', 'Bodega': 'border-blue-500/30 text-blue-400',
+                    'Vendida': 'border-emerald-500/30 text-emerald-400' } [a.estatus] || 'border-zinc-500/30 text-zinc-400';
+                return `
+                    <div class="art-item" onclick="openArtworkDetail('${a.id}')">
+                        <img src="${img}" alt="${a.nombre_obra || 'Obra'}" loading="lazy"
+                             onerror="this.onerror=null; this.src='https://placehold.co/400x400/18181b/71717a?text=Obra';">
+                        <div class="art-badge ${statusColor}">${a.estatus || 'Consolidación'}</div>
+                        ${a.promocionar ? `<div class="promo-tag"><i data-lucide="megaphone" class="w-2.5 h-2.5"></i> Promo</div>` : ''}
+                    </div>
+                `;
+            }).join('');
+
+            lucide.createIcons();
+        }
 
         function updateArtworksCount() {
             const el = document.getElementById('artworksCount');
             const label = document.getElementById('totalArtworksLabel');
-            if (el) el.textContent = artworks.length;
-            if (label) label.textContent = `${artworks.length} obras`;
+            if (el) el.textContent = appData.artworks.length;
+            if (label) label.textContent = `${appData.artworks.length} obras`;
         }
 
         // ============================================================
-        // DETALLE DE OBRA (modal)
+        // ARTWORK DETAIL MODAL
         // ============================================================
         let activeArtwork = null;
 
         window.openArtworkDetail = function(id) {
-            const a = artworks.find(el => el.id === id);
+            const a = appData.artworks.find(el => el.id === id);
             if (!a) return;
             activeArtwork = a;
 
@@ -863,13 +1630,12 @@
 
             const tags = document.getElementById('detailTags');
             if (Array.isArray(a.tags) && a.tags.length) {
-                tags.innerHTML = a.tags.map(t => `<span class="px-2 py-0.5 text-[9px] bg-zinc-800 border border-zinc-700 text-zinc-300 rounded">${t}</span>`)
+                tags.innerHTML = a.tags.map(t => `<span class="px-2 py-0.5 text-[8px] bg-zinc-800 border border-zinc-700 text-zinc-300 rounded">${t}</span>`)
                     .join('');
             } else {
                 tags.innerHTML = '<span class="text-[10px] text-zinc-500">Sin etiquetas</span>';
             }
 
-            // Botón promocionar
             const promoBtn = document.getElementById('togglePromotionBtn');
             const isPromoted = a.promocionar === true;
             promoBtn.className = isPromoted ?
@@ -892,20 +1658,74 @@
 
         window.toggleArtworkPromotion = function() {
             if (!activeArtwork) return;
+
+            if (!taskFlow.authenticatedUser) {
+                pendingArtworkPromotion = {
+                    artworkId: activeArtwork.id,
+                    promocionar: !activeArtwork.promocionar
+                };
+                openActionLoginModal();
+                return;
+            }
+
             const newVal = !activeArtwork.promocionar;
-            // Actualización local (simulada)
-            activeArtwork.promocionar = newVal;
-            const promoBtn = document.getElementById('togglePromotionBtn');
-            promoBtn.className = newVal ?
-                'flex-1 border border-fuchsia-400/40 bg-fuchsia-500/10 text-fuchsia-200 text-[10px] font-medium py-2 rounded flex items-center justify-center gap-1.5' :
-                'flex-1 border border-zinc-700 bg-zinc-900 text-zinc-300 text-[10px] font-medium py-2 rounded flex items-center justify-center gap-1.5';
-            promoBtn.innerHTML = newVal ?
-                `<i data-lucide="megaphone-off" class="w-3.5 h-3.5"></i> Quitar promo` :
-                `<i data-lucide="megaphone" class="w-3.5 h-3.5"></i> Promocionar`;
-            lucide.createIcons();
-            renderArtworks();
-            showNotification(newVal ? 'Obra promocionada' : 'Promoción retirada');
+            executeArtworkPromotion(activeArtwork.id, newVal, taskFlow.authenticatedUser);
         };
+
+        async function executeArtworkPromotion(artworkId, promocionar, user) {
+            const artwork = appData.artworks.find(a => a.id === artworkId);
+            if (!artwork || !user?.id) {
+                showNotification('Selecciona un supervisor o director para actualizar la promoción.');
+                return;
+            }
+
+            const promoBtn = document.getElementById('togglePromotionBtn');
+            const originalContent = promoBtn?.innerHTML;
+            if (promoBtn) {
+                promoBtn.disabled = true;
+                promoBtn.innerHTML = '<i data-lucide="loader-circle" class="w-3.5 h-3.5 animate-spin"></i>';
+                lucide.createIcons();
+            }
+
+            try {
+                await fetch(ENDPOINT_ARTWORKS, {
+                    method: 'POST',
+                    mode: 'no-cors',
+                    headers: { 'Content-Type': 'text/plain;charset=utf-8' },
+                    body: JSON.stringify({
+                        action: 'registro_obra_promocionar_toggle',
+                        data: { id_obra: artworkId, id_actor: user.id, promocionar }
+                    })
+                });
+
+                artwork.promocionar = promocionar;
+                if (activeArtwork?.id === artworkId) {
+                    activeArtwork.promocionar = promocionar;
+                    const isPromoted = promocionar;
+                    if (promoBtn) {
+                        promoBtn.className = isPromoted ?
+                            'flex-1 border border-fuchsia-400/40 bg-fuchsia-500/10 text-fuchsia-200 text-[10px] font-medium py-2 rounded flex items-center justify-center gap-1.5' :
+                            'flex-1 border border-zinc-700 bg-zinc-900 text-zinc-300 text-[10px] font-medium py-2 rounded flex items-center justify-center gap-1.5';
+                        promoBtn.innerHTML = isPromoted ?
+                            `<i data-lucide="megaphone-off" class="w-3.5 h-3.5"></i> Quitar promo` :
+                            `<i data-lucide="megaphone" class="w-3.5 h-3.5"></i> Promocionar`;
+                        promoBtn.disabled = false;
+                        lucide.createIcons();
+                    }
+                }
+                renderArtworks();
+                renderFullArtworksGrid();
+                showNotification(promocionar ? 'Obra promocionada' : 'Promoción retirada');
+            } catch (error) {
+                console.error('Error al actualizar promoción:', error);
+                showNotification('Error al actualizar la promoción');
+                if (promoBtn) {
+                    promoBtn.disabled = false;
+                    promoBtn.innerHTML = originalContent || '';
+                    lucide.createIcons();
+                }
+            }
+        }
 
         window.shareArtworkWhatsApp = function() {
             if (!activeArtwork) return;
@@ -915,7 +1735,7 @@
         };
 
         // ============================================================
-        // TAREAS (modal simplificado)
+        // TAREAS - MODAL
         // ============================================================
         window.openAddTaskModal = function() {
             const modal = document.getElementById('taskModal');
@@ -923,6 +1743,10 @@
             modal.classList.add('flex');
             populateProjectSelect();
             populateResponsibleSelect();
+            const today = new Date();
+            const weekLater = new Date(today);
+            weekLater.setDate(today.getDate() + 7);
+            document.getElementById('taskDeadline').value = weekLater.toISOString().split('T')[0];
             lucide.createIcons();
         };
 
@@ -933,8 +1757,9 @@
 
         function populateProjectSelect() {
             const sel = document.getElementById('projectSelect');
+            if (!sel) return;
             sel.innerHTML = '<option value="">Seleccionar proyecto...</option>';
-            proyectos.forEach(p => {
+            appData.proyectos.forEach(p => {
                 const opt = document.createElement('option');
                 opt.value = p.id;
                 opt.textContent = `${p.asignacion || ''} - ${p.nombre}`;
@@ -944,7 +1769,7 @@
                 const pid = this.value;
                 const subSel = document.getElementById('subprojectSelect');
                 if (pid) {
-                    const subs = subproyectos.filter(sp => sp.id_proyecto === pid);
+                    const subs = appData.subproyectos.filter(sp => sp.id_proyecto === pid);
                     subSel.disabled = false;
                     subSel.innerHTML = '<option value="">Seleccionar subproyecto...</option>';
                     subs.forEach(sp => {
@@ -962,8 +1787,15 @@
 
         function populateResponsibleSelect() {
             const sel = document.getElementById('responsibleSelect');
+            if (!sel) return;
             sel.innerHTML = '<option value="">Seleccionar responsable...</option>';
-            responsables.forEach(r => {
+            const sorted = [...appData.responsables].sort((a, b) => {
+                const order = { 'director': 0, 'supervisor': 1, 'responsable': 2 };
+                const aOrder = a.rol ? (order[a.rol.toLowerCase()] ?? 3) : 3;
+                const bOrder = b.rol ? (order[b.rol.toLowerCase()] ?? 3) : 3;
+                return aOrder - bOrder;
+            });
+            sorted.forEach(r => {
                 const opt = document.createElement('option');
                 opt.value = r.id;
                 const badge = r.rol ? ` [${r.rol}]` : '';
@@ -1009,51 +1841,11 @@
                 showNotification('Tarea creada');
                 closeTaskModal();
                 document.getElementById('taskDetails').value = '';
+                fetchAllData();
             }).catch(() => {
                 showNotification('Error al crear tarea');
             });
         };
-
-        // ============================================================
-        // CHAT (remitente)
-        // ============================================================
-        window.openChatSenderModal = function() {
-            const modal = document.getElementById('chatSenderModal');
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            const pendingContainer = document.getElementById('pendingMsgContainer');
-            const pendingText = document.getElementById('pendingMsgText');
-            if (pendingChatMessage) {
-                pendingContainer.classList.remove('hidden');
-                pendingText.textContent = `"${pendingChatMessage.substring(0, 30)}${pendingChatMessage.length > 30 ? '...' : ''}"`;
-            } else {
-                pendingContainer.classList.add('hidden');
-            }
-            lucide.createIcons();
-        };
-
-        window.closeChatSenderModal = function() {
-            document.getElementById('chatSenderModal').classList.add('hidden');
-            document.getElementById('chatSenderModal').classList.remove('flex');
-        };
-
-        window.setChatSender = function(name) {
-            currentChatSender = name;
-            localStorage.setItem('rtbrok_chat_sender', name);
-            closeChatSenderModal();
-            updateChatSenderUI();
-            if (pendingChatMessage) {
-                const msg = pendingChatMessage;
-                pendingChatMessage = null;
-                document.getElementById('pendingMsgContainer').classList.add('hidden');
-                // Enviar mensaje simulado
-                showNotification(`Mensaje enviado como ${name}`);
-            }
-        };
-
-        function updateChatSenderUI() {
-            // No hay UI de chat en la vista principal, solo guardamos el estado
-        }
 
         // ============================================================
         // LOGIN MODAL
@@ -1061,7 +1853,7 @@
         window.openLoginModal = function() {
             document.getElementById('loginModal').classList.remove('hidden');
             document.getElementById('loginModal').classList.add('flex');
-            renderLoginUsers();
+            renderDirectorsList();
             if (firebaseUser) {
                 const avatar = document.getElementById('modalUserAvatar');
                 const name = document.getElementById('modalUserName');
@@ -1082,14 +1874,19 @@
             document.getElementById('loginModal').classList.remove('flex');
         };
 
-        function renderLoginUsers() {
+        function renderDirectorsList() {
             const container = document.getElementById('loginUsersList');
-            const directors = responsables.filter(r => r.rol && r.rol.toLowerCase() === 'director');
+            if (!container) return;
+            const directors = appData.responsables.filter(r =>
+                r.rol && (r.rol.toLowerCase() === 'director' || r.rol.toLowerCase() === 'dirección')
+            );
+
             if (directors.length === 0) {
                 container.innerHTML =
                     `<div class="text-center text-zinc-500 text-xs py-4">No hay directores registrados</div>`;
                 return;
             }
+
             container.innerHTML = directors.map(d => `
                 <button onclick="selectDirector('${d.id}', '${d.nombre}')" class="flex items-center gap-3 p-2.5 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-indigo-500/50 rounded w-full text-left transition">
                     <div class="w-8 h-8 bg-indigo-600/30 flex items-center justify-center text-indigo-400 font-bold text-xs rounded">${d.nombre ? d.nombre.charAt(0).toUpperCase() : '?'}</div>
@@ -1103,37 +1900,31 @@
 
         window.selectDirector = function(id, nombre) {
             const userData = { id, nombre, rol: 'director' };
+            taskFlow.authenticatedUser = userData;
             sessionStorage.setItem('currentUser', JSON.stringify(userData));
             closeLoginModal();
             showNotification(`Sesión como ${nombre}`);
         };
 
         // ============================================================
-        // TAREAS PERSONALES (localStorage)
-        // ============================================================
-        function renderLocalTasks() {
-            // No se usa en la vista móvil, pero mantenemos la función
-        }
-
-        // ============================================================
-        // NAVEGACIÓN ENTRE TABS (solo obras e inicio)
-        // ============================================================
-        window.switchTab = function(tab) {
-            const navItems = document.querySelectorAll('.nav-item');
-            navItems.forEach(el => el.classList.remove('active'));
-            if (tab === 'dashboard') {
-                document.querySelector('.nav-item:first-child')?.classList.add('active');
-                // Mostrar inicio (ya visible)
-            } else if (tab === 'artworks') {
-                document.querySelector('.nav-item:nth-child(2)')?.classList.add('active');
-                // Scroll a la galería
-                document.querySelector('main')?.scrollTo({ top: 0, behavior: 'smooth' });
-            }
-        };
-
-        // ============================================================
         // MOCK DATA
         // ============================================================
+        function getMockTasks() {
+            return [
+                { id: 'T1', asignacion: '2.5.9JM', estatus: 'completado', prioridad: 'alta', detalles: 'Revisar documentación del proyecto',
+                    descripcion: 'Validar planos estructurales con el equipo.', fecha_limite: '2026-06-15',
+                    id_responsable: '1' },
+                { id: 'T2', asignacion: '1.2.2MR', estatus: 'completado', prioridad: 'media', detalles: 'Aprobación de presupuesto inicial',
+                    descripcion: 'Validación con directiva.', fecha_limite: '2026-05-30', id_responsable: '2' },
+                { id: 'T3', asignacion: '2.1.1AL', estatus: 'completado', prioridad: 'baja', detalles: 'Entrega de catálogo de obras',
+                    descripcion: 'Compilación fotográfica.', fecha_limite: '2026-06-20', id_responsable: '3' },
+                { id: 'T4', asignacion: '1.3.4IS', estatus: 'en_curso', prioridad: 'media', detalles: 'Actualizar inventario de obras',
+                    descripcion: 'Registrar nuevas adquisiciones.', fecha_limite: '2026-07-01', id_responsable: '1' },
+                { id: 'T5', asignacion: '3.2.1DR', estatus: 'pendiente', prioridad: 'urgente', detalles: 'Resolver conflicto de permisos',
+                    descripcion: 'Coordinación con autoridades.', fecha_limite: '2026-06-10', id_responsable: '4' }
+            ];
+        }
+
         function getMockArtworks() {
             return [
                 { id: 'm1', nombre_obra: 'Residencia Minimalista', autor: 'Carlos Mendoza', ubicacion: 'Puebla',
@@ -1172,11 +1963,7 @@
                 { id: 'm9', nombre_obra: 'Torre de Oficinas', autor: 'Arquitectura Moderna', ubicacion: 'Monterrey',
                     estatus: 'Bodega', tipo_obra: 'Comercial', superficie: 2000, precio_lista: 8000000,
                     fecha_registro: '2024-08-15', adjuntos: [{ url: 'https://images.unsplash.com/photo-1486718448742-163732cd1544?w=400' }],
-                    tags: ['corporativo'], ancho: 30, alto: 100, largo: 30, tipo_moneda: 'MXN', promocionar: false },
-                { id: 'm10', nombre_obra: 'Vivienda Sustentable', autor: 'EcoArquitectos', ubicacion: 'Puebla',
-                    estatus: 'Consolidación', tipo_obra: 'Residencial', superficie: 200, precio_lista: 720000,
-                    fecha_registro: '2025-03-20', adjuntos: [{ url: 'https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=400' }],
-                    tags: ['LEED'], ancho: 10, alto: 4, largo: 12, tipo_moneda: 'MXN', promocionar: false },
+                    tags: ['corporativo'], ancho: 30, alto: 100, largo: 30, tipo_moneda: 'MXN', promocionar: false }
             ];
         }
 
@@ -1192,6 +1979,29 @@
                 closeLoginModal();
                 closeTaskModal();
                 closeChatSenderModal();
+                closeActionLoginModal();
+            }
+        });
+
+        // Crear modal de acción login si no existe
+        document.addEventListener('DOMContentLoaded', function() {
+            if (!document.getElementById('actionLoginModal')) {
+                const modal = document.createElement('div');
+                modal.id = 'actionLoginModal';
+                modal.className = 'fixed inset-0 detail-overlay z-50 hidden flex items-center justify-center p-4';
+                modal.innerHTML = `
+                    <div class="bg-zinc-950 border border-zinc-900 w-full max-w-xs p-4 rounded-2xl">
+                        <div class="flex items-center justify-between border-b border-zinc-900 pb-3 mb-3">
+                            <h3 class="font-bold text-sm text-slate-100 flex items-center gap-2">
+                                <i data-lucide="user-check" class="w-4 h-4 text-indigo-400"></i> Identificar Responsable
+                            </h3>
+                            <button onclick="closeActionLoginModal()" class="text-zinc-500 hover:text-white"><i data-lucide="x" class="w-5 h-5"></i></button>
+                        </div>
+                        <div id="action-users-list" class="flex flex-col gap-2 max-h-52 overflow-y-auto"></div>
+                    </div>
+                `;
+                document.body.appendChild(modal);
+                lucide.createIcons();
             }
         });
     </script>
