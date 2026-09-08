@@ -4,7 +4,7 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RTBROK Workspace</title>
-    <link rel="manifest" href="homeScreenRtbrok
+    <link rel="manifest" href="/homeScreenRtbrok
 /manifest.json">
     <meta name="theme-color" content="#3f51b5">
     
@@ -2868,8 +2868,7 @@
 
         if ('serviceWorker' in navigator) {
           window.addEventListener('load', () => {
-            navigator.serviceWorker.register('homeScreenRtbrok
-/sw.js')
+            navigator.serviceWorker.register('/homeScreenRtbrok/sw.js')
               .then(reg => console.log('Service Worker registrado con éxito:', reg.scope))
               .catch(err => console.log('Error al registrar el Service Worker:', err));
           });
