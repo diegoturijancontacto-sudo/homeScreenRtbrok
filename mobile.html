@@ -4,8 +4,10 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>RTBROK Mobile</title>
-    <script src="https://cdn.tailwindcss.com"></script>
-    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.tailwindcss.com">
+    </script>
+    <script src="https://unpkg.com/lucide@latest">
+    </script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
     <link rel="manifest" href="manifest.json">
@@ -57,6 +59,69 @@
         ::-webkit-scrollbar-thumb {
             background: rgba(255, 255, 255, 0.1);
             border-radius: 0px;
+        }
+
+        /* --- Accesos directos: una sola fila, altura reducida --- */
+        .quick-access-bar {
+            display: flex;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            gap: 6px;
+            padding: 4px 8px;
+            background: #0a0a0a;
+            border-bottom: 1px solid #171717;
+            flex-shrink: 0;
+            /* altura reducida al 75% respecto a la versión anterior (que era ~64px) */
+            min-height: 48px;
+            max-height: 48px;
+            align-items: center;
+            scrollbar-width: none;
+            -webkit-overflow-scrolling: touch;
+        }
+        .quick-access-bar::-webkit-scrollbar {
+            display: none;
+        }
+
+        .quick-access-bar .action-btn {
+            display: flex;
+            flex-direction: row;
+            align-items: center;
+            gap: 4px;
+            background: transparent;
+            border: 1px solid #1f1f1f;
+            border-radius: 0px;
+            padding: 4px 8px;
+            white-space: nowrap;
+            transition: all 0.15s ease;
+            flex-shrink: 0;
+            height: 32px;
+            /* reducido */
+            font-size: 9px;
+            color: #94a3b8;
+        }
+        .quick-access-bar .action-btn:active {
+            transform: scale(0.94);
+            background: #141414;
+            border-color: #2a2a2a;
+        }
+        .quick-access-bar .action-btn i {
+            font-size: 16px;
+            color: #e2e8f0;
+        }
+        .quick-access-bar .action-btn span {
+            font-size: 9px;
+            font-weight: 500;
+            color: #94a3b8;
+            line-height: 1.2;
+        }
+        .quick-access-bar .action-btn .badge {
+            background: rgba(99, 102, 241, 0.15);
+            color: #818cf8;
+            font-size: 7px;
+            font-weight: 600;
+            padding: 1px 6px;
+            border: 1px solid rgba(99, 102, 241, 0.1);
+            margin-left: 2px;
         }
 
         .grid-3 {
@@ -319,6 +384,54 @@
             grid-template-columns: 1fr 1fr;
             gap: 2px 8px;
         }
+
+        /* Filtros */
+        .filters-bar {
+            display: flex;
+            gap: 6px;
+            padding: 4px 8px;
+            background: #050505;
+            border-bottom: 1px solid #171717;
+            flex-shrink: 0;
+            align-items: center;
+            flex-wrap: nowrap;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .filters-bar::-webkit-scrollbar {
+            display: none;
+        }
+        .filters-bar select,
+        .filters-bar button {
+            background: #0f0f0f;
+            border: 1px solid #1f1f1f;
+            color: #c0c0c0;
+            font-size: 9px;
+            padding: 3px 8px;
+            border-radius: 0px;
+            outline: none;
+            height: 26px;
+            flex-shrink: 0;
+            cursor: pointer;
+        }
+        .filters-bar select:focus,
+        .filters-bar button:focus {
+            border-color: #4f46e5;
+        }
+        .filters-bar button {
+            background: #1a1a1a;
+            color: #94a3b8;
+        }
+        .filters-bar button:hover {
+            background: #2a2a2a;
+        }
+        .filters-bar .filter-label {
+            font-size: 8px;
+            text-transform: uppercase;
+            color: #52525b;
+            letter-spacing: 0.5px;
+            margin-right: 2px;
+        }
     </style>
 </head>
 <body>
@@ -347,54 +460,65 @@
             </div>
         </header>
 
+        <!-- BARRA DE ACCESOS DIRECTOS (una fila, altura reducida) -->
+        <div class="quick-access-bar">
+            <a href="https://www.instagram.com/" target="_blank" class="action-btn">
+                <i class="fab fa-instagram"></i>
+                <span>Instagram</span>
+            </a>
+            <a href="https://diegoturijancontacto-sudo.github.io/Finanzas/mobile/" target="_blank" class="action-btn">
+                <i data-lucide="database" class="w-4 h-4"></i>
+                <span>Base de datos</span>
+            </a>
+            <a href="https://drive.google.com" target="_blank" class="action-btn">
+                <i data-lucide="hard-drive" class="w-4 h-4"></i>
+                <span>Drive</span>
+            </a>
+            <a href="https://frontline-zeta-ecru.vercel.app/movil/" target="_blank" class="action-btn">
+                <i data-lucide="book-open" class="w-4 h-4"></i>
+                <span>Catálogos</span>
+                <span class="badge">PDF</span>
+            </a>
+            <a href="https://docs.google.com/forms/d/e/1FAIpQLSdC-_if3uzNyq3BuU3YhlUD1ONInOwe4Cv_G4MM1PJrnsDRuw/viewform?usp=header" target="_blank" class="action-btn">
+                <i data-lucide="file-text" class="w-4 h-4"></i>
+                <span>Certificados</span>
+                <span class="badge">form</span>
+            </a>
+            <button onclick="switchTab('artworks')" class="action-btn">
+                <i data-lucide="image" class="w-4 h-4"></i>
+                <span>Obras</span>
+                <span class="badge" id="artworksCount">0</span>
+            </button>
+        </div>
+
         <!-- Scrollable contenido principal -->
         <main class="flex-1 overflow-y-auto overflow-x-hidden pb-1 px-2">
 
             <!-- TAB: DASHBOARD -->
             <div id="tab-dashboard" class="flex flex-col gap-4 w-full">
 
-                <!-- Cuadrícula de accesos directos (3 columnas) -->
-                <section class="py-3">
-                    <div class="grid-3">
-                        <!-- Instagram -->
-                        <a href="https://www.instagram.com/" target="_blank" class="action-btn">
-                            <i class="fab fa-instagram fa-lg"></i>
-                            <span>Instagram</span>
-                        </a>
-                        <!-- Base de datos -->
-                        <a href="https://diegoturijancontacto-sudo.github.io/Finanzas/mobile/" target="_blank" class="action-btn">
-                            <i data-lucide="database" class="w-6 h-6"></i>
-                            <span>Base de datos</span>
-                        </a>
-                        <!-- Drive -->
-                        <a href="https://drive.google.com" target="_blank" class="action-btn">
-                            <i data-lucide="hard-drive" class="w-6 h-6"></i>
-                            <span>Drive</span>
-                        </a>
-                        <!-- Generador de Catálogos -->
-                        <a href="https://frontline-zeta-ecru.vercel.app/movil/" target="_blank" class="action-btn">
-                            <i data-lucide="book-open" class="w-6 h-6"></i>
-                            <span>Catálogos</span>
-                            <span class="badge">PDF</span>
-                        </a>
-                        <!-- Generador de Certificados -->
-                        <a href="https://docs.google.com/forms/d/e/1FAIpQLSdC-_if3uzNyq3BuU3YhlUD1ONInOwe4Cv_G4MM1PJrnsDRuw/viewform?usp=header" target="_blank" class="action-btn">
-                            <i data-lucide="file-text" class="w-6 h-6"></i>
-                            <span>Certificados</span>
-                            <span class="badge">form</span>
-                        </a>
-                        <!-- Obras (abre galería) -->
-                        <button onclick="switchTab('artworks')" class="action-btn">
-                            <i data-lucide="image" class="w-6 h-6"></i>
-                            <span>Obras</span>
-                            <span class="badge" id="artworksCount">0</span>
-                        </button>
-                    </div>
-                </section>
-
-                <!-- Galería de obras (grid 3 columnas) -->
+                <!-- Cuadrícula de accesos directos (3 columnas) ya no se usa, la barra está arriba -->
+                <!-- Se mantiene solo la galería de obras -->
                 <section class="pb-4">
-                    <div class="flex items-center justify-between mb-2 px-1">
+                    <!-- Filtros -->
+                    <div class="filters-bar">
+                        <span class="filter-label">Filtrar</span>
+                        <select id="filterStatus" onchange="applyFilters()">
+                            <option value="">Todos los estatus</option>
+                            <option value="Consolidación">Consolidación</option>
+                            <option value="Bodega">Bodega</option>
+                            <option value="Vendida">Vendida</option>
+                        </select>
+                        <select id="filterPromo" onchange="applyFilters()">
+                            <option value="">Promoción</option>
+                            <option value="true">Promocionadas</option>
+                            <option value="false">No promocionadas</option>
+                        </select>
+                        <button onclick="applyFilters()">Aplicar</button>
+                        <button onclick="resetFilters()">Limpiar</button>
+                    </div>
+
+                    <div class="flex items-center justify-between mb-2 px-1 mt-2">
                         <h2 class="text-xs font-medium text-zinc-300 tracking-wider">OBRAS RECIENTES</h2>
                         <span class="text-[9px] text-zinc-500" id="totalArtworksLabel">0 obras</span>
                     </div>
@@ -436,6 +560,23 @@
                             <p class="text-[8px] text-zinc-400">Registros y galería visual</p>
                         </div>
                     </div>
+                </div>
+                <!-- Filtros también en la vista completa -->
+                <div class="filters-bar">
+                    <span class="filter-label">Filtrar</span>
+                    <select id="filterStatusFull" onchange="applyFiltersFull()">
+                        <option value="">Todos los estatus</option>
+                        <option value="Consolidación">Consolidación</option>
+                        <option value="Bodega">Bodega</option>
+                        <option value="Vendida">Vendida</option>
+                    </select>
+                    <select id="filterPromoFull" onchange="applyFiltersFull()">
+                        <option value="">Promoción</option>
+                        <option value="true">Promocionadas</option>
+                        <option value="false">No promocionadas</option>
+                    </select>
+                    <button onclick="applyFiltersFull()">Aplicar</button>
+                    <button onclick="resetFiltersFull()">Limpiar</button>
                 </div>
                 <div id="artworks-grid-container" class="artwork-grid w-full"></div>
             </div>
@@ -502,7 +643,6 @@
                         <label class="share-option"><input type="checkbox" checked disabled> Técnica</label>
                         <label class="share-option"><input type="checkbox" checked disabled> Medidas</label>
                         <label class="share-option"><input type="checkbox" checked disabled> Precio</label>
-                        <!-- Opciones opcionales ocultas por defecto -->
                         <label class="share-option hidden"><input type="checkbox" id="shareUbicacion"> Ubicación</label>
                         <label class="share-option hidden"><input type="checkbox" id="shareEstatus"> Estatus</label>
                         <label class="share-option hidden"><input type="checkbox" id="shareCliente"> Cliente</label>
@@ -680,6 +820,10 @@
 
         // Estado para opciones de compartir
         let shareOptionsVisible = false;
+
+        // Filtros activos
+        let activeFilters = { status: '', promo: '' };
+        let activeFiltersFull = { status: '', promo: '' };
 
         // ============================================================
         // FUNCIÓN PARA REDIRIGIR AL LOGIN SI NO HAY SESIÓN
@@ -1147,16 +1291,30 @@
         }
 
         // ============================================================
-        // ARTWORKS - RENDER
+        // ARTWORKS - RENDER con filtros
         // ============================================================
+        function getFilteredArtworks(filters) {
+            let result = [...appData.artworks];
+            if (filters.status) {
+                result = result.filter(a => a.estatus === filters.status);
+            }
+            if (filters.promo !== '') {
+                const promoBool = filters.promo === 'true';
+                result = result.filter(a => a.promocionar === promoBool);
+            }
+            return result;
+        }
+
         function renderArtworks() {
             const grid = document.getElementById('artworksGrid');
-            const sorted = [...appData.artworks].sort((a, b) => new Date(b.fecha_registro || 0) - new Date(a.fecha_registro || 0));
+            const filtered = getFilteredArtworks(activeFilters);
+            const sorted = filtered.sort((a, b) => new Date(b.fecha_registro || 0) - new Date(a.fecha_registro || 0));
             const toShow = sorted.slice(0, displayedArtworksCount);
 
             if (toShow.length === 0) {
                 grid.innerHTML =
-                    `<div class="col-span-3 text-center text-zinc-500 text-xs py-8">No hay obras registradas</div>`;
+                    `<div class="col-span-3 text-center text-zinc-500 text-xs py-8">No hay obras que coincidan con los filtros</div>`;
+                document.getElementById('showMoreBtn').style.display = 'none';
                 return;
             }
 
@@ -1182,6 +1340,12 @@
             }
 
             lucide.createIcons();
+            updateTotalLabel(filtered.length);
+        }
+
+        function updateTotalLabel(count) {
+            const label = document.getElementById('totalArtworksLabel');
+            if (label) label.textContent = `${count} obras`;
         }
 
         window.showMoreArtworks = function() {
@@ -1190,16 +1354,54 @@
             renderFullArtworksGrid();
         };
 
+        // ============================================================
+        // FILTROS
+        // ============================================================
+        window.applyFilters = function() {
+            const status = document.getElementById('filterStatus').value;
+            const promo = document.getElementById('filterPromo').value;
+            activeFilters = { status, promo };
+            displayedArtworksCount = INITIAL_ARTWORKS;
+            renderArtworks();
+            renderFullArtworksGrid();
+        };
+
+        window.resetFilters = function() {
+            document.getElementById('filterStatus').value = '';
+            document.getElementById('filterPromo').value = '';
+            activeFilters = { status: '', promo: '' };
+            displayedArtworksCount = INITIAL_ARTWORKS;
+            renderArtworks();
+            renderFullArtworksGrid();
+        };
+
+        // Filtros para la vista completa
+        window.applyFiltersFull = function() {
+            const status = document.getElementById('filterStatusFull').value;
+            const promo = document.getElementById('filterPromoFull').value;
+            activeFiltersFull = { status, promo };
+            renderFullArtworksGrid();
+        };
+
+        window.resetFiltersFull = function() {
+            document.getElementById('filterStatusFull').value = '';
+            document.getElementById('filterPromoFull').value = '';
+            activeFiltersFull = { status: '', promo: '' };
+            renderFullArtworksGrid();
+        };
+
         function renderFullArtworksGrid() {
             const container = document.getElementById('artworks-grid-container');
             if (!container) return;
 
-            if (appData.artworks.length === 0) {
-                container.innerHTML = `<p class="text-[10px] text-slate-500 text-center col-span-3 py-8">No se encontraron obras.</p>`;
+            const filtered = getFilteredArtworks(activeFiltersFull);
+            if (filtered.length === 0) {
+                container.innerHTML =
+                    `<p class="text-[10px] text-slate-500 text-center col-span-3 py-8">No se encontraron obras con los filtros seleccionados.</p>`;
                 return;
             }
 
-            const sorted = [...appData.artworks].sort((a, b) => new Date(b.fecha_registro || 0) - new Date(a.fecha_registro || 0));
+            const sorted = filtered.sort((a, b) => new Date(b.fecha_registro || 0) - new Date(a.fecha_registro || 0));
 
             container.innerHTML = sorted.map(a => {
                 const img = resolveImageUrl(a.adjuntos, a.nombre_obra);
@@ -1220,9 +1422,7 @@
 
         function updateArtworksCount() {
             const el = document.getElementById('artworksCount');
-            const label = document.getElementById('totalArtworksLabel');
             if (el) el.textContent = appData.artworks.length;
-            if (label) label.textContent = `${appData.artworks.length} obras`;
         }
 
         // ============================================================
@@ -1718,11 +1918,11 @@
         });
 
         if ('serviceWorker' in navigator) {
-          window.addEventListener('load', () => {
-            navigator.serviceWorker.register('sw.js')
-              .then(reg => console.log('Service Worker registrado con éxito:', reg.scope))
-              .catch(err => console.log('Error al registrar el Service Worker:', err));
-          });
+            window.addEventListener('load', () => {
+                navigator.serviceWorker.register('sw.js')
+                    .then(reg => console.log('Service Worker registrado con éxito:', reg.scope))
+                    .catch(err => console.log('Error al registrar el Service Worker:', err));
+            });
         }
     </script>
 </body>
