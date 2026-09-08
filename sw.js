@@ -1,4 +1,4 @@
-const CACHE_NAME = 'mi-pwa-cache-v1.1';
+const CACHE_NAME = 'mi-pwa-cache-v2';
 const urlsToCache = [
   './',
   './mobile.html',
