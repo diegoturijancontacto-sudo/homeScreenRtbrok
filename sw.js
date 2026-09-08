@@ -1,7 +1,7 @@
 const CACHE_NAME = 'mi-pwa-cache-v1';
 const urlsToCache = [
   './',
-  './index.html',
+  './mobile.html',
   './images/icon-192.png'
 ];
 
