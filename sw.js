@@ -1,10 +1,8 @@
 const CACHE_NAME = 'mi-pwa-cache-v1';
 const urlsToCache = [
-  '/',
-  '/index.html',
-  '/styles.css',
-  '/app.js',
-  '/images/icon-192.png'
+  './',
+  './index.html',
+  './images/icon-192.png'
 ];
 
 // Instalación del Service Worker y almacenamiento en caché
