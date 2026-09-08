@@ -319,13 +319,6 @@
             grid-template-columns: 1fr 1fr;
             gap: 2px 8px;
         }
-        /* Ocultar opciones de compartir no usadas en el nuevo formato */
-        #shareOptionsContainer .share-option.hidden {
-            display: none !important;
-        }
-        #shareToggleText {
-            display: none;
-        }
     </style>
 </head>
 <body>
@@ -501,12 +494,23 @@
                     <p id="detailMeasures" class="text-slate-300">-</p>
                 </div>
                 <div class="flex flex-wrap gap-1.5" id="detailTags"></div>
-                <!-- Área de opciones de compartición (simplificada para el nuevo formato) -->
+                <!-- Área de opciones de compartición -->
                 <div class="border-t border-zinc-900 pt-3">
-                    <p class="text-[9px] text-zinc-500 mb-2">Formato de mensaje:</p>
-                    <div class="text-[10px] text-zinc-400 bg-zinc-900 p-2 border border-zinc-800 font-mono">
-                        @rtbrok | {Nombre} | {Autor} | {Técnica} | {Medida} | {Precio} | {Código}
+                    <p class="text-[9px] text-zinc-500 mb-2">Incluir en mensaje:</p>
+                    <div class="share-options-grid" id="shareOptionsContainer">
+                        <label class="share-option"><input type="checkbox" checked disabled> Autor</label>
+                        <label class="share-option"><input type="checkbox" checked disabled> Técnica</label>
+                        <label class="share-option"><input type="checkbox" checked disabled> Medidas</label>
+                        <label class="share-option"><input type="checkbox" checked disabled> Precio</label>
+                        <!-- Opciones opcionales ocultas por defecto -->
+                        <label class="share-option hidden"><input type="checkbox" id="shareUbicacion"> Ubicación</label>
+                        <label class="share-option hidden"><input type="checkbox" id="shareEstatus"> Estatus</label>
+                        <label class="share-option hidden"><input type="checkbox" id="shareCliente"> Cliente</label>
+                        <label class="share-option hidden"><input type="checkbox" id="shareObservaciones"> Observaciones</label>
                     </div>
+                    <button onclick="toggleShareOptions()" class="text-[8px] text-indigo-400 hover:text-indigo-300 mt-1">
+                        <span id="shareToggleText">Mostrar más opciones</span>
+                    </button>
                 </div>
                 <div class="flex gap-3 pt-2 border-t border-zinc-900">
                     <button onclick="shareArtworkWhatsApp()" class="flex-1 bg-emerald-950/40 border border-emerald-700/50 text-emerald-300 text-[10px] font-medium py-2 flex items-center justify-center gap-1.5">
@@ -673,6 +677,9 @@
         const INITIAL_ARTWORKS = 9;
         const ARTWORKS_PER_PAGE = 9;
         let displayedArtworksCount = INITIAL_ARTWORKS;
+
+        // Estado para opciones de compartir
+        let shareOptionsVisible = false;
 
         // ============================================================
         // FUNCIÓN PARA REDIRIGIR AL LOGIN SI NO HAY SESIÓN
@@ -1345,27 +1352,35 @@
         }
 
         // ============================================================
-        // FUNCIÓN PARA COMPARTIR POR WHATSAPP - NUEVO FORMATO
+        // FUNCIÓN PARA COMPARTIR POR WHATSAPP CON OPCIONES
         // ============================================================
-        function getArtworkWhatsAppMessage(artwork) {
-            // Formato: @rtbrok | Nombre | Autor | Técnica | Medida | Precio público | código
-            const nombre = artwork.nombre_obra || 'Sin título';
-            const autor = artwork.autor || 'No especificado';
-            const tecnica = artwork.tipo_obra || 'No especificado';
-            
-            // Medidas formateadas
-            const medidas = [artwork.ancho && `${artwork.ancho}m`, artwork.alto && `${artwork.alto}m`, artwork.largo && `${artwork.largo}m`]
-                .filter(Boolean).join(' x ') || 'No especificadas';
-            
-            // Precio
-            const precio = artwork.precio_venta || artwork.precio_lista 
-                ? `$${Number(artwork.precio_venta || artwork.precio_lista).toLocaleString()} ${artwork.tipo_moneda || 'MXN'}` 
-                : 'No disponible';
-            
-            // Código (usamos el ID como código)
-            const codigo = artwork.id || 'N/A';
+        function getArtworkWhatsAppDescription(artwork) {
+            const withoutLinks = (value) => String(value || '')
+                .replace(/(?:https?:\/\/|www\.)\S+/gi, '')
+                .replace(/\s{2,}/g, ' ')
+                .trim();
 
-            return `@rtbrok | ${nombre} | ${autor} | ${tecnica} | ${medidas} | ${precio} | ${codigo}`;
+            const medidasStr = [
+                artwork.ancho && `Ancho: ${artwork.ancho} m`,
+                artwork.alto && `Alto: ${artwork.alto} m`,
+                artwork.largo && `Largo: ${artwork.largo} m`
+            ].filter(Boolean).join(' · ') || 'No especificadas';
+
+            const precioStr = (artwork.precio_venta || artwork.precio_lista)
+                ? `$${Number(artwork.precio_venta || artwork.precio_lista).toLocaleString()} ${artwork.tipo_moneda || 'MXN'}`
+                : 'No disponible';
+
+            const campos = [
+                '@rtbrok',
+                withoutLinks(artwork.nombre_obra) || 'Sin título',
+                withoutLinks(artwork.autor) || 'No especificado',
+                withoutLinks(artwork.tipo_obra) || 'No especificado',
+                withoutLinks(medidasStr),
+                withoutLinks(precioStr),
+                withoutLinks(artwork.id) || 'No especificado'
+            ];
+
+            return campos.join(' | ');
         }
 
         async function getArtworkImageFile(artwork) {
@@ -1395,7 +1410,7 @@
                 }
                 await navigator.share({
                     files: [file],
-                    text: getArtworkWhatsAppMessage(activeArtwork)
+                    text: getArtworkWhatsAppDescription(activeArtwork)
                 });
             } catch (error) {
                 if (error.name !== 'AbortError') showNotification(error.message || 'No fue posible compartir la obra.');
@@ -1405,6 +1420,22 @@
                     button.innerHTML = originalContent || '<i data-lucide="share-2" class="w-3.5 h-3.5"></i> WhatsApp';
                     lucide.createIcons();
                 }
+            }
+        };
+
+        // ============================================================
+        // TOGGLE OPCIONES DE COMPARTIR
+        // ============================================================
+        window.toggleShareOptions = function() {
+            shareOptionsVisible = !shareOptionsVisible;
+            const hiddenOptions = document.querySelectorAll('.share-option.hidden');
+            const toggleText = document.getElementById('shareToggleText');
+            if (shareOptionsVisible) {
+                hiddenOptions.forEach(el => el.classList.remove('hidden'));
+                toggleText.textContent = 'Mostrar menos opciones';
+            } else {
+                hiddenOptions.forEach(el => el.classList.add('hidden'));
+                toggleText.textContent = 'Mostrar más opciones';
             }
         };
 
@@ -1601,47 +1632,47 @@
 
         function getMockArtworks() {
             return [
-                { id: 'OBR-001', nombre_obra: 'Residencia Minimalista', autor: 'Carlos Mendoza', ubicacion: 'Puebla',
+                { id: 'm1', nombre_obra: 'Residencia Minimalista', autor: 'Carlos Mendoza', ubicacion: 'Puebla',
                     estatus: 'Consolidación', tipo_obra: 'Residencial', superficie: 250, precio_lista: 1200000,
                     fecha_registro: '2025-01-15', adjuntos: [{ url: 'https://images.unsplash.com/photo-1544816155-12df9643f363?w=400' }],
                     tags: ['moderno', 'minimalista'], ancho: 12, alto: 6, largo: 15, tipo_moneda: 'MXN',
                 promocionar: true, cliente: 'Familia González', observaciones: 'Excelente ubicación' },
-                { id: 'OBR-002', nombre_obra: 'Torre Corporativa', autor: 'Sofía Valdés', ubicacion: 'CDMX',
+                { id: 'm2', nombre_obra: 'Torre Corporativa', autor: 'Sofía Valdés', ubicacion: 'CDMX',
                     estatus: 'Bodega', tipo_obra: 'Comercial', superficie: 1500, precio_lista: 5000000,
                     fecha_registro: '2025-02-20', adjuntos: [{ url: 'https://images.unsplash.com/photo-1579783900882-c0d3dad7b119?w=400' }],
                     tags: ['corporativo'], ancho: 25, alto: 80, largo: 25, tipo_moneda: 'MXN', promocionar: false,
                     cliente: 'Empresa X', observaciones: 'Sin observaciones' },
-                { id: 'OBR-003', nombre_obra: 'Pabellón Botánico', autor: 'Estudio Arquitectura', ubicacion: 'Monterrey',
+                { id: 'm3', nombre_obra: 'Pabellón Botánico', autor: 'Estudio Arquitectura', ubicacion: 'Monterrey',
                     estatus: 'Vendida', tipo_obra: 'Cultural', superficie: 800, precio_lista: 2200000,
                     fecha_registro: '2024-11-10', adjuntos: [{ url: 'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=400' }],
                     tags: ['público'], ancho: 30, alto: 12, largo: 30, tipo_moneda: 'MXN', promocionar: false,
                     cliente: 'Gobierno', observaciones: 'Proyecto terminado' },
-                { id: 'OBR-004', nombre_obra: 'Casa del Bosque', autor: 'Grupo Z', ubicacion: 'Valle de Bravo',
+                { id: 'm4', nombre_obra: 'Casa del Bosque', autor: 'Grupo Z', ubicacion: 'Valle de Bravo',
                     estatus: 'Consolidación', tipo_obra: 'Residencial', superficie: 180, precio_lista: 850000,
                     fecha_registro: '2025-03-01', adjuntos: [{ url: 'https://images.unsplash.com/photo-1513364776144-60967b0f800f?w=400' }],
                     tags: ['sustentable'], ancho: 10, alto: 4, largo: 12, tipo_moneda: 'MXN', promocionar: false,
                     cliente: 'Sr. López', observaciones: 'En proceso de venta' },
-                { id: 'OBR-005', nombre_obra: 'Edificio Multifamiliar', autor: 'Arquitectos Asociados',
+                { id: 'm5', nombre_obra: 'Edificio Multifamiliar', autor: 'Arquitectos Asociados',
                     ubicacion: 'Guadalajara', estatus: 'Consolidación', tipo_obra: 'Residencial', superficie: 320,
                     precio_lista: 1800000, fecha_registro: '2025-03-15', adjuntos: [{ url: 'https://images.unsplash.com/photo-1574362848149-11496d93a7c7?w=400' }],
                     tags: ['multifamiliar'], ancho: 18, alto: 20, largo: 15, tipo_moneda: 'MXN', promocionar: false,
                     cliente: 'Inmobiliaria', observaciones: 'Sin observaciones' },
-                { id: 'OBR-006', nombre_obra: 'Centro Cultural', autor: 'Mónica Torres', ubicacion: 'Querétaro',
+                { id: 'm6', nombre_obra: 'Centro Cultural', autor: 'Mónica Torres', ubicacion: 'Querétaro',
                     estatus: 'Bodega', tipo_obra: 'Cultural', superficie: 1200, precio_lista: 3500000,
                     fecha_registro: '2024-12-01', adjuntos: [{ url: 'https://images.unsplash.com/photo-1578328819058-b69f3a3b0f6b?w=400' }],
                     tags: ['cultural'], ancho: 40, alto: 10, largo: 30, tipo_moneda: 'MXN', promocionar: false,
                     cliente: 'Ayuntamiento', observaciones: 'Proyecto en pausa' },
-                { id: 'OBR-007', nombre_obra: 'Oficinas Creativas', autor: 'Estudio NOMADA', ubicacion: 'CDMX',
+                { id: 'm7', nombre_obra: 'Oficinas Creativas', autor: 'Estudio NOMADA', ubicacion: 'CDMX',
                     estatus: 'Vendida', tipo_obra: 'Comercial', superficie: 450, precio_lista: 2800000,
                     fecha_registro: '2024-09-20', adjuntos: [{ url: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=400' }],
                     tags: ['creativo'], ancho: 15, alto: 4, largo: 20, tipo_moneda: 'USD', promocionar: true,
                     cliente: 'Tech Startups', observaciones: 'Venta exitosa' },
-                { id: 'OBR-008', nombre_obra: 'Casa de Campo', autor: 'Ignacio Ramírez', ubicacion: 'San Miguel de Allende',
+                { id: 'm8', nombre_obra: 'Casa de Campo', autor: 'Ignacio Ramírez', ubicacion: 'San Miguel de Allende',
                     estatus: 'Consolidación', tipo_obra: 'Residencial', superficie: 350, precio_lista: 950000,
                     fecha_registro: '2025-02-10', adjuntos: [{ url: 'https://images.unsplash.com/photo-1580587771525-78b9dba3b914?w=400' }],
                     tags: ['colonial'], ancho: 14, alto: 5, largo: 16, tipo_moneda: 'MXN', promocionar: false,
                     cliente: 'Sra. Martínez', observaciones: 'Propiedad histórica' },
-                { id: 'OBR-009', nombre_obra: 'Torre de Oficinas', autor: 'Arquitectura Moderna', ubicacion: 'Monterrey',
+                { id: 'm9', nombre_obra: 'Torre de Oficinas', autor: 'Arquitectura Moderna', ubicacion: 'Monterrey',
                     estatus: 'Bodega', tipo_obra: 'Comercial', superficie: 2000, precio_lista: 8000000,
                     fecha_registro: '2024-08-15', adjuntos: [{ url: 'https://images.unsplash.com/photo-1486718448742-163732cd1544?w=400' }],
                     tags: ['corporativo'], ancho: 30, alto: 100, largo: 30, tipo_moneda: 'MXN', promocionar: false,
