@@ -122,6 +122,43 @@
             margin-left: 2px;
         }
 
+        .quick-access-bar.reference-access {
+            display: grid;
+            grid-template-columns: repeat(5, 1fr);
+            gap: 8px;
+            padding: 10px 26px 14px;
+            background: #000;
+            border-bottom: 1px solid #202329;
+            overflow: visible;
+        }
+        .quick-access-bar.reference-access .action-btn {
+            position: relative;
+            height: 96px;
+            min-width: 0;
+            justify-content: center;
+            flex-direction: column;
+            gap: 8px;
+            padding: 7px 2px;
+            border-radius: 4px;
+            border-color: #25272c;
+            color: #f8fafc;
+        }
+        .quick-access-bar.reference-access .action-btn i {
+            font-size: 31px;
+            color: #f8fafc;
+        }
+        .quick-access-bar.reference-access .action-btn span {
+            color: #e4e4e7;
+            font-size: 11px;
+            text-align: center;
+        }
+        .quick-access-bar.reference-access .action-btn .badge {
+            position: absolute;
+            margin: 0;
+            transform: translate(25px, -20px);
+            font-size: 9px;
+        }
+
         .grid-4 {
             display: grid;
             grid-template-columns: repeat(4, 1fr);
@@ -190,8 +227,8 @@
 
         .artwork-grid {
             display: grid;
-            grid-template-columns: repeat(4, 1fr);
-            gap: 4px;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 2px;
             width: 100%;
         }
 
@@ -647,6 +684,9 @@
             color: #9ca3af;
             font-size: 12px;
         }
+        #tab-dashboard > section > .filters-bar {
+            display: none;
+        }
         @media (max-width: 390px) {
             .profile-header, .category-bar { padding-left: 18px; padding-right: 18px; }
             .profile-brand-name { font-size: 14px; }
@@ -668,22 +708,42 @@
     <div class="flex flex-col h-full w-full bg-black">
 
         <!-- Top Bar -->
-        <header class="flex items-center justify-between px-4 py-3 border-b border-[#171717] flex-shrink-0 bg-black">
-            <div class="flex items-center gap-2">
-                <div class="w-8 h-8 bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white font-bold text-[10px]">RT</div>
-                <h1 class="font-bold text-sm tracking-[0.2em] bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">R T B R O K</h1>
+        <section class="profile-header">
+            <div class="profile-topline">
+                <div class="profile-brand">
+                    <div class="profile-brand-mark">RT</div>
+                    <h1 class="profile-brand-name">R T B R O K</h1>
+                </div>
+                <div class="profile-account">
+                    <span id="headerUserName">Turijan Mx</span>
+                    <button onclick="handleUserClick()" aria-label="Perfil">
+                        <img id="sidebarUserAvatar" src="" alt="Usuario" class="user-avatar-xs" />
+                    </button>
+                    <button onclick="openLoginModal()" class="profile-settings" aria-label="Configuración">
+                        <i data-lucide="settings" class="w-6 h-6"></i>
+                    </button>
+                </div>
             </div>
-            <div class="flex items-center gap-2">
-                <span id="headerUserName" class="text-[10px] text-zinc-400 hidden sm:inline">Usuario</span>
-                <img id="sidebarUserAvatar" src="" alt="User" class="user-avatar-xs" onclick="handleUserClick()" />
-                <button onclick="openLoginModal()" class="text-zinc-500 p-1.5 hover:text-white transition">
-                    <i data-lucide="settings" class="w-4 h-4"></i>
-                </button>
+            <div class="profile-summary">
+                <div class="profile-avatar-wrap">
+                    <img id="profileAvatar" src="https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?w=200" alt="rtbrok" class="profile-avatar" />
+                    <button onclick="openAddTaskModal()" class="profile-add" aria-label="Nuevo registro">+</button>
+                </div>
+                <div class="profile-details">
+                    <h2>rtbrok <span class="profile-verified">●</span> <span class="text-zinc-400 text-lg">⌄</span></h2>
+                    <p class="profile-handle">@rtbrok | private art broker</p>
+                    <div class="profile-stats">
+                        <div><strong id="profileArtworkStat">566</strong><span>obra registrada</span></div>
+                        <div><strong>1,017</strong><span>coleccionistas</span></div>
+                        <div><strong>2,879</strong><span>oportunidades</span></div>
+                    </div>
+                </div>
             </div>
-        </header>
+            <p class="profile-bio"><span class="profile-category">Arte</span><br>Adquisiciones privadas de arte contemporáneo entre coleccionistas, artistas y galerías. Compra-venta, curaduría para espacios, obra por encargo.</p>
+        </section>
 
         <!-- BARRA DE ACCESOS DIRECTOS -->
-        <div class="quick-access-bar">
+        <div class="quick-access-bar reference-access">
             <a href="https://www.instagram.com/" target="_blank" class="action-btn">
                 <i class="fab fa-instagram"></i>
                 <span>Instagram</span>
@@ -704,13 +764,15 @@
             <a href="https://docs.google.com/forms/d/e/1FAIpQLSdC-_if3uzNyq3BuU3YhlUD1ONInOwe4Cv_G4MM1PJrnsDRuw/viewform?usp=header" target="_blank" class="action-btn">
                 <i data-lucide="file-text" class="w-4 h-4"></i>
                 <span>Certificados</span>
-                <span class="badge">form</span>
             </a>
-            <button onclick="switchTab('artworks')" class="action-btn">
-                <i data-lucide="image" class="w-4 h-4"></i>
-                <span>Obras</span>
-                <span class="badge" id="artworksCount">0</span>
-            </button>
+        </div>
+
+        <div class="category-bar">
+            <button class="category-button" onclick="openAddTaskModal()"><span class="category-icon accent">+</span><span>Nueva</span></button>
+            <button class="category-button" onclick="applyCategoryFilter('Escultura')"><span class="category-icon"><i data-lucide="landmark"></i></span><span>Escultura</span></button>
+            <button class="category-button" onclick="applyCategoryFilter('Pintura')"><span class="category-icon"><i data-lucide="brush"></i></span><span>Pintura</span></button>
+            <button class="category-button" onclick="applyCategoryFilter('Obra gráfica')"><span class="category-icon"><i data-lucide="image"></i></span><span>Obra gráfica</span></button>
+            <button class="category-button" onclick="resetFilters()"><span class="category-icon"><i data-lucide="grid-2x2"></i></span><span>Todos</span></button>
         </div>
 
         <!-- Scrollable contenido principal -->
@@ -734,9 +796,9 @@
                         <button onclick="resetFilters()">Limpiar</button>
                     </div>
 
-                    <div class="flex items-center justify-between mb-2 px-1 mt-2">
-                        <h2 class="text-xs font-medium text-zinc-300 tracking-wider">OBRAS RECIENTES</h2>
-                        <span class="text-[9px] text-zinc-500" id="totalArtworksLabel">0 obras</span>
+                    <div class="dashboard-heading">
+                        <h2>OBRAS RECIENTES</h2>
+                        <span id="totalArtworksLabel">0 obras</span>
                     </div>
                     <div id="artworksGrid" class="artwork-grid">
                         <!-- Renderizado por JS -->
@@ -797,22 +859,25 @@
 
         <!-- Bottom Navigation FLOTANTE (estilo Instagram) -->
         <nav class="bottom-nav-floating" id="floatingNav">
-            <button class="nav-item active" onclick="switchTab('dashboard')">
+            <button class="nav-item active" data-tab="dashboard" onclick="switchTab('dashboard')">
                 <i data-lucide="layout-grid"></i>
                 <span>Inicio</span>
             </button>
-            <button class="nav-item" onclick="switchTab('tasks')">
-                <i data-lucide="check-square"></i>
-                <span>Tareas</span>
-            </button>
             <button class="nav-item" onclick="openAddTaskModal()">
                 <i data-lucide="plus-circle"></i>
-                <span>Nuevo</span>
+                <span>Nuevo registro</span>
             </button>
-            <!-- Tab obras eliminada -->
-            <button class="nav-item" onclick="openLoginModal()">
-                <i data-lucide="user"></i>
-                <span>Perfil</span>
+            <a class="nav-item" href="https://docs.google.com/forms/d/e/1FAIpQLSdC-_if3uzNyq3BuU3YhlUD1ONInOwe4Cv_G4MM1PJrnsDRuw/viewform?usp=header" target="_blank">
+                <i data-lucide="file-text"></i>
+                <span>Certificado</span>
+            </a>
+            <a class="nav-item" href="https://frontline-zeta-ecru.vercel.app/movil/" target="_blank">
+                <i data-lucide="book-open"></i>
+                <span>Catálogo</span>
+            </a>
+            <button class="nav-item hidden" data-tab="tasks" onclick="switchTab('tasks')">
+                <i data-lucide="check-square"></i>
+                <span>Tareas</span>
             </button>
         </nav>
     </div>
@@ -1203,14 +1268,8 @@
                 }
             });
             // Actualizar nav items
-            document.querySelectorAll('.bottom-nav-floating .nav-item').forEach((el, idx) => {
-                // Saltar el item de obras si existe
-                const span = el.querySelector('span');
-                if (span && span.textContent === 'Obras') {
-                    el.classList.add('hidden-tab');
-                    return;
-                }
-                el.classList.toggle('active', idx === currentTabIdx);
+            document.querySelectorAll('.bottom-nav-floating .nav-item').forEach(el => {
+                el.classList.toggle('active', el.dataset.tab === tabName);
             });
             lucide.createIcons();
             if (tabName === 'artworks') {
@@ -1615,6 +1674,17 @@
             displayedArtworksCount = INITIAL_ARTWORKS;
             renderArtworks();
             renderFullArtworksGrid();
+        };
+
+        window.applyCategoryFilter = function(category) {
+            const select = document.getElementById('filterArtist');
+            const matchingArtist = Array.from(select.options).find(option => option.textContent === category);
+            if (matchingArtist) {
+                select.value = matchingArtist.value;
+                window.applyFilters();
+            } else {
+                showNotification('No hay obras de esta categoría disponibles');
+            }
         };
 
         window.applyFiltersFull = function() {
