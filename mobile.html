@@ -126,6 +126,9 @@
             display: grid;
             grid-template-columns: repeat(5, 1fr);
             gap: 8px;
+            min-height: 0;
+            max-height: none;
+            height: auto;
             padding: 10px 26px 14px;
             background: #000;
             border-bottom: 1px solid #202329;
@@ -767,12 +770,8 @@
             </a>
         </div>
 
-        <div class="category-bar">
+        <div class="category-bar" id="categoryBar">
             <button class="category-button" onclick="openAddTaskModal()"><span class="category-icon accent">+</span><span>Nueva</span></button>
-            <button class="category-button" onclick="applyCategoryFilter('Escultura')"><span class="category-icon"><i data-lucide="landmark"></i></span><span>Escultura</span></button>
-            <button class="category-button" onclick="applyCategoryFilter('Pintura')"><span class="category-icon"><i data-lucide="brush"></i></span><span>Pintura</span></button>
-            <button class="category-button" onclick="applyCategoryFilter('Obra gráfica')"><span class="category-icon"><i data-lucide="image"></i></span><span>Obra gráfica</span></button>
-            <button class="category-button" onclick="resetFilters()"><span class="category-icon"><i data-lucide="grid-2x2"></i></span><span>Todos</span></button>
         </div>
 
         <!-- Scrollable contenido principal -->
@@ -1063,6 +1062,44 @@
         const ENDPOINT_TASKS = 'https://script.google.com/macros/s/AKfycbxmPBIboe_Evn45ZHjtkjydbmlPRMuSax_sEiTc2iN8cqqi2i4-Pf_lOd6875cQXEd_yg/exec';
         const ENDPOINT_ARTWORKS = 'https://script.google.com/macros/s/AKfycbxyBzZ7duM3pKtobXHj8A2NgFpIarP5WPS71TKTH2uFMOXXL8rzo68-blixF8kgCwvl8w/exec';
 
+        const CATEGORY_DEFS = [
+            { key: 'pintura', label: 'Pintura', icon: 'brush' },
+            { key: 'escultura', label: 'Escultura', icon: 'landmark' },
+            { key: 'grafica', label: 'Gráfica', icon: 'image' },
+            { key: 'fotografia', label: 'Fotografía', icon: 'camera' },
+            { key: 'arte digital', label: 'Arte Digital', icon: 'sparkles' },
+            { key: 'instalacion', label: 'Instalación', icon: 'box' },
+            { key: 'objeto', label: 'Objeto', icon: 'package' }
+        ];
+
+        function normalizeTagText(tag) {
+            return (tag || '').toString().trim().toLowerCase().replace(/^#+/, '')
+                .normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/\s+/g, ' ');
+        }
+
+        function extractTagList(tags) {
+            if (Array.isArray(tags)) return tags.flatMap(item => extractTagList(item));
+            if (typeof tags === 'string') return tags.split(/[;,|\n]/).map(item => item.trim()).filter(Boolean);
+            if (tags && typeof tags === 'object') {
+                const candidate = tags.tag || tags.name || tags.value || tags.label;
+                return candidate ? [candidate.toString()] : [];
+            }
+            return [];
+        }
+
+        function resolveCategoryKey(tag) {
+            const normalized = normalizeTagText(tag);
+            if (!normalized) return '';
+            if (normalized === 'artedigital') return 'arte digital';
+            if (normalized === 'grafica') return 'grafica';
+            if (normalized === 'instalacion') return 'instalacion';
+            return CATEGORY_DEFS.some(category => category.key === normalized) ? normalized : '';
+        }
+
+        function getArtworkCategories(artwork) {
+            return [...new Set(extractTagList(artwork?.tags).map(resolveCategoryKey).filter(Boolean))];
+        }
+
         // ============================================================
         // ESTADO GLOBAL
         // ============================================================
@@ -1083,7 +1120,7 @@
         let displayedArtworksCount = INITIAL_ARTWORKS;
 
         let shareOptionsVisible = false;
-        let activeFilters = { artist: '', promo: '' };
+        let activeFilters = { artist: '', promo: '', category: '' };
         let activeFiltersFull = { artist: '', promo: '' };
 
         // ============================================================
@@ -1394,6 +1431,7 @@
                 populateProjectSelect();
                 populateResponsibleSelect();
                 populateArtistFilters();
+                renderCategoryBar();
                 updateArtworksCount();
                 lucide.createIcons();
             } catch (e) {
@@ -1404,6 +1442,7 @@
                 renderFullArtworksGrid();
                 renderDirectorsList();
                 populateArtistFilters();
+                renderCategoryBar();
                 updateArtworksCount();
                 lucide.createIcons();
             }
@@ -1594,6 +1633,9 @@
             if (filters.artist) {
                 result = result.filter(a => a.autor === filters.artist);
             }
+            if (filters.category) {
+                result = result.filter(a => getArtworkCategories(a).includes(filters.category));
+            }
             if (filters.promo !== '') {
                 const promoBool = filters.promo === 'true';
                 result = result.filter(a => a.promocionar === promoBool);
@@ -1661,7 +1703,7 @@
         window.applyFilters = function() {
             const artist = document.getElementById('filterArtist').value;
             const promo = document.getElementById('filterPromo').value;
-            activeFilters = { artist, promo };
+            activeFilters = { ...activeFilters, artist, promo };
             displayedArtworksCount = INITIAL_ARTWORKS;
             renderArtworks();
             renderFullArtworksGrid();
@@ -1670,22 +1712,44 @@
         window.resetFilters = function() {
             document.getElementById('filterArtist').value = '';
             document.getElementById('filterPromo').value = '';
-            activeFilters = { artist: '', promo: '' };
+            activeFilters = { artist: '', promo: '', category: '' };
             displayedArtworksCount = INITIAL_ARTWORKS;
             renderArtworks();
             renderFullArtworksGrid();
         };
 
         window.applyCategoryFilter = function(category) {
-            const select = document.getElementById('filterArtist');
-            const matchingArtist = Array.from(select.options).find(option => option.textContent === category);
-            if (matchingArtist) {
-                select.value = matchingArtist.value;
-                window.applyFilters();
-            } else {
+            const categoryKey = resolveCategoryKey(category);
+            const hasArtworks = appData.artworks.some(artwork => getArtworkCategories(artwork).includes(categoryKey));
+            if (!hasArtworks) {
                 showNotification('No hay obras de esta categoría disponibles');
+                return;
             }
+            activeFilters = { ...activeFilters, category: categoryKey };
+            displayedArtworksCount = INITIAL_ARTWORKS;
+            renderArtworks();
+            renderFullArtworksGrid();
         };
+
+        function renderCategoryBar() {
+            const container = document.getElementById('categoryBar');
+            if (!container) return;
+
+            const availableKeys = new Set(appData.artworks.flatMap(getArtworkCategories));
+            const availableCategories = CATEGORY_DEFS.filter(category => availableKeys.has(category.key)).slice(0, 4);
+            container.innerHTML = `
+                <button class="category-button" onclick="openAddTaskModal()">
+                    <span class="category-icon accent">+</span><span>Nueva</span>
+                </button>
+                ${availableCategories.map(category => `
+                    <button class="category-button" onclick="applyCategoryFilter('${category.key}')">
+                        <span class="category-icon"><i data-lucide="${category.icon}"></i></span>
+                        <span>${category.label}</span>
+                    </button>
+                `).join('')}
+            `;
+            lucide.createIcons();
+        }
 
         window.applyFiltersFull = function() {
             const artist = document.getElementById('filterArtistFull').value;
