@@ -136,30 +136,26 @@
         }
         .quick-access-bar.reference-access .action-btn {
             position: relative;
-            height: 96px;
+            height: 38px;
             min-width: 0;
             justify-content: center;
-            flex-direction: column;
-            gap: 8px;
-            padding: 7px 2px;
+            flex-direction: row;
+            gap: 0;
+            padding: 4px 2px;
             border-radius: 4px;
             border-color: #25272c;
             color: #f8fafc;
         }
         .quick-access-bar.reference-access .action-btn i {
-            font-size: 31px;
-            color: #f8fafc;
+            display: none;
         }
         .quick-access-bar.reference-access .action-btn span {
             color: #e4e4e7;
-            font-size: 11px;
+            font-size: 8px;
             text-align: center;
         }
         .quick-access-bar.reference-access .action-btn .badge {
-            position: absolute;
-            margin: 0;
-            transform: translate(25px, -20px);
-            font-size: 9px;
+            display: none;
         }
 
         .grid-4 {
@@ -360,7 +356,20 @@
 
         /* Ajuste para el contenido principal: dar espacio a la barra flotante */
         .main-content {
-            padding-bottom: 80px;
+            padding-bottom: 110px;
+        }
+
+        #appShell {
+            display: block;
+            height: 100vh;
+            overflow-x: hidden;
+            overflow-y: auto;
+        }
+        #appShell .main-content {
+            display: block;
+            height: auto;
+            min-height: 0;
+            overflow: visible;
         }
 
         .user-avatar-xs {
@@ -542,7 +551,7 @@
             color: #f8fafc;
             font-size: 17px;
             font-weight: 600;
-            letter-spacing: 0.42em;
+            letter-spacing: 0.08em;
         }
         .profile-account {
             display: flex;
@@ -708,17 +717,17 @@
     </div>
 
     <!-- App principal -->
-    <div class="flex flex-col h-full w-full bg-black">
+    <div id="appShell" class="flex flex-col h-full w-full bg-black">
 
         <!-- Top Bar -->
         <section class="profile-header">
             <div class="profile-topline">
                 <div class="profile-brand">
                     <div class="profile-brand-mark">RT</div>
-                    <h1 class="profile-brand-name">R T B R O K</h1>
+                    <h1 class="profile-brand-name">Opusone</h1>
                 </div>
                 <div class="profile-account">
-                    <span id="headerUserName">Turijan Mx</span>
+                    <span id="headerUserName" class="hidden">Turijan Mx</span>
                     <button onclick="handleUserClick()" aria-label="Perfil">
                         <img id="sidebarUserAvatar" src="" alt="Usuario" class="user-avatar-xs" />
                     </button>
@@ -1238,7 +1247,7 @@
                 avatar.src = user.photoURL || `https://ui-avatars.com/api/?background=2d2d2d&color=fff&size=32&name=${encodeURIComponent(user.displayName || 'User')}`;
                 avatar.title = user.displayName || 'Usuario';
                 nameEl.textContent = user.displayName || 'Usuario';
-                nameEl.classList.remove('hidden');
+                nameEl.classList.add('hidden');
                 document.getElementById('firebaseUserOption').classList.remove('hidden');
                 const modalAvatar = document.getElementById('modalUserAvatar');
                 const modalName = document.getElementById('modalUserName');
@@ -1251,7 +1260,7 @@
                 avatar.src = 'https://ui-avatars.com/api/?background=2d2d2d&color=fff&size=32&name=User';
                 avatar.title = 'Iniciar sesión';
                 nameEl.textContent = 'Invitado';
-                nameEl.classList.remove('hidden');
+                nameEl.classList.add('hidden');
                 document.getElementById('firebaseUserOption').classList.add('hidden');
             }
         }
