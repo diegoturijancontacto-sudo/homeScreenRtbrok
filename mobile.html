@@ -733,10 +733,10 @@
                     <button onclick="openAddTaskModal()" class="profile-add" aria-label="Nuevo registro">+</button>
                 </div>
                 <div class="profile-details">
-                    <h2>rtbrok <span class="profile-verified">●</span> <span class="text-zinc-400 text-lg">⌄</span></h2>
+                    <h2>@rtbrok <span class="profile-verified">●</span> <span class="text-zinc-400 text-lg">⌄</span></h2>
                     <p class="profile-handle">@rtbrok | private art broker</p>
                     <div class="profile-stats">
-                        <div><strong id="profileArtworkStat">566</strong><span>obra registrada</span></div>
+                        <div><strong id="profileArtworkStat">0</strong><span>obra registrada</span></div>
                         <div><strong>1,017</strong><span>coleccionistas</span></div>
                         <div><strong>2,879</strong><span>oportunidades</span></div>
                     </div>
@@ -1736,10 +1736,13 @@
             if (!container) return;
 
             const availableKeys = new Set(appData.artworks.flatMap(getArtworkCategories));
-            const availableCategories = CATEGORY_DEFS.filter(category => availableKeys.has(category.key)).slice(0, 4);
+            const availableCategories = CATEGORY_DEFS.filter(category => availableKeys.has(category.key)).slice(0, 3);
             container.innerHTML = `
                 <button class="category-button" onclick="openAddTaskModal()">
                     <span class="category-icon accent">+</span><span>Nueva</span>
+                </button>
+                <button class="category-button" onclick="resetFilters()">
+                    <span class="category-icon"><i data-lucide="grid-2x2"></i></span><span>Todas</span>
                 </button>
                 ${availableCategories.map(category => `
                     <button class="category-button" onclick="applyCategoryFilter('${category.key}')">
@@ -1798,6 +1801,8 @@
         function updateArtworksCount() {
             const el = document.getElementById('artworksCount');
             if (el) el.textContent = appData.artworks.length;
+            const profileStat = document.getElementById('profileArtworkStat');
+            if (profileStat) profileStat.textContent = appData.artworks.length.toLocaleString('es-MX');
         }
 
         // ============================================================
