@@ -122,6 +122,7 @@
             margin-left: 2px;
         }
 
+        /* ===== ACCESOS DIRECTOS GRISES SIN ICONOS ===== */
         .quick-access-bar.reference-access {
             display: grid;
             grid-template-columns: repeat(5, 1fr);
@@ -143,14 +144,15 @@
             gap: 0;
             padding: 4px 2px;
             border-radius: 4px;
-            border-color: #25272c;
-            color: #f8fafc;
+            border: 1px solid #2a2a2a;
+            background: #1a1a1a;
+            color: #9ca3af;
         }
         .quick-access-bar.reference-access .action-btn i {
             display: none;
         }
         .quick-access-bar.reference-access .action-btn span {
-            color: #e4e4e7;
+            color: #9ca3af;
             font-size: 8px;
             text-align: center;
         }
@@ -224,18 +226,17 @@
             margin-right: 4px;
         }
 
-        /* --- CUADRÍCULA DE OBRAS: SIN ESPACIOS --- */
         .artwork-grid {
             display: grid;
             grid-template-columns: repeat(3, 1fr);
-            gap: 0; /* Elimina el espacio entre imágenes */
+            gap: 2px;
             width: 100%;
         }
 
         .artwork-grid .art-item {
             aspect-ratio: 4 / 5;
             background: #0a0a0a;
-            border: none; /* Sin borde para que no haya separación visual */
+            border: 1px solid #141414;
             overflow: hidden;
             position: relative;
             border-radius: 0px;
@@ -246,7 +247,6 @@
             height: 100%;
             object-fit: cover;
             transition: transform 0.25s ease;
-            display: block; /* Elimina el espacio inferior que dejan las imágenes en línea */
         }
 
         .artwork-grid .art-item:active img {
@@ -725,8 +725,7 @@
         <section class="profile-header">
             <div class="profile-topline">
                 <div class="profile-brand">
-                    <div class="profile-brand-mark">RT</div>
-                    <h1 class="profile-brand-name">Opusone v1.12</h1>
+                    <h1 class="profile-brand-name">Opusone</h1>
                 </div>
                 <div class="profile-account">
                     <span id="headerUserName" class="hidden">Turijan Mx</span>
@@ -756,27 +755,21 @@
             <p class="profile-bio"><span class="profile-category">Arte</span><br>Adquisiciones privadas de arte contemporáneo entre coleccionistas, artistas y galerías. Compra-venta, curaduría para espacios, obra por encargo.</p>
         </section>
 
-        <!-- BARRA DE ACCESOS DIRECTOS -->
+        <!-- BARRA DE ACCESOS DIRECTOS (SIN ICONOS, GRISES) -->
         <div class="quick-access-bar reference-access">
             <a href="https://www.instagram.com/" target="_blank" class="action-btn">
-                <i class="fab fa-instagram"></i>
                 <span>Instagram</span>
             </a>
             <a href="https://diegoturijancontacto-sudo.github.io/Finanzas/mobile/" target="_blank" class="action-btn">
-                <i data-lucide="database" class="w-4 h-4"></i>
                 <span>Base de datos</span>
             </a>
             <a href="https://drive.google.com" target="_blank" class="action-btn">
-                <i data-lucide="hard-drive" class="w-4 h-4"></i>
                 <span>Drive</span>
             </a>
             <a href="https://frontline-zeta-ecru.vercel.app/movil/" target="_blank" class="action-btn">
-                <i data-lucide="book-open" class="w-4 h-4"></i>
                 <span>Catálogos</span>
-                <span class="badge">PDF</span>
             </a>
             <a href="https://docs.google.com/forms/d/e/1FAIpQLSdC-_if3uzNyq3BuU3YhlUD1ONInOwe4Cv_G4MM1PJrnsDRuw/viewform?usp=header" target="_blank" class="action-btn">
-                <i data-lucide="file-text" class="w-4 h-4"></i>
                 <span>Certificados</span>
             </a>
         </div>
