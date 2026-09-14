@@ -5,43 +5,29 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>RTBROK Mobile</title>
 
-    <!-- ============================================================ -->
-    <!-- DETECCIÓN PWA INSTALADA + ESCRITORIO -->
-    <!-- Solo redirige a index.html si la app está instalada como PWA -->
-    <!-- ============================================================ -->
     <script>
         (function() {
-            if (window.__rtbrokDesktopRedirect) return;
-            window.__rtbrokDesktopRedirect = true;
-    
-            // 1. Detectar si está corriendo como PWA instalada (standalone)
-            const isStandalone =
-                window.matchMedia('(display-mode: standalone)').matches ||
-                window.matchMedia('(display-mode: fullscreen)').matches ||
-                window.matchMedia('(display-mode: minimal-ui)').matches ||
-                window.navigator.standalone === true; // iOS Safari
-    
-            // Si NO está instalada, no hacemos nada (se queda en móvil normal)
-            if (!isStandalone) return;
-    
-            // 2. Detectar si es un dispositivo de escritorio
-            const isWideScreen = window.innerWidth >= 1024;
-    
-            const ua = navigator.userAgent.toLowerCase();
-            const isDesktopUA = /windows nt|macintosh|linux x86_64|linux i686|cros/i.test(ua) &&
-                                !/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile|tablet/i.test(ua);
-    
-            const isTouchDevice = ('ontouchstart' in window) ||
-                                  (navigator.maxTouchPoints > 0) ||
-                                  (navigator.msMaxTouchPoints > 0);
-    
-            const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
-    
-            const isDesktop = isWideScreen && (!isTouchDevice || isDesktopUA) && !isCoarsePointer;
-            const forceDesktopRedirect = isDesktopUA && !isTouchDevice;
-    
-            // 3. Solo redirige si está instalada Y es escritorio
-            if (isDesktop || forceDesktopRedirect) {
+            // Si venimos de una redirección de index, no volver a redirigir
+            if (sessionStorage.getItem('rtbrok_redirect_lock')) return;
+        
+            function isDesktop() {
+                const ua = (navigator.userAgent || navigator.vendor || window.opera || '').toLowerCase();
+                const uaMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile/i.test(ua);
+                const wideScreen = window.innerWidth >= 1024;
+                const finePointer = window.matchMedia('(pointer: fine)').matches;
+                const noTouch = !('ontouchstart' in window) && navigator.maxTouchPoints === 0;
+                // Es escritorio si: pantalla ancha Y (puntero fino O sin táctil) Y NO es UA móvil
+                return wideScreen && !uaMobile && (finePointer || noTouch);
+            }
+        
+            function isMobilePage() {
+                const path = window.location.pathname.toLowerCase();
+                return /mobile\.html?$/.test(path) || /\/movil\/?$/.test(path) || /\/mobile\/?$/.test(path);
+            }
+        
+            // Solo redirigir si estamos efectivamente en mobile y el dispositivo es desktop
+            if (isMobilePage() && isDesktop()) {
+                sessionStorage.setItem('rtbrok_redirect_lock', '1');
                 window.location.replace('index.html');
             }
         })();
