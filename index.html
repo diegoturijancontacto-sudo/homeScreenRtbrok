@@ -7,68 +7,35 @@
     
     <!-- DETECCIÓN DE DISPOSITIVO MÓVIL Y REDIRECCIÓN -->
     <script>
-        // Detección de dispositivo móvil y redirección
-        (function() {
-            // Función para detectar si es móvil
-            function isMobileDevice() {
-                // Verificar por ancho de pantalla
-                if (window.innerWidth <= 768) return true;
-                
-                // Verificar por user agent
-                const userAgent = navigator.userAgent || navigator.vendor || window.opera;
-                const mobileRegex = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile/i;
-                return mobileRegex.test(userAgent.toLowerCase());
-            }
-
-            // Función para obtener la ruta base (sin el nombre del archivo)
-            function getBasePath() {
-                const path = window.location.pathname;
-                const lastSlash = path.lastIndexOf('/');
-                if (lastSlash === -1) return './';
-                return path.substring(0, lastSlash + 1);
-            }
-
-            // Función para redirigir si es móvil y no estamos ya en mobile.html
-            function redirectIfMobile() {
-                // Verificar si ya estamos en mobile.html
-                const currentPath = window.location.pathname;
-                const isMobilePage = currentPath.includes('mobile.html?v=1.14') || 
-                                    currentPath.endsWith('/mobile') ||
-                                    currentPath.includes('/movil/') ||
-                                    currentPath.includes('mobile');
-                
-                if (isMobilePage) return;
-                
-                // Verificar si es móvil
-                if (isMobileDevice()) {
-                    // Obtener la URL base
-                    const basePath = getBasePath();
-                    // Construir la URL de destino
-                    const mobileUrl = basePath + 'mobile.html';
-                    // Redirigir
-                    window.location.href = mobileUrl;
-                }
-            }
-
-            // Ejecutar la redirección
-            redirectIfMobile();
-
-            // Escuchar cambios de tamaño para redirigir si la ventana se reduce a móvil
-            let resizeTimeout;
-            window.addEventListener('resize', function() {
-                clearTimeout(resizeTimeout);
-                resizeTimeout = setTimeout(() => {
-                    redirectIfMobile();
-                }, 300);
-            });
-
-            // Escuchar cambios en el estado de la página (para navegación SPA)
-            window.addEventListener('pageshow', function(event) {
-                if (event.persisted) {
-                    redirectIfMobile();
-                }
-            });
-        })();
+    (function() {
+        // Evitar redirecciones repetidas en la misma sesión
+        if (sessionStorage.getItem('rtbrok_redirect_lock')) return;
+    
+        function isMobile() {
+            const ua = (navigator.userAgent || navigator.vendor || window.opera || '').toLowerCase();
+            const uaMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile/i.test(ua);
+            const narrowScreen = window.innerWidth <= 768;
+            const coarsePointer = window.matchMedia('(pointer: coarse)').matches;
+            // Es móvil si: UA móvil, O pantalla estrecha con puntero táctil
+            return uaMobile || (narrowScreen && coarsePointer);
+        }
+    
+        // Verificar que NO estamos ya en mobile
+        function isMobilePage() {
+            const path = window.location.pathname.toLowerCase();
+            return /mobile\.html?$/.test(path) || /\/movil\/?$/.test(path) || /\/mobile\/?$/.test(path);
+        }
+    
+        if (!isMobilePage() && isMobile()) {
+            // Bloquear futuras redirecciones en esta sesión
+            sessionStorage.setItem('rtbrok_redirect_lock', '1');
+            window.location.replace('mobile.html');
+            return;
+        }
+    
+        // Solo bloquear si efectivamente redirigimos; si no, dejar libre
+        // (no ponemos el lock aquí para no impedir una redirección futura legítima)
+    })();
     </script>
 
     <script src="https://cdn.tailwindcss.com">
