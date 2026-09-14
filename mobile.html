@@ -4,6 +4,47 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=yes">
     <title>RTBROK Mobile</title>
+
+    <!-- ============================================================ -->
+    <!-- DETECCIÓN DE ESCRITORIO: Redirige a index.html si es desktop -->
+    <!-- ============================================================ -->
+    <script>
+        (function() {
+            // Si ya estamos redirigiendo, no hacer nada
+            if (window.__rtbrokDesktopRedirect) return;
+            window.__rtbrokDesktopRedirect = true;
+
+            // 1. Detección por ancho de pantalla (la más fiable)
+            const isWideScreen = window.innerWidth >= 1024;
+
+            // 2. Detección por user agent (para tablets/desktop)
+            const ua = navigator.userAgent.toLowerCase();
+            const isDesktopUA = /windows nt|macintosh|linux x86_64|linux i686|cros/i.test(ua) &&
+                                !/android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile|tablet/i.test(ua);
+
+            // 3. Detección por capacidades táctiles
+            const isTouchDevice = ('ontouchstart' in window) ||
+                                  (navigator.maxTouchPoints > 0) ||
+                                  (navigator.msMaxTouchPoints > 0);
+
+            // 4. Detección por orientación y tipo de puntero
+            const isCoarsePointer = window.matchMedia('(pointer: coarse)').matches;
+            const isFinePointer = window.matchMedia('(pointer: fine)').matches;
+
+            // Lógica: Si es pantalla ancha Y no es táctil (o es un SO de escritorio), redirigir
+            const isDesktop = isWideScreen && (!isTouchDevice || isDesktopUA) && !isCoarsePointer;
+
+            // También redirigir si es un UA de escritorio claro y no es tablet
+            const forceDesktopRedirect = isDesktopUA && !isTouchDevice;
+
+            if (isDesktop || forceDesktopRedirect) {
+                // Usar replace para no dejar la página móvil en el historial
+                window.location.replace('index.html');
+            }
+        })();
+    </script>
+    <!-- ============================================================ -->
+
     <script src="https://cdn.tailwindcss.com">
     </script>
     <script src="https://unpkg.com/lucide@latest">
