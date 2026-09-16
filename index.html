@@ -8,7 +8,6 @@
     <!-- DETECCIÓN DE DISPOSITIVO MÓVIL Y REDIRECCIÓN -->
     <script>
     (function() {
-        // Evitar redirecciones repetidas en la misma sesión
         if (sessionStorage.getItem('rtbrok_redirect_lock')) return;
     
         function isMobile() {
@@ -16,39 +15,29 @@
             const uaMobile = /android|webos|iphone|ipad|ipod|blackberry|iemobile|opera mini|mobile/i.test(ua);
             const narrowScreen = window.innerWidth <= 768;
             const coarsePointer = window.matchMedia('(pointer: coarse)').matches;
-            // Es móvil si: UA móvil, O pantalla estrecha con puntero táctil
             return uaMobile || (narrowScreen && coarsePointer);
         }
     
-        // Verificar que NO estamos ya en mobile
         function isMobilePage() {
             const path = window.location.pathname.toLowerCase();
             return /mobile\.html?$/.test(path) || /\/movil\/?$/.test(path) || /\/mobile\/?$/.test(path);
         }
     
         if (!isMobilePage() && isMobile()) {
-            // Bloquear futuras redirecciones en esta sesión
             sessionStorage.setItem('rtbrok_redirect_lock', '1');
             window.location.replace('mobile.html');
             return;
         }
-    
-        // Solo bloquear si efectivamente redirigimos; si no, dejar libre
-        // (no ponemos el lock aquí para no impedir una redirección futura legítima)
     })();
     </script>
 
-    <script src="https://cdn.tailwindcss.com">
-    </script>
-    <script src="https://unpkg.com/lucide@latest">
-    </script>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js">
-    </script>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jspdf/2.5.1/jspdf.umd.min.js"></script>
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 
-    <!-- Firebase SDKs (modular) -->
     <script type="importmap">
         {
             "imports": {
@@ -249,7 +238,6 @@
         .user-avatar-small:hover {
             border-color: rgba(255,255,255,0.3);
         }
-        /* Overlay de carga */
         .loading-overlay {
             position: fixed;
             inset: 0;
@@ -282,11 +270,477 @@
             font-size: 12px;
             letter-spacing: 0.1em;
         }
+
+        /* ===== NUEVO: PANEL DE TAREAS ESTILO BLOC DE NOTAS ===== */
+        .notepad-task-list {
+            counter-reset: task-counter;
+        }
+        .notepad-task-item {
+            counter-increment: task-counter;
+            position: relative;
+            display: flex;
+            align-items: flex-start;
+            gap: 10px;
+            padding: 10px 12px 10px 38px;
+            border-bottom: 1px solid rgba(255,255,255,0.03);
+            transition: background 0.2s ease;
+            min-height: 48px;
+        }
+        .notepad-task-item::before {
+            content: counter(task-counter);
+            position: absolute;
+            left: 10px;
+            top: 10px;
+            font-size: 11px;
+            font-weight: 600;
+            color: #52525b;
+            font-family: 'Inter', monospace;
+            width: 18px;
+            text-align: right;
+        }
+        .notepad-task-item:hover {
+            background: rgba(255,255,255,0.02);
+        }
+        .notepad-task-item .task-actions {
+            display: flex;
+            align-items: center;
+            gap: 4px;
+            opacity: 0;
+            transition: opacity 0.2s ease;
+            pointer-events: none;
+            flex-shrink: 0;
+        }
+        .notepad-task-item:hover .task-actions {
+            opacity: 1;
+            pointer-events: auto;
+        }
+        .notepad-task-item .task-text {
+            flex: 1;
+            min-width: 0;
+        }
+        .notepad-task-item .task-text .task-title {
+            font-size: 12px;
+            font-weight: 500;
+            color: #e4e4e7;
+            line-height: 1.3;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .notepad-task-item .task-text .task-meta {
+            font-size: 10px;
+            color: #71717a;
+            margin-top: 2px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+        .notepad-task-item .task-meta .resp {
+            color: #a1a1aa;
+        }
+
+        /* Botones de acción mini */
+        .mini-action-btn {
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            width: 26px;
+            height: 26px;
+            border: 1px solid rgba(255,255,255,0.08);
+            background: rgba(255,255,255,0.03);
+            color: #a1a1aa;
+            transition: all 0.15s ease;
+            cursor: pointer;
+        }
+        .mini-action-btn:hover {
+            background: rgba(255,255,255,0.08);
+            color: #fff;
+            border-color: rgba(255,255,255,0.2);
+        }
+        .mini-action-btn.start:hover {
+            color: #60a5fa;
+            border-color: rgba(96,165,250,0.4);
+        }
+        .mini-action-btn.review:hover {
+            color: #fbbf24;
+            border-color: rgba(251,191,36,0.4);
+        }
+        .mini-action-btn.approve:hover {
+            color: #34d399;
+            border-color: rgba(52,211,153,0.4);
+        }
+        .mini-action-btn.pause:hover {
+            color: #f87171;
+            border-color: rgba(248,113,113,0.4);
+        }
+
+        /* ===== NUEVO: TABS Y BOTÓN FLOTANTES ===== */
+        .floating-tabs {
+            position: absolute;
+            top: 12px;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 30;
+            display: flex;
+            align-items: center;
+            gap: 0;
+            background: rgba(9,9,11,0.85);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 999px;
+            padding: 3px;
+            box-shadow: 0 8px 32px rgba(0,0,0,0.6);
+        }
+        .floating-tab {
+            padding: 5px 16px;
+            font-size: 11px;
+            font-weight: 500;
+            color: #71717a;
+            border-radius: 999px;
+            transition: all 0.2s ease;
+            cursor: pointer;
+            border: none;
+            background: transparent;
+            white-space: nowrap;
+        }
+        .floating-tab.active {
+            background: #fff;
+            color: #000;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(255,255,255,0.15);
+        }
+        .floating-tab:not(.active):hover {
+            color: #d4d4d8;
+            background: rgba(255,255,255,0.04);
+        }
+        .floating-add-btn {
+            position: absolute;
+            top: 12px;
+            right: 12px;
+            z-index: 30;
+            width: 32px;
+            height: 32px;
+            border-radius: 50%;
+            background: #4f46e5;
+            color: #fff;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: none;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 16px rgba(79,70,229,0.4);
+        }
+        .floating-add-btn:hover {
+            background: #6366f1;
+            transform: scale(1.08);
+            box-shadow: 0 6px 24px rgba(79,70,229,0.6);
+        }
+        .floating-add-btn:active {
+            transform: scale(0.96);
+        }
+
+        /* ===== NUEVO: MODAL NUEVA TAREA ESTILO GOOGLE DOCS ===== */
+        .docs-modal {
+            position: fixed;
+            inset: 0;
+            background: #0a0a0b;
+            z-index: 100;
+            display: flex;
+            flex-direction: column;
+            animation: docsFadeIn 0.25s ease;
+        }
+        @keyframes docsFadeIn {
+            from { opacity: 0; transform: translateY(8px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+        .docs-modal.hidden {
+            display: none;
+        }
+        /* Barra superior */
+        .docs-topbar {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.06);
+            background: rgba(9,9,11,0.9);
+            backdrop-filter: blur(12px);
+            flex-shrink: 0;
+            gap: 12px;
+        }
+        .docs-topbar-left {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            min-width: 0;
+            flex: 1;
+        }
+        .docs-topbar-left .logo {
+            font-size: 11px;
+            font-weight: 700;
+            color: #52525b;
+            letter-spacing: 0.15em;
+            flex-shrink: 0;
+        }
+        .docs-topbar-left .doc-title-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #f4f4f5;
+            font-size: 14px;
+            font-weight: 600;
+            font-family: 'Inter', sans-serif;
+            padding: 2px 4px;
+            border-radius: 4px;
+            width: 100%;
+            max-width: 320px;
+            transition: background 0.15s;
+        }
+        .docs-topbar-left .doc-title-input:hover {
+            background: rgba(255,255,255,0.04);
+        }
+        .docs-topbar-left .doc-title-input:focus {
+            background: rgba(255,255,255,0.06);
+            outline: 1px solid rgba(99,102,241,0.5);
+        }
+        .docs-topbar-left .doc-subtitle-input {
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #71717a;
+            font-size: 11px;
+            font-weight: 400;
+            font-family: 'Inter', sans-serif;
+            padding: 2px 4px;
+            border-radius: 4px;
+            width: 100%;
+            max-width: 280px;
+            transition: background 0.15s;
+        }
+        .docs-topbar-left .doc-subtitle-input:hover {
+            background: rgba(255,255,255,0.04);
+        }
+        .docs-topbar-left .doc-subtitle-input:focus {
+            background: rgba(255,255,255,0.06);
+            outline: 1px solid rgba(99,102,241,0.5);
+        }
+        .docs-topbar-right {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            flex-shrink: 0;
+        }
+        .docs-btn {
+            padding: 6px 16px;
+            font-size: 11px;
+            font-weight: 600;
+            border: none;
+            border-radius: 6px;
+            cursor: pointer;
+            transition: all 0.15s ease;
+            font-family: 'Inter', sans-serif;
+            white-space: nowrap;
+        }
+        .docs-btn.cancel {
+            background: transparent;
+            color: #a1a1aa;
+            border: 1px solid rgba(255,255,255,0.08);
+        }
+        .docs-btn.cancel:hover {
+            background: rgba(255,255,255,0.04);
+            color: #e4e4e7;
+        }
+        .docs-btn.create {
+            background: #4f46e5;
+            color: #fff;
+        }
+        .docs-btn.create:hover {
+            background: #6366f1;
+        }
+        .docs-btn.create:disabled {
+            opacity: 0.5;
+            cursor: not-allowed;
+        }
+        /* Barra de parámetros (borde superior) */
+        .docs-param-bar {
+            display: flex;
+            align-items: center;
+            gap: 0;
+            padding: 0 16px;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            background: rgba(9,9,11,0.6);
+            flex-shrink: 0;
+            overflow-x: auto;
+            scrollbar-width: none;
+        }
+        .docs-param-bar::-webkit-scrollbar {
+            display: none;
+        }
+        .docs-param-item {
+            display: flex;
+            align-items: center;
+            gap: 6px;
+            padding: 8px 14px;
+            border-right: 1px solid rgba(255,255,255,0.04);
+            flex-shrink: 0;
+        }
+        .docs-param-item:last-child {
+            border-right: none;
+        }
+        .docs-param-item label {
+            font-size: 9px;
+            font-weight: 600;
+            text-transform: uppercase;
+            letter-spacing: 0.08em;
+            color: #52525b;
+            white-space: nowrap;
+        }
+        .docs-param-item select,
+        .docs-param-item input {
+            background: rgba(255,255,255,0.04);
+            border: 1px solid rgba(255,255,255,0.06);
+            color: #d4d4d8;
+            font-size: 11px;
+            font-family: 'Inter', sans-serif;
+            padding: 4px 8px;
+            border-radius: 4px;
+            outline: none;
+            transition: border-color 0.15s, background 0.15s;
+            min-width: 0;
+        }
+        .docs-param-item select:focus,
+        .docs-param-item input:focus {
+            border-color: rgba(99,102,241,0.6);
+            background: rgba(255,255,255,0.06);
+        }
+        .docs-param-item select option {
+            background: #18181b;
+            color: #e4e4e7;
+        }
+        .docs-param-item .param-badge {
+            font-size: 10px;
+            color: #818cf8;
+            background: rgba(99,102,241,0.1);
+            border: 1px solid rgba(99,102,241,0.2);
+            padding: 2px 8px;
+            border-radius: 4px;
+            white-space: nowrap;
+        }
+        /* Área de contenido (documento) */
+        .docs-body {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            justify-content: center;
+            padding: 40px 24px 80px;
+        }
+        .docs-page {
+            width: 100%;
+            max-width: 720px;
+            background: #0f0f11;
+            border: 1px solid rgba(255,255,255,0.06);
+            border-radius: 8px;
+            padding: 48px 56px;
+            min-height: 400px;
+            box-shadow: 0 4px 40px rgba(0,0,0,0.5);
+        }
+        .docs-page .docs-title-display {
+            font-size: 28px;
+            font-weight: 700;
+            color: #f4f4f5;
+            margin-bottom: 4px;
+            line-height: 1.2;
+            outline: none;
+            border: none;
+            background: transparent;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+            padding: 0;
+        }
+        .docs-page .docs-title-display::placeholder {
+            color: #3f3f46;
+        }
+        .docs-page .docs-subtitle-display {
+            font-size: 14px;
+            font-weight: 400;
+            color: #71717a;
+            margin-bottom: 32px;
+            outline: none;
+            border: none;
+            background: transparent;
+            width: 100%;
+            font-family: 'Inter', sans-serif;
+            padding: 0;
+            border-bottom: 1px solid rgba(255,255,255,0.04);
+            padding-bottom: 16px;
+        }
+        .docs-page .docs-subtitle-display::placeholder {
+            color: #3f3f46;
+        }
+        .docs-page .docs-content-input {
+            width: 100%;
+            background: transparent;
+            border: none;
+            outline: none;
+            color: #a1a1aa;
+            font-size: 13px;
+            font-family: 'Inter', sans-serif;
+            line-height: 1.7;
+            resize: none;
+            min-height: 200px;
+            padding: 0;
+        }
+        .docs-page .docs-content-input::placeholder {
+            color: #3f3f46;
+        }
+        /* Pie de página */
+        .docs-footer {
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 8px 16px;
+            border-top: 1px solid rgba(255,255,255,0.04);
+            background: rgba(9,9,11,0.6);
+            flex-shrink: 0;
+            font-size: 10px;
+            color: #52525b;
+        }
+        .docs-footer .status-dot {
+            width: 6px;
+            height: 6px;
+            border-radius: 50%;
+            background: #34d399;
+            display: inline-block;
+            margin-right: 6px;
+        }
+        @media (max-width: 640px) {
+            .docs-page {
+                padding: 24px 20px;
+            }
+            .docs-page .docs-title-display {
+                font-size: 22px;
+            }
+            .docs-param-bar {
+                padding: 0 8px;
+            }
+            .docs-param-item {
+                padding: 6px 8px;
+            }
+            .docs-param-item label {
+                font-size: 8px;
+            }
+            .docs-param-item select,
+            .docs-param-item input {
+                font-size: 10px;
+                padding: 3px 6px;
+            }
+        }
     </style>
 </head>
 <body class="h-full bg-black text-slate-100 flex overflow-hidden select-none">
 
-    <!-- Overlay de carga mientras se verifica autenticación -->
+    <!-- Overlay de carga -->
     <div id="loadingOverlay" class="loading-overlay">
         <div class="loading-spinner"></div>
         <div class="loading-text">VERIFICANDO SESIÓN</div>
@@ -301,7 +755,6 @@
             <div class="w-8 h-[1px] bg-zinc-950"></div>
             <a href="https://www.instagram.com/" target="_blank" class="group flex flex-col items-center gap-1.5 text-zinc-400 hover:text-white transition">
                 <div class="w-11 h-11 bg-zinc-900/40 group-hover:bg-zinc-900 border border-transparent group-hover:border-zinc-800 flex items-center justify-center transition shadow-lg">
-                    <!-- Quita data-lucide y cambia las clases -->
                     <i class="fab fa-instagram fa-lg"></i>
                 </div>
                 <span class="text-[10px] font-medium tracking-tight">Instagram</span>
@@ -332,7 +785,6 @@
             </a>
         </div>
         <div class="flex flex-col items-center gap-4">
-            <!-- Avatar del usuario autenticado -->
             <div id="userAvatarContainer" class="hidden">
                 <img id="sidebarUserAvatar" src="" alt="User" class="user-avatar-small" onclick="handleUserClick()" title="Usuario autenticado">
             </div>
@@ -352,7 +804,6 @@
         <header class="w-full px-6 sm:px-10 py-5 flex items-center justify-between border-b border-zinc-900 shrink-0">
             <div class="flex items-center gap-4">
                 <h1 class="font-bold text-lg sm:text-xl tracking-[0.25em] bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">R T B R O K</h1>
-                <!-- Información del usuario autenticado -->
                 <div id="headerUserInfo" class="hidden text-xs text-zinc-400 border-l border-zinc-800 pl-4">
                     <span id="headerUserName" class="text-white font-medium">Usuario</span>
                     <span class="text-zinc-500">·</span>
@@ -380,21 +831,20 @@
                 <div class="flex flex-col gap-8 w-full px-6 sm:px-8 pt-8 max-w-7xl mx-auto">
                     <!-- Top Grid: TAREAS y CHAT -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- TAREAS WIDGET -->
-                        <section class="bg-zinc-950 border border-zinc-900 p-5 sm:p-6 flex flex-col h-[420px] shadow-2xl relative">
-                            <div class="flex items-center justify-between mb-4">
-                                <div class="flex items-center gap-1 bg-black p-1 border border-zinc-800">
-                                    <button onclick="switchTaskWidgetTab('equipo')" id="widget-tab-equipo" class="px-3 py-1 text-xs font-semibold bg-indigo-600 text-white transition">Equipo</button>
-                                    <button onclick="switchTaskWidgetTab('yo')" id="widget-tab-yo" class="px-3 py-1 text-xs font-medium text-slate-400 hover:text-white transition">Yo</button>
-                                </div>
-                                <div class="flex items-center gap-2">
-                                    <span id="widget-title" class="font-semibold text-sm text-slate-200">Equipo</span>
-                                    <button onclick="openAddTaskModal()" id="btn-add-task-equipo" class="p-1.5 bg-indigo-600/20 hover:bg-indigo-600/30 text-indigo-400 hover:text-indigo-300 transition" title="Añadir tarea">
-                                        <i data-lucide="plus" class="w-4 h-4"></i>
-                                    </button>
-                                </div>
+                        <!-- TAREAS WIDGET - REDISEÑADO -->
+                        <section class="relative bg-zinc-950 border border-zinc-900 p-5 sm:p-6 flex flex-col h-[420px] shadow-2xl">
+                            <!-- Tabs flotantes -->
+                            <div class="floating-tabs" id="floating-task-tabs">
+                                <button onclick="switchTaskWidgetTab('equipo')" id="widget-tab-equipo" class="floating-tab active">Equipo</button>
+                                <button onclick="switchTaskWidgetTab('yo')" id="widget-tab-yo" class="floating-tab">Yo</button>
                             </div>
-                            <div id="widget-tasks-equipo-pane" class="flex-1 overflow-y-auto pr-1 flex flex-col bg-black border border-zinc-800 divide-y divide-zinc-800/80">
+                            <!-- Botón flotante añadir -->
+                            <button onclick="openAddTaskModal()" id="btn-add-task-equipo" class="floating-add-btn" title="Añadir tarea">
+                                <i data-lucide="plus" class="w-4 h-4"></i>
+                            </button>
+
+                            <!-- Lista de tareas estilo bloc de notas -->
+                            <div id="widget-tasks-equipo-pane" class="flex-1 overflow-y-auto pr-1 flex flex-col bg-black border border-zinc-800 notepad-task-list mt-14">
                                 <div class="flex items-center justify-between p-3 animate-pulse">
                                     <div class="flex items-center gap-3">
                                         <div class="w-2 h-2 bg-zinc-800"></div>
@@ -406,7 +856,7 @@
                                     <div class="h-5 w-16 bg-zinc-800"></div>
                                 </div>
                             </div>
-                            <div id="widget-tasks-yo-pane" class="flex-1 overflow-y-auto pr-1 hidden flex-col bg-black border border-zinc-800">
+                            <div id="widget-tasks-yo-pane" class="flex-1 overflow-y-auto pr-1 hidden flex-col bg-black border border-zinc-800 mt-14">
                                 <div class="p-2 border-b border-zinc-800 flex gap-2">
                                     <input type="text" id="new-local-task-input" placeholder="Nueva tarea personal..." class="flex-1 bg-zinc-900 border border-zinc-700 px-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500">
                                     <button onclick="addLocalTask()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 text-xs font-medium transition">Añadir</button>
@@ -574,11 +1024,9 @@
             </div>
 
             <div class="grid grid-cols-1 md:grid-cols-2 gap-6">
-                <!-- Imagen principal -->
                 <div class="bg-zinc-900 overflow-hidden rounded-sm">
                     <img id="detail-image" src="" alt="Obra" class="w-full h-auto object-cover max-h-[400px]">
                 </div>
-                <!-- Información -->
                 <div class="space-y-4">
                     <div class="grid grid-cols-2 gap-3 text-sm">
                         <div>
@@ -621,7 +1069,6 @@
                 </div>
             </div>
 
-            <!-- Documentos y Adjuntos -->
             <div class="mt-6 pt-4 border-t border-zinc-900">
                 <div class="flex gap-6 text-xs">
                     <div class="flex-1">
@@ -692,7 +1139,7 @@
         </div>
     </div>
 
-    <!-- MODAL: Login / Selección de Director (con integración Firebase) -->
+    <!-- MODAL: Login / Selección de Director -->
     <div id="login-modal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-4">
         <div class="bg-zinc-950 border border-zinc-900 w-full max-w-md p-6 shadow-2xl flex flex-col gap-5">
             <div class="flex items-center justify-between border-b border-zinc-900 pb-4">
@@ -702,7 +1149,6 @@
                 <button onclick="closeLoginModal()" class="text-zinc-500 hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
 
-            <!-- Opción: Usuario de Firebase (si ya está autenticado) -->
             <div id="firebaseUserOption" class="hidden flex flex-col gap-2">
                 <p class="text-xs text-zinc-400">Sesión activa con Google:</p>
                 <div class="flex items-center gap-3 p-3 bg-zinc-900 border border-zinc-800 rounded-sm">
@@ -720,7 +1166,6 @@
                 </button>
             </div>
 
-            <!-- Separador -->
             <div class="relative" id="authSeparator">
                 <div class="absolute inset-0 flex items-center">
                     <div class="w-full border-t border-zinc-800/60"></div>
@@ -730,12 +1175,10 @@
                 </div>
             </div>
 
-            <!-- Lista de Directores (sistema local) -->
             <div id="login-users-list" class="flex flex-col gap-2 max-h-60 overflow-y-auto">
                 <div class="text-center text-zinc-500 text-xs py-4">Cargando usuarios...</div>
             </div>
 
-            <!-- Botón para ir a login.html -->
             <div class="mt-2 pt-3 border-t border-zinc-900">
                 <button onclick="goToLoginPage()" class="w-full text-xs text-zinc-400 hover:text-white transition py-2 flex items-center justify-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
@@ -749,72 +1192,91 @@
         </div>
     </div>
 
-    <!-- MODAL: Crear Tarea -->
-    <div id="select-project-modal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-zinc-950 border border-zinc-900 w-full max-w-lg p-6 shadow-2xl flex flex-col gap-5">
-            <div class="flex items-center justify-between border-b border-zinc-900 pb-4">
-                <h3 class="font-bold text-sm text-slate-100 flex items-center gap-2">
-                    <i data-lucide="folder-tree" class="w-4 h-4 text-cyan-400"></i> Nueva Tarea
-                </h3>
-                <button onclick="closeSelectProjectModal()" class="text-zinc-500 hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
-            </div>
-            <div class="flex flex-col gap-4">
-                <div class="flex items-center gap-2 p-2 bg-indigo-600/10 border border-indigo-600/20">
-                    <i data-lucide="user" class="w-4 h-4 text-indigo-400"></i>
-                    <span class="text-xs text-slate-300">Creando como: <span id="auth-user-display" class="font-semibold text-indigo-400">-</span></span>
-                </div>
-                <div class="flex flex-col gap-2">
-                    <label class="text-xs font-semibold text-slate-300">Proyecto</label>
-                    <select id="project-select" class="bg-zinc-900 border border-zinc-800 px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
-                        <option value="">Selecciona un proyecto...</option>
-                    </select>
-                </div>
-                <div class="flex flex-col gap-2">
-                    <label class="text-xs font-semibold text-slate-300">Subproyecto</label>
-                    <select id="subproject-select" class="bg-zinc-900 border border-zinc-800 px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500" disabled>
-                        <option value="">Primero selecciona un proyecto</option>
-                    </select>
-                </div>
-                <div class="flex flex-col gap-2">
-                    <label class="text-xs font-semibold text-slate-300">Asignar a (Responsable)</label>
-                    <select id="responsible-select" class="bg-zinc-900 border border-zinc-800 px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
-                        <option value="">Selecciona un responsable...</option>
-                    </select>
-                    <p class="text-[10px] text-slate-500">Puedes asignar la tarea a cualquier usuario del sistema</p>
-                </div>
-                <div class="flex flex-col gap-2">
-                    <label class="text-xs font-semibold text-slate-300">Detalles de la tarea</label>
-                    <input type="text" id="new-task-details" placeholder="Ej: Revisar documentación..." class="bg-zinc-900 border border-zinc-800 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500">
-                    <textarea id="new-task-description" placeholder="Descripción detallada..." class="bg-zinc-900 border border-zinc-800 px-3 py-2 text-sm text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500 h-16 resize-none"></textarea>
-                </div>
-                <div class="grid grid-cols-2 gap-3">
-                    <div class="flex flex-col gap-2">
-                        <label class="text-xs font-semibold text-slate-300">Prioridad</label>
-                        <select id="new-task-priority" class="bg-zinc-900 border border-zinc-800 px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
-                            <option value="baja">Baja</option>
-                            <option value="media" selected>Media</option>
-                            <option value="alta">Alta</option>
-                            <option value="urgente">Urgente</option>
-                        </select>
-                    </div>
-                    <div class="flex flex-col gap-2">
-                        <label class="text-xs font-semibold text-slate-300">Fecha Límite</label>
-                        <input type="date" id="new-task-deadline" class="bg-zinc-900 border border-zinc-800 px-3 py-2 text-sm text-slate-200 focus:outline-none focus:border-indigo-500">
-                    </div>
+    <!-- ============================================================ -->
+    <!-- MODAL: NUEVA TAREA - ESTILO GOOGLE DOCS (PANTALLA COMPLETA) -->
+    <!-- ============================================================ -->
+    <div id="docs-task-modal" class="docs-modal hidden">
+        <!-- Barra superior -->
+        <div class="docs-topbar">
+            <div class="docs-topbar-left">
+                <span class="logo">RTBROK</span>
+                <div class="flex flex-col min-w-0">
+                    <input type="text" id="docs-task-title" class="doc-title-input" placeholder="Título de la tarea" autocomplete="off">
+                    <input type="text" id="docs-task-subtitle" class="doc-subtitle-input" placeholder="Subtítulo o descripción breve" autocomplete="off">
                 </div>
             </div>
-            <div class="flex items-center justify-end gap-2 pt-3 border-t border-zinc-900">
-                <button onclick="closeSelectProjectModal()" class="px-4 py-2 text-xs font-medium bg-zinc-900 hover:bg-zinc-800 text-zinc-300 transition">Cancelar</button>
-                <button onclick="confirmAddTask()" class="px-4 py-2 text-xs font-medium bg-indigo-600 hover:bg-indigo-500 text-white transition flex items-center gap-2">
-                    <i data-lucide="plus" class="w-4 h-4"></i> Crear Tarea
+            <div class="docs-topbar-right">
+                <button onclick="closeDocsTaskModal()" class="docs-btn cancel">Cancelar</button>
+                <button onclick="confirmDocsTask()" id="docs-create-btn" class="docs-btn create">
+                    <i data-lucide="plus" class="w-3.5 h-3.5 inline-block mr-1"></i> Crear tarea
                 </button>
+            </div>
+        </div>
+
+        <!-- Barra de parámetros (borde superior) -->
+        <div class="docs-param-bar">
+            <div class="docs-param-item">
+                <label>Proyecto</label>
+                <select id="docs-project-select">
+                    <option value="">Selecciona...</option>
+                </select>
+            </div>
+            <div class="docs-param-item">
+                <label>Subproyecto</label>
+                <select id="docs-subproject-select" disabled>
+                    <option value="">Primero proyecto</option>
+                </select>
+            </div>
+            <div class="docs-param-item">
+                <label>Responsable</label>
+                <select id="docs-responsible-select">
+                    <option value="">Selecciona...</option>
+                </select>
+            </div>
+            <div class="docs-param-item">
+                <label>Prioridad</label>
+                <select id="docs-priority-select">
+                    <option value="baja">Baja</option>
+                    <option value="media" selected>Media</option>
+                    <option value="alta">Alta</option>
+                    <option value="urgente">Urgente</option>
+                </select>
+            </div>
+            <div class="docs-param-item">
+                <label>Fecha límite</label>
+                <input type="date" id="docs-deadline-input">
+            </div>
+            <div class="docs-param-item">
+                <label>Creado por</label>
+                <span id="docs-auth-user" class="param-badge">—</span>
+            </div>
+        </div>
+
+        <!-- Cuerpo del documento -->
+        <div class="docs-body">
+            <div class="docs-page">
+                <input type="text" id="docs-page-title" class="docs-title-display" placeholder="Título de la tarea" autocomplete="off">
+                <input type="text" id="docs-page-subtitle" class="docs-subtitle-display" placeholder="Descripción breve" autocomplete="off">
+                <textarea id="docs-page-content" class="docs-content-input" placeholder="Escribe aquí los detalles de la tarea...&#10;&#10;• Paso 1&#10;• Paso 2&#10;• Notas adicionales"></textarea>
+            </div>
+        </div>
+
+        <!-- Pie de página -->
+        <div class="docs-footer">
+            <div class="flex items-center gap-2">
+                <span class="status-dot"></span>
+                <span id="docs-footer-status">Listo para crear</span>
+            </div>
+            <div class="flex items-center gap-4">
+                <span>RTBROK Workspace</span>
+                <span id="docs-footer-date"></span>
             </div>
         </div>
     </div>
 
     <script type="module">
         // ============================================================
-        // FIREBASE AUTH - Módulo
+        // FIREBASE AUTH
         // ============================================================
         import { initializeApp } from 'firebase/app';
         import { getAuth, onAuthStateChanged, signOut } from 'firebase/auth';
@@ -832,13 +1294,12 @@
         const app = initializeApp(firebaseConfig);
         const auth = getAuth(app);
 
-        // Variables para el usuario de Firebase
         let firebaseUser = null;
         let isFirebaseUser = false;
         let authChecked = false;
 
         // ============================================================
-        // CONFIGURACIÓN Y CONSTANTES
+        // CONFIGURACIÓN
         // ============================================================
         const ENDPOINT_TASKS = 'https://script.google.com/macros/s/AKfycbxmPBIboe_Evn45ZHjtkjydbmlPRMuSax_sEiTc2iN8cqqi2i4-Pf_lOd6875cQXEd_yg/exec';
         const ENDPOINT_ARTWORKS = 'https://script.google.com/macros/s/AKfycbxyBzZ7duM3pKtobXHj8A2NgFpIarP5WPS71TKTH2uFMOXXL8rzo68-blixF8kgCwvl8w/exec';
@@ -873,43 +1334,12 @@
         let displayedArtworksCount = INITIAL_ARTWORKS;
 
         // ============================================================
-        // FUNCIÓN PARA REDIRIGIR AL LOGIN SI NO HAY SESIÓN
-        // ============================================================
-        function redirectToLoginIfNeeded() {
-            // Si ya se verificó la autenticación y no hay usuario
-            if (authChecked && !firebaseUser) {
-                // Verificar si hay un usuario en sessionStorage como respaldo
-                const savedUser = sessionStorage.getItem('firebaseUser');
-                if (!savedUser) {
-                    // Redirigir a login.html
-                    window.location.href = 'login.html';
-                    return true;
-                } else {
-                    // Hay usuario en sessionStorage, restaurarlo
-                    try {
-                        const userData = JSON.parse(savedUser);
-                        firebaseUser = userData;
-                        isFirebaseUser = true;
-                        updateUserUI(userData);
-                        return false;
-                    } catch (e) {
-                        window.location.href = 'login.html';
-                        return true;
-                    }
-                }
-            }
-            return false;
-        }
-
-        // ============================================================
         // INICIO
         // ============================================================
         window.onload = function() {
-            // Mostrar overlay de carga
             const overlay = document.getElementById('loadingOverlay');
             overlay.classList.remove('hidden');
 
-            // Verificar si hay un usuario en sessionStorage (respaldo)
             const savedUser = sessionStorage.getItem('firebaseUser');
             if (savedUser) {
                 try {
@@ -920,7 +1350,6 @@
                 } catch (e) {}
             }
 
-            // Iniciar Firebase Auth Listener
             onAuthStateChanged(auth, (user) => {
                 authChecked = true;
 
@@ -936,16 +1365,12 @@
                     isFirebaseUser = true;
                     sessionStorage.setItem('firebaseUser', JSON.stringify(userData));
                     updateUserUI(userData);
-
-                    // Ocultar overlay y cargar datos
                     overlay.classList.add('hidden');
                     initApp();
                 } else {
-                    // No hay usuario autenticado en Firebase
                     firebaseUser = null;
                     isFirebaseUser = false;
 
-                    // Verificar si hay usuario en sessionStorage como respaldo
                     const savedUser = sessionStorage.getItem('firebaseUser');
                     if (savedUser) {
                         try {
@@ -959,14 +1384,12 @@
                         } catch (e) {}
                     }
 
-                    // No hay usuario, redirigir al login
                     sessionStorage.removeItem('firebaseUser');
                     updateUserUI(null);
                     window.location.href = 'login.html';
                 }
             });
 
-            // Timeout de seguridad: si después de 3 segundos no hay respuesta, redirigir
             setTimeout(() => {
                 if (!authChecked) {
                     window.location.href = 'login.html';
@@ -975,7 +1398,6 @@
         };
 
         function initApp() {
-            // Inicializar la aplicación
             initClock();
             updateChatSenderUI();
             fetchAllData();
@@ -992,10 +1414,23 @@
             const now = new Date();
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             document.getElementById('current-date').textContent = now.toLocaleDateString('es-ES', options);
+
+            // Inicializar fecha en el modal docs
+            const deadlineInput = document.getElementById('docs-deadline-input');
+            if (deadlineInput) {
+                const today = new Date();
+                const weekLater = new Date(today);
+                weekLater.setDate(today.getDate() + 7);
+                deadlineInput.value = weekLater.toISOString().split('T')[0];
+            }
+            const footerDate = document.getElementById('docs-footer-date');
+            if (footerDate) {
+                footerDate.textContent = new Date().toLocaleDateString('es-ES', { day: 'numeric', month: 'short', year: 'numeric' });
+            }
         }
 
         // ============================================================
-        // FUNCIONES DE USUARIO FIREBASE
+        // USUARIO FIREBASE
         // ============================================================
         function updateUserUI(user) {
             const avatarContainer = document.getElementById('userAvatarContainer');
@@ -1054,7 +1489,6 @@
                 taskFlow.authenticatedUser = userData;
                 sessionStorage.setItem('currentUser', JSON.stringify(userData));
                 closeLoginModal();
-                openSelectProjectModal();
                 showNotification(`Sesión iniciada como ${userData.nombre}`);
             }
         };
@@ -1065,7 +1499,6 @@
                 sessionStorage.removeItem('currentUser');
                 showNotification('Sesión cerrada');
                 updateUserUI(null);
-                // Redirigir al login después de cerrar sesión
                 setTimeout(() => {
                     window.location.href = 'login.html';
                 }, 500);
@@ -1075,7 +1508,7 @@
         };
 
         // ============================================================
-        // FUNCIONES DE RELOJ
+        // RELOJ
         // ============================================================
         function initClock() {
             setInterval(() => {
@@ -1088,7 +1521,7 @@
         }
 
         // ============================================================
-        // FUNCIONES DE NAVEGACIÓN
+        // NAVEGACIÓN
         // ============================================================
         window.switchTab = function(tabName) {
             currentTabIdx = tabsOrder.indexOf(tabName);
@@ -1116,35 +1549,33 @@
         };
 
         // ============================================================
-        // FUNCIONES DE TAREAS
+        // TAREAS - TABS FLOTANTES
         // ============================================================
         window.switchTaskWidgetTab = function(tab) {
             const btnEq = document.getElementById('widget-tab-equipo');
             const btnYo = document.getElementById('widget-tab-yo');
             const paneEq = document.getElementById('widget-tasks-equipo-pane');
             const paneYo = document.getElementById('widget-tasks-yo-pane');
-            const title = document.getElementById('widget-title');
+            const addBtn = document.getElementById('btn-add-task-equipo');
 
             if (tab === 'equipo') {
-                btnEq.className = 'px-3 py-1 text-xs font-semibold bg-indigo-600 text-white transition';
-                btnYo.className = 'px-3 py-1 text-xs font-medium text-slate-400 hover:text-white transition';
+                btnEq.classList.add('active');
+                btnYo.classList.remove('active');
                 paneEq.classList.replace('hidden', 'flex');
                 paneYo.classList.replace('flex', 'hidden');
-                title.textContent = 'Equipo';
-                document.getElementById('btn-add-task-equipo').classList.remove('hidden');
+                if (addBtn) addBtn.style.display = 'flex';
             } else {
-                btnYo.className = 'px-3 py-1 text-xs font-semibold bg-indigo-600 text-white transition';
-                btnEq.className = 'px-3 py-1 text-xs font-medium text-slate-400 hover:text-white transition';
+                btnYo.classList.add('active');
+                btnEq.classList.remove('active');
                 paneYo.classList.replace('hidden', 'flex');
                 paneEq.classList.replace('flex', 'hidden');
-                title.textContent = 'Personal';
-                document.getElementById('btn-add-task-equipo').classList.add('hidden');
+                if (addBtn) addBtn.style.display = 'none';
             }
             lucide.createIcons();
         };
 
         // ============================================================
-        // TAREAS PERSONALES (LocalStorage)
+        // TAREAS PERSONALES
         // ============================================================
         window.addLocalTask = function() {
             const input = document.getElementById('new-local-task-input');
@@ -1328,7 +1759,6 @@
                 appData.catalogs = [];
                 return;
             }
-
             try {
                 const payload = await response.json();
                 if (payload.status !== 'success' || !Array.isArray(payload.data)) {
@@ -1445,14 +1875,10 @@
         }
 
         async function fetchCatalogArtworks(selectedIds) {
-            // La fuente de verdad para las obras es ENDPOINT_ARTWORKS. No usamos
-            // sólo appData.artworks, porque la galería puede no haber terminado de cargar.
             const response = await fetch(`${ENDPOINT_ARTWORKS}?endpoint=obras`, { cache: 'no-store' });
             if (!response.ok) throw new Error('No fue posible consultar las obras del catálogo.');
             const records = getArtworkRecords(await response.json());
             const byId = new Map(records.map(artwork => [String(artwork.id || '').trim(), artwork]));
-
-            // Mantiene el mismo orden en el que las obras fueron guardadas en el catálogo.
             return selectedIds
                 .map(id => byId.get(String(id).trim()))
                 .filter(Boolean);
@@ -1468,7 +1894,6 @@
             const titleY = 120;
             const artistName = config.artistName || config.title || 'CATÁLOGO';
 
-            // Portada, siguiendo el formato de pdfcatalog.js.
             doc.setDrawColor(225, 225, 225);
             doc.rect(15, 15, pageWidth - 30, pageHeight - 30);
             doc.setTextColor(20, 20, 20);
@@ -1897,57 +2322,51 @@
         }
 
         // ============================================================
-        // RENDER: TAREAS
+        // RENDER: TAREAS - PANEL REDISEÑADO (SOLO EN CURSO, LISTA NUMERADA)
         // ============================================================
         function renderDashboardWidgets() {
             const tasksContainer = document.getElementById('widget-tasks-equipo-pane');
 
-            const pendingTasks = [...appData.tasks]
-                .filter(t => {
-                    const status = (t.estatus || '').toLowerCase();
-                    return status !== 'completado' && status !== 'completada';
-                })
-                .reverse()
-                .slice(0, 7);
+            // Mostrar solo tareas EN CURSO, ordenadas de la más reciente a la más antigua
+            const inProgressTasks = [...appData.tasks]
+                .filter(t => (t.estatus || '').toLowerCase() === 'en_curso')
+                .sort((a, b) => {
+                    const dateA = a.fecha_registro ? new Date(a.fecha_registro) : new Date(0);
+                    const dateB = b.fecha_registro ? new Date(b.fecha_registro) : new Date(0);
+                    return dateB - dateA;
+                });
 
-            if (pendingTasks.length === 0) {
-                tasksContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">No hay tareas pendientes actuales.</p>`;
+            if (inProgressTasks.length === 0) {
+                tasksContainer.innerHTML = `<p class="text-xs text-slate-500 text-center py-8">No hay tareas en curso.</p>`;
             } else {
-                let html = pendingTasks.map(t => {
+                let html = inProgressTasks.map(t => {
                     const responsableName = getResponsableNameById(t.id_responsable);
                     const st = (t.estatus || 'pendiente').toLowerCase();
 
+                    // Solo mostramos acciones de "en curso" (enviar a revisión / pausar)
                     let actionButtons = '';
-                    if (st === 'pendiente') {
-                        actionButtons =
-                            `<button onclick="requestStatusChange('${t.id}', 'en_curso')" class="px-2.5 py-1 text-[10px] font-semibold bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/30 transition flex items-center gap-1 shrink-0"><i data-lucide="play" class="w-3 h-3"></i> Iniciar</button>`;
-                    } else if (st === 'en_curso') {
+                    if (st === 'en_curso') {
                         actionButtons = `
-                            <div class="flex items-center gap-1 shrink-0">
-                                <button onclick="requestStatusChange('${t.id}', 'pendiente')" class="px-2 py-1 text-[10px] font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 transition" title="Pausar"><i data-lucide="pause" class="w-3 h-3"></i></button>
-                                <button onclick="requestStatusChange('${t.id}', 'en_revision')" class="px-2 py-1 text-[10px] font-semibold bg-amber-600/20 hover:bg-amber-600/40 text-amber-400 border border-amber-500/30 transition flex items-center gap-1"><i data-lucide="file-search" class="w-3 h-3"></i> Revisión</button>
-                            </div>
+                            <button onclick="event.stopPropagation(); requestStatusChange('${t.id}', 'pendiente')" class="mini-action-btn pause" title="Pausar">
+                                <i data-lucide="pause" class="w-3 h-3"></i>
+                            </button>
+                            <button onclick="event.stopPropagation(); requestStatusChange('${t.id}', 'en_revision')" class="mini-action-btn review" title="Enviar a revisión">
+                                <i data-lucide="file-search" class="w-3 h-3"></i>
+                            </button>
                         `;
-                    } else if (st === 'en_revision') {
-                        actionButtons =
-                            `<button onclick="requestStatusChange('${t.id}', 'completado')" class="px-2.5 py-1 text-[10px] font-semibold bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 transition flex items-center gap-1 shrink-0"><i data-lucide="check" class="w-3 h-3"></i> Aprobar</button>`;
                     }
 
                     return `
-                        <div class="flex items-center justify-between p-3 hover:bg-zinc-900/60 transition gap-2">
-                            <div class="flex items-center gap-3 overflow-hidden min-w-0 flex-1">
-                                <span class="w-2 h-2 rounded-full shrink-0 ${getStatusDotColor(t.estatus)}"></span>
-                                <div class="truncate">
-                                    <p class="text-xs font-medium text-slate-200 truncate" title="${escapeHtml(t.detalles || t.descripcion || 'Sin descripción')}">${t.detalles || t.descripcion || 'Sin descripción'}</p>
-                                    <p class="text-[10px] text-slate-400 font-mono">
-                                        ${t.asignacion || 'S/A'}
-                                        <span class="text-slate-500">·</span>
-                                        <span class="text-slate-300">${responsableName}</span>
-                                    </p>
+                        <div class="notepad-task-item" title="${escapeHtml(t.detalles || t.descripcion || '')}">
+                            <div class="task-text">
+                                <div class="task-title">${escapeHtml(t.detalles || t.descripcion || 'Sin descripción')}</div>
+                                <div class="task-meta">
+                                    <span>${escapeHtml(t.asignacion || 'S/A')}</span>
+                                    <span> · </span>
+                                    <span class="resp">${escapeHtml(responsableName)}</span>
                                 </div>
                             </div>
-                            <div class="flex items-center gap-2 shrink-0">
-                                <span class="text-[10px] px-2 py-0.5 ${getStatusBadgeColor(t.estatus)}">${t.estatus || 'pendiente'}</span>
+                            <div class="task-actions">
                                 ${actionButtons}
                             </div>
                         </div>
@@ -2063,7 +2482,7 @@
         }
 
         // ============================================================
-        // RENDER: ARTWORKS (CARRUSEL INFINITO)
+        // RENDER: ARTWORKS
         // ============================================================
         function renderArtworksCarousel() {
             const container = document.getElementById('artworks-carousel');
@@ -2129,9 +2548,6 @@
             renderFullArtworksGrid();
         };
 
-        // ============================================================
-        // RENDER: ARTWORKS (VISTA COMPLETA)
-        // ============================================================
         function renderFullArtworksGrid() {
             const container = document.getElementById('artworks-grid-container');
             if (!container) return;
@@ -2178,7 +2594,7 @@
         }
 
         // ============================================================
-        // ARTWORK DETAIL MODAL
+        // ARTWORK DETAIL
         // ============================================================
         let activeDetailArtwork = null;
 
@@ -2376,7 +2792,6 @@
             }
 
             try {
-                // El backend requiere id_obra, promocionar e id_actor; este último se valida como supervisor/director.
                 await fetch(ENDPOINT_ARTWORKS, {
                     method: 'POST',
                     mode: 'no-cors',
@@ -2421,14 +2836,14 @@
             if (e.key === 'Escape') {
                 closeArtworkDetail();
                 closeLoginModal();
-                closeSelectProjectModal();
+                closeDocsTaskModal();
                 closeChatSenderModal();
                 closeActionLoginModal();
             }
         });
 
         // ============================================================
-        // LOGIN / AUTH - LOCAL
+        // LOGIN / AUTH
         // ============================================================
         window.openLoginModal = function() {
             document.getElementById('login-modal').classList.remove('hidden');
@@ -2448,7 +2863,6 @@
                 document.getElementById('firebaseUserOption').classList.add('hidden');
                 document.getElementById('authSeparator').classList.add('hidden');
             }
-
         };
 
         window.closeLoginModal = function() {
@@ -2504,55 +2918,68 @@
             taskFlow.authenticatedUser = { id, nombre, rol };
             sessionStorage.setItem('currentUser', JSON.stringify({ id, name: nombre, role: rol }));
             closeLoginModal();
-            openSelectProjectModal();
+            openDocsTaskModal();
         };
 
         // ============================================================
-        // CREAR TAREA
+        // NUEVA TAREA - MODAL DOCS (PANTALLA COMPLETA)
         // ============================================================
-        window.openSelectProjectModal = function() {
+        window.openDocsTaskModal = function() {
             if (!taskFlow.authenticatedUser) {
                 openLoginModal();
                 return;
             }
-            document.getElementById('auth-user-display').textContent =
-                `${taskFlow.authenticatedUser.nombre} (${taskFlow.authenticatedUser.rol})`;
 
-            const projSelect = document.getElementById('project-select');
-            projSelect.innerHTML = '<option value="">Selecciona un proyecto...</option>';
-            if (appData.proyectos.length === 0) {
-                projSelect.innerHTML = '<option value="">Cargando proyectos...</option>';
-                fetchAllData().then(() => populateProjectSelect());
-            } else {
-                populateProjectSelect();
+            // Mostrar quién crea
+            const authBadge = document.getElementById('docs-auth-user');
+            if (authBadge) {
+                authBadge.textContent = `${taskFlow.authenticatedUser.nombre} (${taskFlow.authenticatedUser.rol})`;
             }
 
-            populateResponsibleSelect();
+            // Poblar selects
+            populateDocsProjectSelect();
+            populateDocsResponsibleSelect();
 
-            document.getElementById('subproject-select').disabled = true;
-            document.getElementById('subproject-select').innerHTML = '<option value="">Primero selecciona un proyecto</option>';
-            document.getElementById('new-task-details').value = '';
-            document.getElementById('new-task-description').value = '';
-            document.getElementById('new-task-priority').value = 'media';
+            // Reset campos
+            document.getElementById('docs-task-title').value = '';
+            document.getElementById('docs-task-subtitle').value = '';
+            document.getElementById('docs-page-title').value = '';
+            document.getElementById('docs-page-subtitle').value = '';
+            document.getElementById('docs-page-content').value = '';
+            document.getElementById('docs-subproject-select').disabled = true;
+            document.getElementById('docs-subproject-select').innerHTML = '<option value="">Primero proyecto</option>';
+            document.getElementById('docs-priority-select').value = 'media';
 
             const today = new Date();
             const weekLater = new Date(today);
             weekLater.setDate(today.getDate() + 7);
-            document.getElementById('new-task-deadline').value = weekLater.toISOString().split('T')[0];
+            document.getElementById('docs-deadline-input').value = weekLater.toISOString().split('T')[0];
 
-            document.getElementById('select-project-modal').classList.remove('hidden');
-            document.getElementById('select-project-modal').classList.add('flex');
+            // Mostrar modal
+            document.getElementById('docs-task-modal').classList.remove('hidden');
+            document.body.style.overflow = 'hidden';
+
+            // Focus en título
+            setTimeout(() => {
+                document.getElementById('docs-task-title').focus();
+            }, 100);
+
             lucide.createIcons();
         };
 
-        window.closeSelectProjectModal = function() {
-            document.getElementById('select-project-modal').classList.add('hidden');
-            document.getElementById('select-project-modal').classList.remove('flex');
+        window.closeDocsTaskModal = function() {
+            document.getElementById('docs-task-modal').classList.add('hidden');
+            document.body.style.overflow = 'auto';
         };
 
-        function populateProjectSelect() {
-            const select = document.getElementById('project-select');
+        function populateDocsProjectSelect() {
+            const select = document.getElementById('docs-project-select');
             select.innerHTML = '<option value="">Selecciona un proyecto...</option>';
+            if (appData.proyectos.length === 0) {
+                select.innerHTML = '<option value="">Cargando proyectos...</option>';
+                fetchAllData().then(() => populateDocsProjectSelect());
+                return;
+            }
             appData.proyectos.forEach(p => {
                 const option = document.createElement('option');
                 option.value = p.id;
@@ -2563,26 +2990,26 @@
             select.onchange = function() {
                 const projectId = this.value;
                 if (projectId) {
-                    populateSubprojectSelect(projectId);
+                    populateDocsSubprojectSelect(projectId);
                 } else {
-                    document.getElementById('subproject-select').disabled = true;
-                    document.getElementById('subproject-select').innerHTML = '<option value="">Primero selecciona un proyecto</option>';
+                    document.getElementById('docs-subproject-select').disabled = true;
+                    document.getElementById('docs-subproject-select').innerHTML = '<option value="">Primero proyecto</option>';
                 }
             };
         }
 
-        function populateSubprojectSelect(projectId) {
-            const select = document.getElementById('subproject-select');
+        function populateDocsSubprojectSelect(projectId) {
+            const select = document.getElementById('docs-subproject-select');
             const subproyectos = appData.subproyectos.filter(sp => sp.id_proyecto === projectId);
 
             if (subproyectos.length === 0) {
-                select.innerHTML = '<option value="">No hay subproyectos disponibles</option>';
+                select.innerHTML = '<option value="">No hay subproyectos</option>';
                 select.disabled = true;
                 return;
             }
 
             select.disabled = false;
-            select.innerHTML = '<option value="">Selecciona un subproyecto...</option>';
+            select.innerHTML = '<option value="">Selecciona...</option>';
             subproyectos.forEach(sp => {
                 const option = document.createElement('option');
                 option.value = sp.id;
@@ -2591,14 +3018,14 @@
             });
         }
 
-        function populateResponsibleSelect() {
-            const select = document.getElementById('responsible-select');
+        function populateDocsResponsibleSelect() {
+            const select = document.getElementById('docs-responsible-select');
             if (appData.responsables.length === 0) {
-                select.innerHTML = `<option value="">Cargando responsables...</option>`;
+                select.innerHTML = `<option value="">Cargando...</option>`;
                 return;
             }
 
-            select.innerHTML = '<option value="">Selecciona un responsable...</option>';
+            select.innerHTML = '<option value="">Selecciona...</option>';
             const sorted = [...appData.responsables].sort((a, b) => {
                 const order = { 'director': 0, 'supervisor': 1, 'responsable': 2 };
                 const aOrder = a.rol ? (order[a.rol.toLowerCase()] ?? 3) : 3;
@@ -2610,7 +3037,7 @@
                 const option = document.createElement('option');
                 option.value = r.id;
                 const rolBadge = r.rol ? ` [${r.rol}]` : '';
-                option.textContent = `${r.nombre || 'Sin nombre'}${rolBadge} - ${r.email || 'sin email'}`;
+                option.textContent = `${r.nombre || 'Sin nombre'}${rolBadge}`;
                 select.appendChild(option);
             });
 
@@ -2625,14 +3052,29 @@
             }
         }
 
-        window.confirmAddTask = async function() {
-            const projectSelect = document.getElementById('project-select');
-            const subprojectSelect = document.getElementById('subproject-select');
-            const responsibleSelect = document.getElementById('responsible-select');
-            const details = document.getElementById('new-task-details').value.trim();
-            const description = document.getElementById('new-task-description').value.trim();
-            const priority = document.getElementById('new-task-priority').value;
-            const deadline = document.getElementById('new-task-deadline').value;
+        // Sincronizar título y subtítulo entre barra y documento
+        document.getElementById('docs-task-title')?.addEventListener('input', function() {
+            document.getElementById('docs-page-title').value = this.value;
+        });
+        document.getElementById('docs-page-title')?.addEventListener('input', function() {
+            document.getElementById('docs-task-title').value = this.value;
+        });
+        document.getElementById('docs-task-subtitle')?.addEventListener('input', function() {
+            document.getElementById('docs-page-subtitle').value = this.value;
+        });
+        document.getElementById('docs-page-subtitle')?.addEventListener('input', function() {
+            document.getElementById('docs-task-subtitle').value = this.value;
+        });
+
+        window.confirmDocsTask = async function() {
+            const projectSelect = document.getElementById('docs-project-select');
+            const subprojectSelect = document.getElementById('docs-subproject-select');
+            const responsibleSelect = document.getElementById('docs-responsible-select');
+            const title = document.getElementById('docs-task-title').value.trim();
+            const subtitle = document.getElementById('docs-task-subtitle').value.trim();
+            const content = document.getElementById('docs-page-content').value.trim();
+            const priority = document.getElementById('docs-priority-select').value;
+            const deadline = document.getElementById('docs-deadline-input').value;
 
             const projectId = projectSelect.value;
             const subprojectId = subprojectSelect.value;
@@ -2640,9 +3082,9 @@
 
             if (!projectId) { alert('Por favor selecciona un proyecto.'); return; }
             if (!subprojectId) { alert('Por favor selecciona un subproyecto.'); return; }
-            if (!responsableId) { alert('Por favor selecciona un responsable para asignar la tarea.'); return; }
-            if (!details) { alert('Por favor ingresa los detalles de la tarea.'); return; }
-            if (!taskFlow.authenticatedUser) { alert('No has iniciado sesión. Por favor intenta de nuevo.'); return; }
+            if (!responsableId) { alert('Por favor selecciona un responsable.'); return; }
+            if (!title) { alert('Por favor ingresa un título para la tarea.'); return; }
+            if (!taskFlow.authenticatedUser) { alert('No has iniciado sesión.'); return; }
 
             const taskId = 'T_' + Date.now().toString(36).toUpperCase();
             const payload = {
@@ -2653,16 +3095,16 @@
                     id_responsable: responsableId,
                     prioridad: priority,
                     estatus: 'pendiente',
-                    detalles: details,
-                    descripcion: description || '',
+                    detalles: title,
+                    descripcion: subtitle || content || '',
                     fecha_limite: deadline || ''
                 }
             };
 
             try {
-                const btn = document.querySelector('#select-project-modal .bg-indigo-600');
+                const btn = document.getElementById('docs-create-btn');
                 const originalText = btn.innerHTML;
-                btn.innerHTML = '<i data-lucide="loader-circle" class="w-4 h-4 animate-spin"></i> Creando...';
+                btn.innerHTML = '<i data-lucide="loader-circle" class="w-3.5 h-3.5 animate-spin inline-block mr-1"></i> Creando...';
                 btn.disabled = true;
 
                 await fetch(ENDPOINT_TASKS, {
@@ -2678,14 +3120,14 @@
 
                 btn.innerHTML = originalText;
                 btn.disabled = false;
-                closeSelectProjectModal();
+                closeDocsTaskModal();
                 showNotification('Tarea creada exitosamente');
             } catch (error) {
                 console.error('Error al crear tarea:', error);
                 alert('Error al crear la tarea. Por favor intenta de nuevo.');
-                const btn = document.querySelector('#select-project-modal .bg-indigo-600');
+                const btn = document.getElementById('docs-create-btn');
                 if (btn) {
-                    btn.innerHTML = '<i data-lucide="plus" class="w-4 h-4"></i> Crear Tarea';
+                    btn.innerHTML = '<i data-lucide="plus" class="w-3.5 h-3.5 inline-block mr-1"></i> Crear tarea';
                     btn.disabled = false;
                     lucide.createIcons();
                 }
@@ -2693,7 +3135,7 @@
         };
 
         window.openAddTaskModal = function() {
-            openSelectProjectModal();
+            openDocsTaskModal();
         };
 
         // ============================================================
@@ -2703,15 +3145,19 @@
             return [
                 { id: 'T1', asignacion: '2.5.9JM', estatus: 'completado', prioridad: 'alta', detalles: 'Revisar documentación del proyecto',
                     descripcion: 'Validar planos estructurales con el equipo.', fecha_limite: '2026-06-15',
-                    id_responsable: '1' },
+                    id_responsable: '1', fecha_registro: '2025-06-01' },
                 { id: 'T2', asignacion: '1.2.2MR', estatus: 'completado', prioridad: 'media', detalles: 'Aprobación de presupuesto inicial',
-                    descripcion: 'Validación con directiva.', fecha_limite: '2026-05-30', id_responsable: '2' },
+                    descripcion: 'Validación con directiva.', fecha_limite: '2026-05-30', id_responsable: '2', fecha_registro: '2025-05-15' },
                 { id: 'T3', asignacion: '2.1.1AL', estatus: 'completado', prioridad: 'baja', detalles: 'Entrega de catálogo de obras',
-                    descripcion: 'Compilación fotográfica.', fecha_limite: '2026-06-20', id_responsable: '3' },
+                    descripcion: 'Compilación fotográfica.', fecha_limite: '2026-06-20', id_responsable: '3', fecha_registro: '2025-06-10' },
                 { id: 'T4', asignacion: '1.3.4IS', estatus: 'en_curso', prioridad: 'media', detalles: 'Actualizar inventario de obras',
-                    descripcion: 'Registrar nuevas adquisiciones.', fecha_limite: '2026-07-01', id_responsable: '1' },
-                { id: 'T5', asignacion: '3.2.1DR', estatus: 'pendiente', prioridad: 'urgente', detalles: 'Resolver conflicto de permisos',
-                    descripcion: 'Coordinación con autoridades.', fecha_limite: '2026-06-10', id_responsable: '4' }
+                    descripcion: 'Registrar nuevas adquisiciones.', fecha_limite: '2026-07-01', id_responsable: '1', fecha_registro: '2025-06-20' },
+                { id: 'T5', asignacion: '3.2.1DR', estatus: 'en_curso', prioridad: 'urgente', detalles: 'Resolver conflicto de permisos',
+                    descripcion: 'Coordinación con autoridades.', fecha_limite: '2026-06-10', id_responsable: '4', fecha_registro: '2025-06-18' },
+                { id: 'T6', asignacion: '2.3.1IS', estatus: 'en_curso', prioridad: 'alta', detalles: 'Preparar presentación para cliente',
+                    descripcion: 'Armar deck con renders finales.', fecha_limite: '2026-06-25', id_responsable: '2', fecha_registro: '2025-06-22' },
+                { id: 'T7', asignacion: '1.4.2SV', estatus: 'en_curso', prioridad: 'media', detalles: 'Revisar contratos de proveedores',
+                    descripcion: 'Verificar cláusulas y vigencias.', fecha_limite: '2026-06-28', id_responsable: '3', fecha_registro: '2025-06-19' }
             ];
         }
 
