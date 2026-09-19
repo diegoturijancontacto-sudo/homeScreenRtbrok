@@ -271,7 +271,7 @@
             letter-spacing: 0.1em;
         }
 
-        /* ===== NUEVO: PANEL DE TAREAS ESTILO BLOC DE NOTAS ===== */
+        /* ===== PANEL DE TAREAS ESTILO BLOC DE NOTAS ===== */
         .notepad-task-list {
             counter-reset: task-counter;
         }
@@ -374,13 +374,8 @@
             border-color: rgba(248,113,113,0.4);
         }
 
-        /* ===== NUEVO: TABS Y BOTÓN FLOTANTES ===== */
+        /* ===== TABS (ahora debajo, no flotantes) ===== */
         .floating-tabs {
-            position: absolute;
-            top: 12px;
-            left: 50%;
-            transform: translateX(-50%);
-            z-index: 30;
             display: flex;
             align-items: center;
             gap: 0;
@@ -414,10 +409,6 @@
             background: rgba(255,255,255,0.04);
         }
         .floating-add-btn {
-            position: absolute;
-            top: 12px;
-            right: 12px;
-            z-index: 30;
             width: 32px;
             height: 32px;
             border-radius: 50%;
@@ -430,6 +421,7 @@
             cursor: pointer;
             transition: all 0.2s ease;
             box-shadow: 0 4px 16px rgba(79,70,229,0.4);
+            flex-shrink: 0;
         }
         .floating-add-btn:hover {
             background: #6366f1;
@@ -440,7 +432,7 @@
             transform: scale(0.96);
         }
 
-        /* ===== NUEVO: MODAL NUEVA TAREA ESTILO GOOGLE DOCS ===== */
+        /* ===== MODAL NUEVA TAREA ESTILO GOOGLE DOCS ===== */
         .docs-modal {
             position: fixed;
             inset: 0;
@@ -457,7 +449,6 @@
         .docs-modal.hidden {
             display: none;
         }
-        /* Barra superior */
         .docs-topbar {
             display: flex;
             align-items: center;
@@ -562,7 +553,6 @@
             opacity: 0.5;
             cursor: not-allowed;
         }
-        /* Barra de parámetros (borde superior) */
         .docs-param-bar {
             display: flex;
             align-items: center;
@@ -627,7 +617,6 @@
             border-radius: 4px;
             white-space: nowrap;
         }
-        /* Área de contenido (documento) */
         .docs-body {
             flex: 1;
             overflow-y: auto;
@@ -694,7 +683,6 @@
         .docs-page .docs-content-input::placeholder {
             color: #3f3f46;
         }
-        /* Pie de página */
         .docs-footer {
             display: flex;
             align-items: center;
@@ -747,38 +735,38 @@
     </div>
 
     <!-- Sidebar -->
-    <aside class="w-20 bg-black border-r border-zinc-900/80 flex flex-col items-center justify-between py-6 shrink-0 z-20">
+    <aside class="w-20 bg-black flex flex-col items-center justify-between py-6 shrink-0 z-20">
         <div class="flex flex-col items-center gap-6">
-            <div class="w-10 h-10 bg-zinc-900 border border-zinc-800 flex items-center justify-center text-white font-bold text-xs shadow-inner cursor-pointer" onclick="switchTab('dashboard')">
+            <div class="w-10 h-10 bg-zinc-900 flex items-center justify-center text-white font-bold text-xs shadow-inner cursor-pointer" onclick="switchTab('dashboard')">
                 RT
             </div>
             <div class="w-8 h-[1px] bg-zinc-950"></div>
             <a href="https://www.instagram.com/" target="_blank" class="group flex flex-col items-center gap-1.5 text-zinc-400 hover:text-white transition">
-                <div class="w-11 h-11 bg-zinc-900/40 group-hover:bg-zinc-900 border border-transparent group-hover:border-zinc-800 flex items-center justify-center transition shadow-lg">
+                <div class="w-11 h-11 bg-zinc-900/40 group-hover:bg-zinc-900 flex items-center justify-center transition shadow-lg">
                     <i class="fab fa-instagram fa-lg"></i>
                 </div>
                 <span class="text-[10px] font-medium tracking-tight">Instagram</span>
             </a>
             <a href="https://diegoturijancontacto-sudo.github.io/Finanzas/mobile/" target="_blank" class="group flex flex-col items-center gap-1.5 text-zinc-400 hover:text-white transition">
-                <div class="w-11 h-11 bg-zinc-900/40 group-hover:bg-zinc-900 border border-transparent group-hover:border-zinc-800 flex items-center justify-center transition shadow-lg">
+                <div class="w-11 h-11 bg-zinc-900/40 group-hover:bg-zinc-900 flex items-center justify-center transition shadow-lg">
                     <i data-lucide="database" class="w-5 h-5"></i>
                 </div>
                 <span class="text-[10px] font-medium tracking-tight">Base de datos</span>
             </a>
             <a href="https://drive.google.com" target="_blank" class="group flex flex-col items-center gap-1.5 text-zinc-400 hover:text-white transition">
-                <div class="w-11 h-11 bg-zinc-900/40 group-hover:bg-zinc-900 border border-transparent group-hover:border-zinc-800 flex items-center justify-center transition shadow-lg">
+                <div class="w-11 h-11 bg-zinc-900/40 group-hover:bg-zinc-900 flex items-center justify-center transition shadow-lg">
                     <i data-lucide="hard-drive" class="w-5 h-5"></i>
                 </div>
                 <span class="text-[10px] font-medium tracking-tight">Drive</span>
             </a>
             <a href="https://frontline-zeta-ecru.vercel.app/movil/" target="_blank" class="group flex flex-col items-center gap-1.5 text-zinc-400 hover:text-white transition text-center px-1">
-                <div class="w-11 h-11 bg-zinc-900/40 group-hover:bg-zinc-900 border border-transparent group-hover:border-zinc-800 flex items-center justify-center transition shadow-lg">
+                <div class="w-11 h-11 bg-zinc-900/40 group-hover:bg-zinc-900 flex items-center justify-center transition shadow-lg">
                     <i data-lucide="book-open" class="w-5 h-5"></i>
                 </div>
                 <span class="text-[9px] font-medium tracking-tight leading-tight">Generador de catálogos</span>
             </a>
             <a href="https://docs.google.com/forms/d/e/1FAIpQLSdC-_if3uzNyq3BuU3YhlUD1ONInOwe4Cv_G4MM1PJrnsDRuw/viewform?usp=header" target="_blank" class="group flex flex-col items-center gap-1.5 text-zinc-400 hover:text-white transition text-center px-1">
-                <div class="w-11 h-11 bg-zinc-900/40 group-hover:bg-zinc-900 border border-transparent group-hover:border-zinc-800 flex items-center justify-center transition shadow-lg">
+                <div class="w-11 h-11 bg-zinc-900/40 group-hover:bg-zinc-900 flex items-center justify-center transition shadow-lg">
                     <i data-lucide="file-text" class="w-5 h-5"></i>
                 </div>
                 <span class="text-[9px] font-medium tracking-tight leading-tight">Generador de Certificados</span>
@@ -788,10 +776,10 @@
             <div id="userAvatarContainer" class="hidden">
                 <img id="sidebarUserAvatar" src="" alt="User" class="user-avatar-small" onclick="handleUserClick()" title="Usuario autenticado">
             </div>
-            <button onclick="openLoginModal()" class="w-10 h-10 bg-zinc-900/60 hover:bg-zinc-800 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white transition" title="Configuración / Iniciar sesión">
+            <button onclick="openLoginModal()" class="w-10 h-10 bg-zinc-900/60 hover:bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white transition" title="Configuración / Iniciar sesión">
                 <i data-lucide="settings" class="w-4 h-4"></i>
             </button>
-            <button onclick="prevPage()" class="w-10 h-10 bg-zinc-900/60 hover:bg-zinc-800 border border-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white transition" title="Volver">
+            <button onclick="prevPage()" class="w-10 h-10 bg-zinc-900/60 hover:bg-zinc-800 flex items-center justify-center text-zinc-400 hover:text-white transition" title="Volver">
                 <i data-lucide="arrow-left" class="w-4 h-4"></i>
             </button>
         </div>
@@ -801,10 +789,10 @@
     <div class="flex-1 flex flex-col h-full overflow-hidden bg-black relative">
 
         <!-- Top Bar -->
-        <header class="w-full px-6 sm:px-10 py-5 flex items-center justify-between border-b border-zinc-900 shrink-0">
+        <header class="w-full px-6 sm:px-10 py-5 flex items-center justify-between shrink-0">
             <div class="flex items-center gap-4">
                 <h1 class="font-bold text-lg sm:text-xl tracking-[0.25em] bg-gradient-to-r from-white via-slate-200 to-slate-400 bg-clip-text text-transparent">R T B R O K</h1>
-                <div id="headerUserInfo" class="hidden text-xs text-zinc-400 border-l border-zinc-800 pl-4">
+                <div id="headerUserInfo" class="hidden text-xs text-zinc-400 pl-4">
                     <span id="headerUserName" class="text-white font-medium">Usuario</span>
                     <span class="text-zinc-500">·</span>
                     <span id="headerUserEmail" class="text-zinc-500">email</span>
@@ -813,7 +801,7 @@
             <div class="hidden md:flex items-center w-full max-w-md mx-6">
                 <form id="search-form" onsubmit="handleSearch(event)" class="relative flex items-center w-full">
                     <span class="absolute left-3.5 text-zinc-500"><i data-lucide="search" class="w-4 h-4"></i></span>
-                    <input type="text" id="search-input" placeholder="Buscar..." class="w-full bg-zinc-900/80 border border-zinc-800 pl-10 pr-20 py-2 text-xs text-slate-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-700 transition">
+                    <input type="text" id="search-input" placeholder="Buscar..." class="w-full bg-zinc-900/80 pl-10 pr-20 py-2 text-xs text-slate-100 placeholder-zinc-500 focus:outline-none focus:bg-zinc-900 transition">
                     <button type="submit" class="absolute right-1.5 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 px-2.5 py-1 text-[10px] font-medium transition">Ir</button>
                 </form>
             </div>
@@ -831,20 +819,10 @@
                 <div class="flex flex-col gap-8 w-full px-6 sm:px-8 pt-8 max-w-7xl mx-auto">
                     <!-- Top Grid: TAREAS y CHAT -->
                     <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                        <!-- TAREAS WIDGET - REDISEÑADO -->
-                        <section class="relative bg-zinc-950 border border-zinc-900 p-5 sm:p-6 flex flex-col h-[420px] shadow-2xl">
-                            <!-- Tabs flotantes -->
-                            <div class="floating-tabs" id="floating-task-tabs">
-                                <button onclick="switchTaskWidgetTab('equipo')" id="widget-tab-equipo" class="floating-tab active">Equipo</button>
-                                <button onclick="switchTaskWidgetTab('yo')" id="widget-tab-yo" class="floating-tab">Yo</button>
-                            </div>
-                            <!-- Botón flotante añadir -->
-                            <button onclick="openAddTaskModal()" id="btn-add-task-equipo" class="floating-add-btn" title="Añadir tarea">
-                                <i data-lucide="plus" class="w-4 h-4"></i>
-                            </button>
-
+                        <!-- TAREAS WIDGET - PESTAÑAS Y BOTÓN ABAJO -->
+                        <section class="bg-zinc-950 p-5 sm:p-6 flex flex-col h-[480px] shadow-2xl">
                             <!-- Lista de tareas estilo bloc de notas -->
-                            <div id="widget-tasks-equipo-pane" class="flex-1 overflow-y-auto pr-1 flex flex-col bg-black border border-zinc-800 notepad-task-list mt-14">
+                            <div id="widget-tasks-equipo-pane" class="flex-1 overflow-y-auto pr-1 flex flex-col bg-black notepad-task-list">
                                 <div class="flex items-center justify-between p-3 animate-pulse">
                                     <div class="flex items-center gap-3">
                                         <div class="w-2 h-2 bg-zinc-800"></div>
@@ -856,14 +834,26 @@
                                     <div class="h-5 w-16 bg-zinc-800"></div>
                                 </div>
                             </div>
-                            <div id="widget-tasks-yo-pane" class="flex-1 overflow-y-auto pr-1 hidden flex-col bg-black border border-zinc-800 mt-14">
-                                <div class="p-2 border-b border-zinc-800 flex gap-2">
-                                    <input type="text" id="new-local-task-input" placeholder="Nueva tarea personal..." class="flex-1 bg-zinc-900 border border-zinc-700 px-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:border-indigo-500">
+                            <div id="widget-tasks-yo-pane" class="flex-1 overflow-y-auto pr-1 hidden flex-col bg-black">
+                                <div class="p-2 flex gap-2">
+                                    <input type="text" id="new-local-task-input" placeholder="Nueva tarea personal..." class="flex-1 bg-zinc-900 px-3 py-1.5 text-xs text-slate-100 placeholder-slate-500 focus:outline-none focus:bg-zinc-800 transition">
                                     <button onclick="addLocalTask()" class="bg-indigo-600 hover:bg-indigo-500 text-white px-3 py-1.5 text-xs font-medium transition">Añadir</button>
                                 </div>
                                 <div id="widget-tasks-yo-list" class="flex-1 overflow-y-auto divide-y divide-zinc-800/80"></div>
                             </div>
-                            <div class="pt-3 mt-auto border-t border-zinc-900 text-center">
+
+                            <!-- Pestañas y botón añadir (DEBAJO del panel) -->
+                            <div class="flex items-center justify-between pt-4 mt-auto">
+                                <div class="floating-tabs" id="floating-task-tabs">
+                                    <button onclick="switchTaskWidgetTab('equipo')" id="widget-tab-equipo" class="floating-tab active">Equipo</button>
+                                    <button onclick="switchTaskWidgetTab('yo')" id="widget-tab-yo" class="floating-tab">Yo</button>
+                                </div>
+                                <button onclick="openAddTaskModal()" id="btn-add-task-equipo" class="floating-add-btn" title="Añadir tarea">
+                                    <i data-lucide="plus" class="w-4 h-4"></i>
+                                </button>
+                            </div>
+
+                            <div class="pt-3 border-t-0 text-center">
                                 <button onclick="switchTab('tasks')" class="text-xs text-zinc-400 hover:text-white font-medium flex items-center justify-center gap-1.5 w-full py-1 transition group">
                                     <span>Ver todas las tareas</span>
                                     <i data-lucide="arrow-right" class="w-3.5 h-3.5 group-hover:translate-x-0.5 transition-transform"></i>
@@ -872,10 +862,10 @@
                         </section>
 
                         <!-- CHAT WIDGET -->
-                        <section class="bg-zinc-950 border border-zinc-900 p-5 sm:p-6 flex flex-col h-[420px] shadow-2xl relative">
-                            <div class="flex items-center justify-between mb-3 pb-2 border-b border-zinc-900">
+                        <section class="bg-zinc-950 p-5 sm:p-6 flex flex-col h-[480px] shadow-2xl relative">
+                            <div class="flex items-center justify-between mb-3 pb-2">
                                 <div class="flex items-center gap-3">
-                                    <div class="w-8 h-8 bg-zinc-900 border border-zinc-800 flex items-center justify-center text-xs font-bold text-zinc-300">RT</div>
+                                    <div class="w-8 h-8 bg-zinc-900 flex items-center justify-center text-xs font-bold text-zinc-300">RT</div>
                                     <div>
                                         <h4 class="text-xs font-bold text-slate-100 flex items-center gap-1.5">
                                             RTBROK <span class="w-2 h-2 bg-emerald-500 inline-block"></span>
@@ -893,22 +883,22 @@
                                 </div>
                             </div>
                             <div id="widget-chat-messages" class="flex-1 overflow-y-auto pr-1 flex flex-col space-y-3 py-2"></div>
-                            <div class="pt-3 mt-auto border-t border-zinc-900 flex items-center gap-2">
+                            <div class="pt-3 mt-auto flex items-center gap-2">
                                 <button onclick="openChatSenderModal()" class="text-zinc-500 hover:text-zinc-300 p-2"><i data-lucide="smile" class="w-4 h-4"></i></button>
-                                <input type="text" id="widget-chat-input" onkeydown="if(event.key==='Enter') sendWidgetChatMessage()" placeholder="Escribe un mensaje..." class="flex-1 bg-zinc-900 border border-zinc-800 px-4 py-2.5 text-xs text-slate-100 placeholder-zinc-500 focus:outline-none focus:border-zinc-700">
+                                <input type="text" id="widget-chat-input" onkeydown="if(event.key==='Enter') sendWidgetChatMessage()" placeholder="Escribe un mensaje..." class="flex-1 bg-zinc-900 px-4 py-2.5 text-xs text-slate-100 placeholder-zinc-500 focus:outline-none focus:bg-zinc-800 transition">
                                 <button onclick="sendWidgetChatMessage()" class="text-zinc-400 hover:text-white p-2"><i data-lucide="mic" class="w-4 h-4"></i></button>
                             </div>
                         </section>
                     </div>
 
                     <!-- RENDIMIENTO GENERAL -->
-                    <section class="bg-zinc-950 border border-zinc-900 p-6 shadow-2xl flex flex-col gap-4">
+                    <section class="bg-zinc-950 p-6 shadow-2xl flex flex-col gap-4">
                         <div class="flex items-center justify-between">
                             <span class="text-xs font-bold uppercase tracking-wider text-zinc-400">RENDIMIENTO GENERAL (Tareas completadas por responsable)</span>
                             <button onclick="switchTab('tasks')" class="text-xs text-zinc-400 hover:text-white transition">Ver más</button>
                         </div>
                         <div id="general-performance-bar-container" class="flex flex-col gap-3">
-                            <div id="general-performance-bar" class="w-full bg-zinc-900 h-4 flex overflow-hidden border border-zinc-800/80 rounded-sm"></div>
+                            <div id="general-performance-bar" class="w-full bg-zinc-900 h-4 flex overflow-hidden rounded-sm"></div>
                             <div id="general-performance-legend" class="flex flex-wrap items-center gap-4 pt-1 text-xs text-zinc-300"></div>
                         </div>
                     </section>
@@ -929,7 +919,7 @@
                         <!-- Las obras se renderizan aquí con JavaScript -->
                     </div>
                     <div class="flex justify-center mt-6">
-                        <button id="show-more-btn" onclick="showMoreArtworks()" class="show-more-btn px-6 py-2.5 border border-zinc-800 text-zinc-300 text-xs font-medium hover:border-zinc-600 transition flex items-center gap-2">
+                        <button id="show-more-btn" onclick="showMoreArtworks()" class="show-more-btn px-6 py-2.5 text-zinc-300 text-xs font-medium hover:text-white transition flex items-center gap-2">
                             <i data-lucide="plus" class="w-4 h-4"></i>
                             Mostrar más obras
                             <span id="total-artworks-count" class="text-zinc-500 ml-1"></span>
@@ -941,9 +931,9 @@
 
             <!-- TAB: TASKS (Full View) -->
             <div id="tab-tasks" class="w-full max-w-7xl mx-auto hidden flex-col gap-6 px-6 sm:px-8 py-8">
-                <div class="flex items-center justify-between bg-zinc-950 border border-zinc-900 p-6 shadow-2xl">
+                <div class="flex items-center justify-between bg-zinc-950 p-6 shadow-2xl">
                     <div class="flex items-center gap-3">
-                        <div class="p-3 bg-zinc-900 text-zinc-200 border border-zinc-800"><i data-lucide="check-square" class="w-5 h-5"></i></div>
+                        <div class="p-3 bg-zinc-900 text-zinc-200"><i data-lucide="check-square" class="w-5 h-5"></i></div>
                         <div>
                             <h2 class="font-bold text-base text-white">Gestión Completa de Tareas</h2>
                             <p class="text-xs text-zinc-400">Base de datos centralizada de proyectos y subtareas</p>
@@ -954,13 +944,13 @@
                     </button>
                 </div>
                 <div class="grid grid-cols-1 xl:grid-cols-[minmax(0,1.65fr)_minmax(300px,0.85fr)] gap-6 items-start">
-                    <div class="bg-zinc-950 border border-zinc-900 overflow-hidden p-6 shadow-2xl">
+                    <div class="bg-zinc-950 overflow-hidden p-6 shadow-2xl">
                         <div id="tasks-table-container" class="space-y-3"></div>
                     </div>
-                    <aside class="bg-zinc-950 border border-zinc-900 p-5 shadow-2xl xl:sticky xl:top-6" aria-labelledby="catalogs-heading">
-                        <div class="flex items-start justify-between gap-3 border-b border-zinc-900 pb-4">
+                    <aside class="bg-zinc-950 p-5 shadow-2xl xl:sticky xl:top-6" aria-labelledby="catalogs-heading">
+                        <div class="flex items-start justify-between gap-3 pb-4">
                             <div class="flex items-center gap-3">
-                                <div class="p-2.5 bg-violet-500/10 text-violet-300 border border-violet-500/20"><i data-lucide="book-open" class="w-4 h-4"></i></div>
+                                <div class="p-2.5 bg-violet-500/10 text-violet-300"><i data-lucide="book-open" class="w-4 h-4"></i></div>
                                 <div>
                                     <h3 id="catalogs-heading" class="font-bold text-sm text-white">Catálogos</h3>
                                     <p id="catalogs-count" class="text-[10px] text-zinc-500 mt-0.5">Cargando catálogos...</p>
@@ -980,9 +970,9 @@
             <!-- TAB: ARTWORKS (Full View) -->
             <div id="tab-artworks" class="w-full hidden flex-col gap-6">
                 <div class="px-6 sm:px-8 pt-8 max-w-7xl mx-auto w-full">
-                    <div class="flex items-center justify-between bg-zinc-950 border border-zinc-900 p-6 shadow-2xl">
+                    <div class="flex items-center justify-between bg-zinc-950 p-6 shadow-2xl">
                         <div class="flex items-center gap-3">
-                            <div class="p-3 bg-zinc-900 text-zinc-200 border border-zinc-800"><i data-lucide="image" class="w-5 h-5"></i></div>
+                            <div class="p-3 bg-zinc-900 text-zinc-200"><i data-lucide="image" class="w-5 h-5"></i></div>
                             <div>
                                 <h2 class="font-bold text-base text-white">Generador y Catálogo de Obras</h2>
                                 <p class="text-xs text-zinc-400">Registros de obra, inventario y galerías visuales (Más recientes arriba)</p>
@@ -1002,18 +992,18 @@
 
     <!-- MODAL: Detalles de Obra -->
     <div id="artwork-detail-modal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-zinc-950 border border-zinc-800 w-full max-w-4xl max-h-[90vh] overflow-y-auto detail-modal modal-content p-6 shadow-2xl">
-            <div class="flex items-start justify-between border-b border-zinc-900 pb-4 mb-4">
+        <div class="bg-zinc-950 w-full max-w-4xl max-h-[90vh] overflow-y-auto detail-modal modal-content p-6 shadow-2xl">
+            <div class="flex items-start justify-between pb-4 mb-4">
                 <div>
                     <h3 id="detail-title" class="font-bold text-lg text-white">Nombre de la Obra</h3>
                     <p id="detail-subtitle" class="text-xs text-zinc-400 mt-0.5">Autor · Ubicación</p>
                 </div>
                 <div class="flex items-center gap-2">
-                    <button id="toggle-artwork-promotion" type="button" onclick="toggleArtworkPromotion()" class="inline-flex items-center gap-1.5 border px-3 py-2 text-xs font-medium transition" aria-pressed="false">
+                    <button id="toggle-artwork-promotion" type="button" onclick="toggleArtworkPromotion()" class="inline-flex items-center gap-1.5 px-3 py-2 text-xs font-medium transition" aria-pressed="false">
                         <i data-lucide="megaphone" class="w-4 h-4"></i>
                         <span>Promocionar</span>
                     </button>
-                    <button id="share-artwork-whatsapp" type="button" onclick="shareArtworkToWhatsApp()" class="inline-flex items-center gap-1.5 border border-emerald-700/60 bg-emerald-950/40 px-3 py-2 text-xs font-medium text-emerald-300 transition hover:border-emerald-500 hover:text-emerald-100" aria-label="Compartir obra por WhatsApp">
+                    <button id="share-artwork-whatsapp" type="button" onclick="shareArtworkToWhatsApp()" class="inline-flex items-center gap-1.5 bg-emerald-950/40 px-3 py-2 text-xs font-medium text-emerald-300 transition hover:text-emerald-100" aria-label="Compartir obra por WhatsApp">
                         <i data-lucide="share-2" class="w-4 h-4"></i>
                         WhatsApp
                     </button>
@@ -1069,7 +1059,7 @@
                 </div>
             </div>
 
-            <div class="mt-6 pt-4 border-t border-zinc-900">
+            <div class="mt-6 pt-4">
                 <div class="flex gap-6 text-xs">
                     <div class="flex-1">
                         <p class="text-[10px] text-zinc-500 uppercase tracking-wider">Documentos</p>
@@ -1086,8 +1076,8 @@
 
     <!-- MODAL: Seleccionar Remitente de Chat -->
     <div id="chat-sender-modal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-zinc-950 border border-zinc-900 w-full max-w-md p-6 shadow-2xl flex flex-col gap-5">
-            <div class="flex items-center justify-between border-b border-zinc-900 pb-4">
+        <div class="bg-zinc-950 w-full max-w-md p-6 shadow-2xl flex flex-col gap-5">
+            <div class="flex items-center justify-between pb-4">
                 <h3 class="font-bold text-sm text-slate-100 flex items-center gap-2">
                     <i data-lucide="user-check" class="w-4 h-4 text-white"></i>
                     Seleccionar Remitente <span class="text-amber-400 text-xs font-normal">(Requerido)</span>
@@ -1095,25 +1085,25 @@
                 <button onclick="closeChatSenderModal()" class="text-zinc-500 hover:text-white transition"><i data-lucide="x" class="w-5 h-5"></i></button>
             </div>
             <div class="grid grid-cols-2 gap-3">
-                <button onclick="setChatSender('Isabel')" class="p-3.5 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-slate-200 font-medium text-xs flex items-center gap-3 transition">
+                <button onclick="setChatSender('Isabel')" class="p-3.5 bg-zinc-900 hover:bg-zinc-800 text-slate-200 font-medium text-xs flex items-center gap-3 transition">
                     <div class="w-8 h-8 bg-zinc-800 flex items-center justify-center text-white font-bold text-xs">I</div>
                     <span>Isabel</span>
                 </button>
-                <button onclick="setChatSender('Santiago')" class="p-3.5 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-slate-200 font-medium text-xs flex items-center gap-3 transition">
+                <button onclick="setChatSender('Santiago')" class="p-3.5 bg-zinc-900 hover:bg-zinc-800 text-slate-200 font-medium text-xs flex items-center gap-3 transition">
                     <div class="w-8 h-8 bg-zinc-800 flex items-center justify-center text-white font-bold text-xs">S</div>
                     <span>Santiago</span>
                 </button>
-                <button onclick="setChatSender('Diego')" class="p-3.5 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-slate-200 font-medium text-xs flex items-center gap-3 transition">
+                <button onclick="setChatSender('Diego')" class="p-3.5 bg-zinc-900 hover:bg-zinc-800 text-slate-200 font-medium text-xs flex items-center gap-3 transition">
                     <div class="w-8 h-8 bg-zinc-800 flex items-center justify-center text-white font-bold text-xs">D</div>
                     <span>Diego</span>
                 </button>
-                <button onclick="setChatSender('José Manuel')" class="p-3.5 bg-zinc-900 border border-zinc-800 hover:border-zinc-700 text-slate-200 font-medium text-xs flex items-center gap-3 transition">
+                <button onclick="setChatSender('José Manuel')" class="p-3.5 bg-zinc-900 hover:bg-zinc-800 text-slate-200 font-medium text-xs flex items-center gap-3 transition">
                     <div class="w-8 h-8 bg-zinc-800 flex items-center justify-center text-white font-bold text-xs">JM</div>
                     <span>José Manuel</span>
                 </button>
             </div>
             <div id="pending-message-container" class="hidden">
-                <div class="pending-message-indicator text-xs text-amber-400 bg-amber-500/10 border border-amber-500/20 p-2 rounded flex items-center gap-2">
+                <div class="pending-message-indicator text-xs text-amber-400 bg-amber-500/10 p-2 rounded flex items-center gap-2">
                     <i data-lucide="message-square" class="w-3 h-3"></i>
                     <span id="pending-message-text">Mensaje pendiente de enviar</span>
                 </div>
@@ -1123,8 +1113,8 @@
 
     <!-- MODAL: Identificar Responsable para Acción de Estado -->
     <div id="action-login-modal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-zinc-950 border border-zinc-900 w-full max-w-md p-6 shadow-2xl flex flex-col gap-5">
-            <div class="flex items-center justify-between border-b border-zinc-900 pb-4">
+        <div class="bg-zinc-950 w-full max-w-md p-6 shadow-2xl flex flex-col gap-5">
+            <div class="flex items-center justify-between pb-4">
                 <div>
                     <h3 class="font-bold text-sm text-slate-100 flex items-center gap-2">
                         <i data-lucide="user-check" class="w-4 h-4 text-indigo-400"></i> Identificar Responsable
@@ -1141,8 +1131,8 @@
 
     <!-- MODAL: Login / Selección de Director -->
     <div id="login-modal" class="fixed inset-0 modal-overlay z-50 hidden flex items-center justify-center p-4">
-        <div class="bg-zinc-950 border border-zinc-900 w-full max-w-md p-6 shadow-2xl flex flex-col gap-5">
-            <div class="flex items-center justify-between border-b border-zinc-900 pb-4">
+        <div class="bg-zinc-950 w-full max-w-md p-6 shadow-2xl flex flex-col gap-5">
+            <div class="flex items-center justify-between pb-4">
                 <h3 class="font-bold text-sm text-slate-100 flex items-center gap-2">
                     <i data-lucide="shield" class="w-4 h-4 text-white"></i> Iniciar Sesión
                 </h3>
@@ -1151,8 +1141,8 @@
 
             <div id="firebaseUserOption" class="hidden flex flex-col gap-2">
                 <p class="text-xs text-zinc-400">Sesión activa con Google:</p>
-                <div class="flex items-center gap-3 p-3 bg-zinc-900 border border-zinc-800 rounded-sm">
-                    <img id="modalUserAvatar" src="" alt="avatar" class="w-9 h-9 rounded-full border border-zinc-700">
+                <div class="flex items-center gap-3 p-3 bg-zinc-900 rounded-sm">
+                    <img id="modalUserAvatar" src="" alt="avatar" class="w-9 h-9 rounded-full">
                     <div class="flex-1 min-w-0">
                         <p id="modalUserName" class="text-sm font-medium text-white truncate">Usuario</p>
                         <p id="modalUserEmail" class="text-xs text-zinc-400 truncate">email</p>
@@ -1179,7 +1169,7 @@
                 <div class="text-center text-zinc-500 text-xs py-4">Cargando usuarios...</div>
             </div>
 
-            <div class="mt-2 pt-3 border-t border-zinc-900">
+            <div class="mt-2 pt-3">
                 <button onclick="goToLoginPage()" class="w-full text-xs text-zinc-400 hover:text-white transition py-2 flex items-center justify-center gap-2">
                     <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
                         <path d="M15 3h4a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2h-4"/>
@@ -1196,7 +1186,6 @@
     <!-- MODAL: NUEVA TAREA - ESTILO GOOGLE DOCS (PANTALLA COMPLETA) -->
     <!-- ============================================================ -->
     <div id="docs-task-modal" class="docs-modal hidden">
-        <!-- Barra superior -->
         <div class="docs-topbar">
             <div class="docs-topbar-left">
                 <span class="logo">RTBROK</span>
@@ -1213,7 +1202,6 @@
             </div>
         </div>
 
-        <!-- Barra de parámetros (borde superior) -->
         <div class="docs-param-bar">
             <div class="docs-param-item">
                 <label>Proyecto</label>
@@ -1252,7 +1240,6 @@
             </div>
         </div>
 
-        <!-- Cuerpo del documento -->
         <div class="docs-body">
             <div class="docs-page">
                 <input type="text" id="docs-page-title" class="docs-title-display" placeholder="Título de la tarea" autocomplete="off">
@@ -1261,7 +1248,6 @@
             </div>
         </div>
 
-        <!-- Pie de página -->
         <div class="docs-footer">
             <div class="flex items-center gap-2">
                 <span class="status-dot"></span>
@@ -1415,7 +1401,6 @@
             const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
             document.getElementById('current-date').textContent = now.toLocaleDateString('es-ES', options);
 
-            // Inicializar fecha en el modal docs
             const deadlineInput = document.getElementById('docs-deadline-input');
             if (deadlineInput) {
                 const today = new Date();
@@ -1549,7 +1534,7 @@
         };
 
         // ============================================================
-        // TAREAS - TABS FLOTANTES
+        // TAREAS - TABS
         // ============================================================
         window.switchTaskWidgetTab = function(tab) {
             const btnEq = document.getElementById('widget-tab-equipo');
@@ -1630,15 +1615,15 @@
             switch ((estatus || '').toLowerCase()) {
                 case 'completado':
                 case 'completada':
-                    return 'bg-emerald-500/10 text-emerald-400 border border-emerald-500/20';
+                    return 'bg-emerald-500/10 text-emerald-400';
                 case 'en_curso':
-                    return 'bg-blue-500/10 text-blue-400 border border-blue-500/20';
+                    return 'bg-blue-500/10 text-blue-400';
                 case 'en_revision':
-                    return 'bg-amber-500/10 text-amber-400 border border-amber-500/20';
+                    return 'bg-amber-500/10 text-amber-400';
                 case 'bloqueada':
-                    return 'bg-rose-500/10 text-rose-400 border border-rose-500/20';
+                    return 'bg-rose-500/10 text-rose-400';
                 default:
-                    return 'bg-zinc-800 text-slate-400 border border-zinc-700';
+                    return 'bg-zinc-800 text-slate-400';
             }
         }
 
@@ -1679,7 +1664,7 @@
             if (existing) existing.remove();
 
             const div = document.createElement('div');
-            div.className = 'rtbrok-notification fixed bottom-4 left-1/2 -translate-x-1/2 bg-zinc-900 border border-indigo-600/30 px-6 py-3 shadow-2xl z-[100] flex items-center gap-3';
+            div.className = 'rtbrok-notification fixed bottom-4 left-1/2 -translate-x-1/2 bg-zinc-900 px-6 py-3 shadow-2xl z-[100] flex items-center gap-3';
             div.innerHTML = `
                 <span class="text-indigo-400"><i data-lucide="check-circle" class="w-5 h-5"></i></span>
                 <span class="text-sm text-slate-200">${message}</span>
@@ -1793,13 +1778,13 @@
                 const works = Number(catalog.selectedWorksCount) || 0;
                 const artist = catalog.config?.artistName || '';
                 return `
-                    <button type="button" data-catalog-id="${escapeHtml(catalog.id)}" class="catalog-download-card w-full text-left border border-zinc-800 bg-black/50 p-3 hover:border-violet-500/50 hover:bg-violet-500/[0.04] transition focus:outline-none focus:ring-1 focus:ring-violet-400">
+                    <button type="button" data-catalog-id="${escapeHtml(catalog.id)}" class="catalog-download-card w-full text-left bg-black/50 p-3 hover:bg-violet-500/[0.04] transition focus:outline-none focus:ring-1 focus:ring-violet-400">
                         <div class="flex items-start justify-between gap-3">
                             <div class="min-w-0">
                                 <h4 class="text-xs font-semibold text-slate-100 truncate" title="${escapeHtml(catalog.title || 'Catálogo sin título')}">${escapeHtml(catalog.title || 'Catálogo sin título')}</h4>
                                 ${artist ? `<p class="text-[10px] text-violet-300 mt-1 truncate">${escapeHtml(artist)}</p>` : ''}
                             </div>
-                            <span class="shrink-0 text-[10px] text-zinc-400 bg-zinc-900 border border-zinc-800 px-1.5 py-0.5">${works} ${works === 1 ? 'obra' : 'obras'}</span>
+                            <span class="shrink-0 text-[10px] text-zinc-400 bg-zinc-900 px-1.5 py-0.5">${works} ${works === 1 ? 'obra' : 'obras'}</span>
                         </div>
                         <div class="flex items-center justify-between gap-2 mt-2">
                             ${catalog.date ? `<p class="text-[10px] text-zinc-500">Actualizado: ${escapeHtml(catalog.date)}</p>` : '<span></span>'}
@@ -2073,7 +2058,7 @@
                             ${m.sending ? '<span class="text-amber-400 text-[8px] animate-pulse">● Enviando...</span>' : ''}
                             ${m.error ? '<span class="text-rose-400 text-[8px]">● Error</span>' : ''}
                         </div>
-                        <div class="max-w-[85%] px-3 py-2 text-xs ${isMe && m.user !== 'Galería S14' && m.user !== 'Coleccionista' ? 'bg-zinc-900 text-slate-100 border border-zinc-800' : 'bg-zinc-900/60 text-slate-300 border border-zinc-800/80'}">
+                        <div class="max-w-[85%] px-3 py-2 text-xs ${isMe && m.user !== 'Galería S14' && m.user !== 'Coleccionista' ? 'bg-zinc-900 text-slate-100' : 'bg-zinc-900/60 text-slate-300'}">
                             ${m.message}
                         </div>
                     </div>
@@ -2246,7 +2231,7 @@
                     : appData.responsables;
                 container.innerHTML = users.length ? users.map(r => `
                     <button onclick="selectUserForAction('${r.id}', '${r.nombre}', '${r.rol || 'responsable'}')"
-                            class="flex items-center gap-3 p-3 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-indigo-500/50 transition w-full text-left">
+                            class="flex items-center gap-3 p-3 bg-zinc-900 hover:bg-zinc-800 transition w-full text-left">
                         <div class="w-9 h-9 bg-indigo-600/30 flex items-center justify-center text-indigo-400 font-bold text-xs">
                             ${r.nombre ? r.nombre.charAt(0).toUpperCase() : '?'}
                         </div>
@@ -2327,7 +2312,6 @@
         function renderDashboardWidgets() {
             const tasksContainer = document.getElementById('widget-tasks-equipo-pane');
 
-            // Mostrar solo tareas EN CURSO, ordenadas de la más reciente a la más antigua
             const inProgressTasks = [...appData.tasks]
                 .filter(t => (t.estatus || '').toLowerCase() === 'en_curso')
                 .sort((a, b) => {
@@ -2343,7 +2327,6 @@
                     const responsableName = getResponsableNameById(t.id_responsable);
                     const st = (t.estatus || 'pendiente').toLowerCase();
 
-                    // Solo mostramos acciones de "en curso" (enviar a revisión / pausar)
                     let actionButtons = '';
                     if (st === 'en_curso') {
                         actionButtons = `
@@ -2391,21 +2374,21 @@
                 let actionButtons = '';
                 if (st === 'pendiente') {
                     actionButtons =
-                        `<button onclick="requestStatusChange('${t.id}', 'en_curso')" class="px-2.5 py-1 text-xs font-semibold bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 border border-blue-500/30 transition flex items-center gap-1"><i data-lucide="play" class="w-3.5 h-3.5"></i> Iniciar</button>`;
+                        `<button onclick="requestStatusChange('${t.id}', 'en_curso')" class="px-2.5 py-1 text-xs font-semibold bg-blue-600/20 hover:bg-blue-600/40 text-blue-400 transition flex items-center gap-1"><i data-lucide="play" class="w-3.5 h-3.5"></i> Iniciar</button>`;
                 } else if (st === 'en_curso') {
                     actionButtons = `
                         <div class="flex items-center gap-1">
-                            <button onclick="requestStatusChange('${t.id}', 'pendiente')" class="px-2 py-1 text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-300 border border-zinc-700 transition" title="Pausar"><i data-lucide="pause" class="w-3.5 h-3.5"></i></button>
-                            <button onclick="requestStatusChange('${t.id}', 'en_revision')" class="px-2.5 py-1 text-xs font-semibold bg-amber-600/20 hover:bg-amber-600/40 text-amber-400 border border-amber-500/30 transition flex items-center gap-1"><i data-lucide="file-search" class="w-3.5 h-3.5"></i> Enviar a revisión</button>
+                            <button onclick="requestStatusChange('${t.id}', 'pendiente')" class="px-2 py-1 text-xs font-medium bg-zinc-800 hover:bg-zinc-700 text-zinc-300 transition" title="Pausar"><i data-lucide="pause" class="w-3.5 h-3.5"></i></button>
+                            <button onclick="requestStatusChange('${t.id}', 'en_revision')" class="px-2.5 py-1 text-xs font-semibold bg-amber-600/20 hover:bg-amber-600/40 text-amber-400 transition flex items-center gap-1"><i data-lucide="file-search" class="w-3.5 h-3.5"></i> Enviar a revisión</button>
                         </div>
                     `;
                 } else if (st === 'en_revision') {
                     actionButtons =
-                        `<button onclick="requestStatusChange('${t.id}', 'completado')" class="px-2.5 py-1 text-xs font-semibold bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 border border-emerald-500/30 transition flex items-center gap-1"><i data-lucide="check" class="w-3.5 h-3.5"></i> Aprobar</button>`;
+                        `<button onclick="requestStatusChange('${t.id}', 'completado')" class="px-2.5 py-1 text-xs font-semibold bg-emerald-600/20 hover:bg-emerald-600/40 text-emerald-400 transition flex items-center gap-1"><i data-lucide="check" class="w-3.5 h-3.5"></i> Aprobar</button>`;
                 }
 
                 return `
-                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 bg-black border border-zinc-800 hover:border-zinc-700 transition">
+                    <div class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3 p-4 bg-black hover:bg-zinc-900/40 transition">
                         <div class="flex items-start gap-3">
                             <div class="p-2 bg-cyan-500/10 text-cyan-400 mt-0.5"><i data-lucide="check-circle" class="w-4 h-4"></i></div>
                             <div>
@@ -2418,7 +2401,7 @@
                                 <p class="text-xs text-slate-400 mt-0.5">${t.descripcion || ''}</p>
                             </div>
                         </div>
-                        <div class="flex items-center gap-4 text-xs text-slate-400 w-full sm:w-auto justify-between sm:justify-end border-t sm:border-t-0 pt-2 sm:pt-0 border-zinc-800">
+                        <div class="flex items-center gap-4 text-xs text-slate-400 w-full sm:w-auto justify-between sm:justify-end pt-2 sm:pt-0">
                             <span>Límite: <strong class="text-slate-200">${t.fecha_limite || 'N/A'}</strong></span>
                             ${actionButtons}
                         </div>
@@ -2717,7 +2700,7 @@
             const tagsContainer = document.getElementById('detail-tags');
             if (Array.isArray(artwork.tags) && artwork.tags.length > 0) {
                 tagsContainer.innerHTML = artwork.tags.map(tag =>
-                    `<span class="px-2 py-0.5 text-[10px] bg-zinc-800 border border-zinc-700 text-zinc-300 rounded-sm">${tag}</span>`
+                    `<span class="px-2 py-0.5 text-[10px] bg-zinc-800 text-zinc-300 rounded-sm">${tag}</span>`
                 ).join('');
             } else {
                 tagsContainer.innerHTML = '<span class="text-xs text-zinc-500">Sin etiquetas</span>';
@@ -2753,7 +2736,7 @@
             button.setAttribute('aria-pressed', String(isPromoted));
             button.className = isPromoted
                 ? 'inline-flex items-center gap-1.5 border border-fuchsia-400/60 bg-fuchsia-500/10 px-3 py-2 text-xs font-medium text-fuchsia-200 transition hover:border-fuchsia-300 hover:text-white'
-                : 'inline-flex items-center gap-1.5 border border-zinc-700 bg-zinc-900 px-3 py-2 text-xs font-medium text-zinc-300 transition hover:border-fuchsia-500/60 hover:text-fuchsia-200';
+                : 'inline-flex items-center gap-1.5 bg-zinc-900 px-3 py-2 text-xs font-medium text-zinc-300 transition hover:text-fuchsia-200';
             button.innerHTML = isPromoted
                 ? '<i data-lucide="megaphone-off" class="w-4 h-4"></i><span>Quitar promoción</span>'
                 : '<i data-lucide="megaphone" class="w-4 h-4"></i><span>Promocionar</span>';
@@ -2900,7 +2883,7 @@
 
             container.innerHTML = directors.map(d => `
                 <button onclick="selectDirector('${d.id}', '${d.nombre}', '${d.rol}')"
-                        class="flex items-center gap-3 p-3 bg-zinc-900 hover:bg-zinc-800 border border-zinc-800 hover:border-indigo-500/50 transition w-full text-left">
+                        class="flex items-center gap-3 p-3 bg-zinc-900 hover:bg-zinc-800 transition w-full text-left">
                     <div class="w-10 h-10 bg-indigo-600/30 flex items-center justify-center text-indigo-400 font-bold text-sm">
                         ${d.nombre ? d.nombre.charAt(0).toUpperCase() : '?'}
                     </div>
@@ -2930,17 +2913,14 @@
                 return;
             }
 
-            // Mostrar quién crea
             const authBadge = document.getElementById('docs-auth-user');
             if (authBadge) {
                 authBadge.textContent = `${taskFlow.authenticatedUser.nombre} (${taskFlow.authenticatedUser.rol})`;
             }
 
-            // Poblar selects
             populateDocsProjectSelect();
             populateDocsResponsibleSelect();
 
-            // Reset campos
             document.getElementById('docs-task-title').value = '';
             document.getElementById('docs-task-subtitle').value = '';
             document.getElementById('docs-page-title').value = '';
@@ -2955,11 +2935,9 @@
             weekLater.setDate(today.getDate() + 7);
             document.getElementById('docs-deadline-input').value = weekLater.toISOString().split('T')[0];
 
-            // Mostrar modal
             document.getElementById('docs-task-modal').classList.remove('hidden');
             document.body.style.overflow = 'hidden';
 
-            // Focus en título
             setTimeout(() => {
                 document.getElementById('docs-task-title').focus();
             }, 100);
@@ -3052,7 +3030,6 @@
             }
         }
 
-        // Sincronizar título y subtítulo entre barra y documento
         document.getElementById('docs-task-title')?.addEventListener('input', function() {
             document.getElementById('docs-page-title').value = this.value;
         });
