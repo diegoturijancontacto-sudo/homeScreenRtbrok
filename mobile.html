@@ -283,6 +283,51 @@
             transform: scale(1.02);
         }
 
+        .artwork-grid .art-item .art-info {
+            position: absolute;
+            inset: auto 0 0 0;
+            background: linear-gradient(180deg, rgba(0,0,0,0), rgba(0,0,0,0.92));
+            padding: 16px 6px 7px;
+            z-index: 1;
+        }
+
+        .artwork-grid .art-item .art-title {
+            font-size: 9px;
+            line-height: 1.2;
+            font-weight: 700;
+            color: #f8fafc;
+            letter-spacing: 0.02em;
+            margin-bottom: 2px;
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+
+        .artwork-grid .art-item .art-author {
+            font-size: 7px;
+            line-height: 1.2;
+            color: #e2e8f0;
+            margin-bottom: 3px;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .artwork-grid .art-item .art-meta {
+            font-size: 6px;
+            line-height: 1.2;
+            color: #cbd5e1;
+            white-space: nowrap;
+            overflow: hidden;
+            text-overflow: ellipsis;
+        }
+
+        .artwork-grid .art-item .art-meta span {
+            color: #94a3b8;
+            font-weight: 600;
+        }
+
         .artwork-grid .art-item .art-badge {
             position: absolute;
             top: 4px;
@@ -296,11 +341,12 @@
             color: #a1a1aa;
             border: 1px solid rgba(255, 255, 255, 0.05);
             border-radius: 0px;
+            z-index: 2;
         }
 
         .artwork-grid .art-item .promo-tag {
             position: absolute;
-            bottom: 4px;
+            bottom: 44px;
             left: 4px;
             background: rgba(0, 0, 0, 0.7);
             backdrop-filter: blur(2px);
@@ -313,6 +359,7 @@
             display: flex;
             align-items: center;
             gap: 3px;
+            z-index: 2;
         }
 
         /* ---------- NUEVA BARRA DE NAVEGACIÓN FLOTANTE ---------- */
@@ -1694,12 +1741,22 @@
                 const img = resolveImageUrl(a.adjuntos, a.nombre_obra);
                 const statusColor = { 'Consolidación': 'border-amber-500/30 text-amber-400', 'Bodega': 'border-blue-500/30 text-blue-400',
                     'Vendida': 'border-emerald-500/30 text-emerald-400' } [a.estatus] || 'border-zinc-500/30 text-zinc-400';
+                const title = a.nombre_obra || 'Sin título';
+                const author = a.autor || 'Autor desconocido';
+                const technique = a.tecnica || a.tipo_obra || 'No especificado';
+                const provenance = a.provenance || a.procedencia || a.origen || 'No especificado';
                 return `
                     <div class="art-item" onclick="openArtworkDetail('${a.id}')">
-                        <img src="${img}" alt="${a.nombre_obra || 'Obra'}" loading="lazy"
+                        <img src="${img}" alt="${title}" loading="lazy"
                              onerror="this.onerror=null; this.src='https://placehold.co/400x400/18181b/71717a?text=Obra';">
                         <div class="art-badge ${statusColor}">${a.estatus || 'Consolidación'}</div>
                         ${a.promocionar ? `<div class="promo-tag"><i data-lucide="megaphone" class="w-2.5 h-2.5"></i> Promo</div>` : ''}
+                        <div class="art-info">
+                            <div class="art-title">${title}</div>
+                            <div class="art-author">${author}</div>
+                            <div class="art-meta"><span>Técnica:</span> ${technique}</div>
+                            <div class="art-meta"><span>Provenance:</span> ${provenance}</div>
+                        </div>
                     </div>
                 `;
             }).join('');
@@ -1819,12 +1876,22 @@
                 const img = resolveImageUrl(a.adjuntos, a.nombre_obra);
                 const statusColor = { 'Consolidación': 'border-amber-500/30 text-amber-400', 'Bodega': 'border-blue-500/30 text-blue-400',
                     'Vendida': 'border-emerald-500/30 text-emerald-400' } [a.estatus] || 'border-zinc-500/30 text-zinc-400';
+                const title = a.nombre_obra || 'Sin título';
+                const author = a.autor || 'Autor desconocido';
+                const technique = a.tecnica || a.tipo_obra || 'No especificado';
+                const provenance = a.provenance || a.procedencia || a.origen || 'No especificado';
                 return `
                     <div class="art-item" onclick="openArtworkDetail('${a.id}')">
-                        <img src="${img}" alt="${a.nombre_obra || 'Obra'}" loading="lazy"
+                        <img src="${img}" alt="${title}" loading="lazy"
                              onerror="this.onerror=null; this.src='https://placehold.co/400x400/18181b/71717a?text=Obra';">
                         <div class="art-badge ${statusColor}">${a.estatus || 'Consolidación'}</div>
                         ${a.promocionar ? `<div class="promo-tag"><i data-lucide="megaphone" class="w-2.5 h-2.5"></i> Promo</div>` : ''}
+                        <div class="art-info">
+                            <div class="art-title">${title}</div>
+                            <div class="art-author">${author}</div>
+                            <div class="art-meta"><span>Técnica:</span> ${technique}</div>
+                            <div class="art-meta"><span>Provenance:</span> ${provenance}</div>
+                        </div>
                     </div>
                 `;
             }).join('');
