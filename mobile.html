@@ -1190,6 +1190,7 @@
             proyectos: [],
             subproyectos: [],
             responsables: [],
+            comisiones: [],
         };
 
         let taskFlow = { authenticatedUser: null };
@@ -1414,6 +1415,11 @@
             return responsable ? responsable.nombre : 'Desconocido';
         }
 
+        function getProvenanceNameById(provenanceId) {
+            const commission = appData.comisiones.find(item => String(item.id).trim() === String(provenanceId || '').trim());
+            return commission?.provenance || 'No especificado';
+        }
+
         function getStatusBadgeColor(estatus) {
             switch ((estatus || '').toLowerCase()) {
                 case 'completado':
@@ -1501,8 +1507,10 @@
                 if (resA) {
                     const dataA = await resA.json();
                     appData.artworks = dataA.registrosObra || dataA.data || getMockArtworks();
+                    appData.comisiones = dataA.comisiones || [];
                 } else {
                     appData.artworks = getMockArtworks();
+                    appData.comisiones = [];
                 }
 
                 renderTasksTable();
@@ -1518,6 +1526,7 @@
             } catch (e) {
                 appData.tasks = getMockTasks();
                 appData.artworks = getMockArtworks();
+                appData.comisiones = [];
                 renderTasksTable();
                 renderArtworks();
                 renderFullArtworksGrid();
@@ -1744,7 +1753,7 @@
                 const title = a.nombre_obra || 'Sin título';
                 const author = a.autor || 'Autor desconocido';
                 const technique = a.tecnica || a.tipo_obra || 'No especificado';
-                const provenance = a.provenance || a.procedencia || a.origen || 'No especificado';
+                const provenance = getProvenanceNameById(a.provenance);
                 return `
                     <div class="art-item" onclick="openArtworkDetail('${a.id}')">
                         <img src="${img}" alt="${title}" loading="lazy"
@@ -1879,7 +1888,7 @@
                 const title = a.nombre_obra || 'Sin título';
                 const author = a.autor || 'Autor desconocido';
                 const technique = a.tecnica || a.tipo_obra || 'No especificado';
-                const provenance = a.provenance || a.procedencia || a.origen || 'No especificado';
+                const provenance = getProvenanceNameById(a.provenance);
                 return `
                     <div class="art-item" onclick="openArtworkDetail('${a.id}')">
                         <img src="${img}" alt="${title}" loading="lazy"

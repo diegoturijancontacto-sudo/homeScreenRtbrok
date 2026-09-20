@@ -1324,6 +1324,7 @@
             subproyectos: [],
             responsables: [],
             catalogs: [],
+            comisiones: [],
             messages: []
         };
 
@@ -1632,6 +1633,11 @@
             return responsable ? responsable.nombre : 'Desconocido';
         }
 
+        function getProvenanceNameById(provenanceId) {
+            const commission = appData.comisiones.find(item => String(item.id).trim() === String(provenanceId || '').trim());
+            return commission?.provenance || 'No especificado';
+        }
+
         function getStatusBadgeColor(estatus) {
             switch ((estatus || '').toLowerCase()) {
                 case 'completado':
@@ -1733,8 +1739,10 @@
                 if (resA) {
                     const dataA = await resA.json();
                     appData.artworks = dataA.registrosObra || dataA.data || getMockArtworks();
+                    appData.comisiones = dataA.comisiones || [];
                 } else {
                     appData.artworks = getMockArtworks();
+                    appData.comisiones = [];
                 }
 
                 await setCatalogsFromResponse(resC);
@@ -1750,6 +1758,7 @@
             } catch (e) {
                 appData.tasks = getMockTasks();
                 appData.artworks = getMockArtworks();
+                appData.comisiones = [];
                 appData.catalogs = [];
                 renderDashboardWidgets();
                 renderTasksTable();
@@ -2509,7 +2518,7 @@
                     'Vendida': 'border-emerald-500/30 text-emerald-400'
                 } [a.estatus] || 'border-zinc-500/30 text-zinc-400';
                 const technique = a.tecnica || a.tipo_obra || 'No especificado';
-                const provenance = a.provenance || a.procedencia || a.origen || 'No especificado';
+                const provenance = getProvenanceNameById(a.provenance);
 
                 return `
                     <div class="artwork-item artwork-card" onclick="openArtworkDetail('${a.id}')">
@@ -2580,7 +2589,7 @@
                     'Vendida': 'border-emerald-500/30 text-emerald-400'
                 } [a.estatus] || 'border-zinc-500/30 text-zinc-400';
                 const technique = a.tecnica || a.tipo_obra || 'No especificado';
-                const provenance = a.provenance || a.procedencia || a.origen || 'No especificado';
+                const provenance = getProvenanceNameById(a.provenance);
 
                 return `
                     <div class="artwork-item artwork-card" onclick="openArtworkDetail('${a.id}')">
