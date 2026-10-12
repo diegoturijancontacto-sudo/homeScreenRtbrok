@@ -25,7 +25,7 @@
     
         if (!isMobilePage() && isMobile()) {
             sessionStorage.setItem('rtbrok_redirect_lock', '1');
-            window.location.replace('mobile.html');
+            window.location.replace('mobile.html' + window.location.search + window.location.hash);
             return;
         }
     })();
@@ -1493,6 +1493,8 @@
             updateChatSenderUI();
             fetchAllData();
             loadInstagramFeed();   // llena preview del dashboard + tab de Instagram
+            openTabFromUrl();      // enlaces directos: ?tab=instagram o #instagram
+            window.addEventListener('hashchange', openTabFromUrl);
             setInterval(fetchChatMessages, 8000);
             renderLocalTasks();
 
@@ -1634,6 +1636,16 @@
                 loadInstagramFeed();
             }
         };
+
+        // Enlace directo a una pestaña:
+        //   index.html?tab=instagram   o   index.html#instagram
+        function openTabFromUrl() {
+            const params = new URLSearchParams(window.location.search);
+            const raw = (params.get('tab') || window.location.hash.replace('#', '') || '').toLowerCase();
+            const aliases = { ig: 'instagram', publicaciones: 'instagram', obras: 'artworks', tareas: 'tasks', inicio: 'dashboard' };
+            const tab = aliases[raw] || raw;
+            if (tab && tabsOrder.includes(tab)) switchTab(tab);
+        }
 
         window.nextPage = function() {
             switchTab(tabsOrder[(currentTabIdx + 1) % tabsOrder.length]);
