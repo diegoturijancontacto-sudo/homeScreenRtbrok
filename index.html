@@ -772,7 +772,7 @@
         .art-hero h2 .brand-at { display:inline-grid; place-items:center; border:3px solid #fff; border-radius:50%; width:.9em; height:.9em; margin-right:2px; font-size:.82em; }
         .art-hero-copy p { margin:6px 0 0 62px; font:20px Georgia,serif; color:#f4f4f5; }
         .art-hero-actions { display:flex; align-items:center; gap:8px; position:relative; z-index:1; }
-        .art-action { min-height:45px; display:inline-flex; align-items:center; gap:9px; padding:0 15px; background:rgba(8,12,18,.86); border:1px solid #252a33; border-radius:6px; color:#f4f4f5; font-size:12px; font-weight:600; text-decoration:none; white-space:nowrap; }
+        .art-action { min-height:45px; display:inline-flex; align-items:center; gap:9px; padding:0 15px; background:rgba(8,12,18,.86); border:1px solid #252a33; border-radius:6px; color:#f4f4f5; font-size:12px; font-weight:600; text-decoration:none; white-space:nowrap; cursor:pointer; }
         .art-action svg { width:17px; height:17px; }
         .art-action-gold { background:#a97836; border-color:#bd904e; }
         .art-stats { display:grid; grid-template-columns:repeat(5,minmax(0,1fr)); gap:10px; }
@@ -782,12 +782,72 @@
         .stat-icon svg { width:20px;height:20px; }.stat-icon.green{color:#10c89b;background:#0b2a27}.stat-icon.yellow{color:#facc15;background:#292414}.stat-icon.blue{color:#9bb7d8}.stat-icon.red{color:#fb4562;background:#28151d}
         .art-stat small { display:block;color:#a5afbd;font-size:12px;margin-bottom:4px; }.art-stat strong{font-size:21px;font-weight:600;color:#f8fafc;}
         .art-content-grid { display:grid;grid-template-columns:minmax(250px,.95fr) minmax(450px,1.8fr) minmax(250px,1fr);gap:10px;align-items:stretch; }
-        .art-panel { min-width:0;padding:14px; }.art-panel-heading { display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px; }.art-panel-heading h3{font-size:14px;font-weight:650;color:#f4f4f5;margin:0;}.art-panel-heading button{display:flex;align-items:center;gap:5px;color:#aab4c1;font-size:11px;white-space:nowrap}.art-panel-heading button svg{width:14px;height:14px}
+        .art-panel { min-width:0;padding:14px; }.art-panel-heading { display:flex;align-items:center;justify-content:space-between;margin-bottom:12px;gap:8px; }.art-panel-heading h3{font-size:14px;font-weight:650;color:#f4f4f5;margin:0;}.art-panel-heading button{display:flex;align-items:center;gap:5px;color:#aab4c1;font-size:11px;white-space:nowrap;}.art-panel-heading button svg{width:14px;height:14px}
         .activity-list { display:flex;flex-direction:column;gap:9px; }.activity-item{display:grid;grid-template-columns:7px 54px 1fr;align-items:center;gap:10px;min-height:62px}.activity-item img{width:54px;height:54px;object-fit:cover;border-radius:6px;background:#171b21}.activity-item strong{display:block;color:#f4f4f5;font-size:12px}.activity-item p{margin:3px 0;color:#adb7c4;font-size:11px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}.activity-item small{color:#788493;font-size:10px}.activity-dot{width:8px;height:8px;border-radius:50%;background:#a855f7}.dot-1{background:#00bd94}.dot-2{background:#facc15}.dot-3{background:#93a9c3}.dot-4{background:#fb4562}
         .art-promo-grid { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px; }.art-promo-grid .artwork-item{aspect-ratio: .77;border:0;border-radius:6px}.art-promo-grid .status-badge{display:none}.art-promo-grid .promotion-badge{top:auto;bottom:7px;left:7px;right:auto;padding:3px 6px;color:#facc15;background:rgba(0,0,0,.8)}.art-promo-grid .hover-info{opacity:1;padding:9px 8px;background:linear-gradient(transparent,rgba(0,0,0,.94))}.art-promo-grid .hover-info .title{font-size:11px}.art-promo-grid .hover-info .sub,.art-promo-grid .hover-info .meta{display:none}.art-dashboard #show-more-btn{display:none!important}
         .art-catalog-list { display:flex;flex-direction:column;gap:8px;max-height:260px;overflow:auto; }.art-catalog-list .catalog-download-card{display:flex;align-items:center;gap:10px;padding:10px;background:#090d12;border:1px solid #1a2029;border-radius:6px}.art-catalog-list .catalog-download-card > div:first-child{flex:1}.art-catalog-list h4{font-size:12px}.art-catalog-list p{font-size:10px}.art-catalog-list .catalog-download-card > div:last-child{margin:0}.legacy-dashboard-runtime{display:none!important}
-        @media(max-width:1150px){body>aside{width:78px!important;padding:16px 8px!important;align-items:center!important}body>aside>div:first-child{align-items:center!important}body>aside>div:first-child>div:first-child{width:48px!important;justify-content:center!important;padding:0!important}.sidebar-logo{width:48px;height:38px;object-fit:contain}body>aside>div:first-child>a{flex-direction:column!important;padding:7px 3px;gap:3px!important}body>aside>div:first-child>a span{font-size:9px!important;text-align:center}.art-content-grid{grid-template-columns:minmax(220px,.8fr) minmax(400px,1.5fr)}.art-catalogs{grid-column:1/-1}.art-catalog-list{display:grid;grid-template-columns:repeat(3,1fr)}}
-        @media(max-width:760px){body>aside{display:none!important}.art-hero{min-height:260px;align-items:flex-start;flex-direction:column;padding:22px;background-position:center}.art-hero-logo{width:min(88vw,430px)}.art-hero-actions{flex-wrap:wrap}.art-action{min-height:38px;padding:0 10px;font-size:10px}.art-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.art-stat:last-child{grid-column:1/-1}.art-content-grid{grid-template-columns:1fr}.art-catalogs{grid-column:auto}.art-catalog-list{display:flex}.art-promo-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.art-promotions{grid-row:1}.activity-item{grid-template-columns:7px 54px 1fr}body>div.flex-1.flex.flex-col>header{padding:10px 14px!important}body>div.flex-1.flex.flex-col>header>div:last-child #current-date{display:none}}
+
+        /* Preview Instagram en el dashboard */
+        .art-instagram-preview { display: flex; flex-direction: column; }
+        .art-instagram-preview #instagram-preview-grid { flex: 1; }
+        .art-instagram-preview .ig-preview-card {
+            position: relative;
+            aspect-ratio: 1 / 1;
+            overflow: hidden;
+            border-radius: 6px;
+            background: #090d12;
+            border: 1px solid #1a2029;
+            cursor: pointer;
+            transition: transform 0.25s ease, box-shadow 0.25s ease;
+            display: block;
+        }
+        .art-instagram-preview .ig-preview-card:hover {
+            transform: scale(1.03);
+            box-shadow: 0 0 20px rgba(236, 72, 153, 0.15);
+        }
+        .art-instagram-preview .ig-preview-card img {
+            width: 100%;
+            height: 100%;
+            object-fit: cover;
+            display: block;
+        }
+        .art-instagram-preview .ig-preview-card .ig-overlay {
+            position: absolute;
+            inset: 0;
+            background: linear-gradient(transparent 55%, rgba(0,0,0,0.85));
+            opacity: 0;
+            transition: opacity 0.25s ease;
+            display: flex;
+            align-items: flex-end;
+            padding: 8px;
+        }
+        .art-instagram-preview .ig-preview-card:hover .ig-overlay { opacity: 1; }
+        .art-instagram-preview .ig-preview-card .ig-caption {
+            font-size: 9px;
+            color: #e5e7eb;
+            line-height: 1.3;
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .art-instagram-preview .ig-preview-card .ig-video-badge {
+            position: absolute;
+            top: 6px;
+            right: 6px;
+            background: rgba(0,0,0,0.75);
+            backdrop-filter: blur(4px);
+            padding: 2px 6px;
+            border-radius: 3px;
+            font-size: 9px;
+            color: #f9a8d4;
+            display: inline-flex;
+            align-items: center;
+            gap: 3px;
+        }
+
+        @media(max-width:1150px){body>aside{width:78px!important;padding:16px 8px!important;align-items:center!important}body>aside>div:first-child{align-items:center!important}body>aside>div:first-child>div:first-child{width:48px!important;justify-content:center!important;padding:0!important}.sidebar-logo{width:48px;height:38px;object-fit:contain}body>aside>div:first-child>a{flex-direction:column!important;padding:7px 3px;gap:3px!important}body>aside>div:first-child>a span{font-size:9px!important;text-align:center}.art-content-grid{grid-template-columns:minmax(220px,.8fr) minmax(400px,1.5fr)}.art-catalogs{grid-column:1/-1}.art-instagram-preview{grid-column:1/-1}.art-catalog-list{display:grid;grid-template-columns:repeat(3,1fr)}}
+        @media(max-width:760px){body>aside{display:none!important}.art-hero{min-height:260px;align-items:flex-start;flex-direction:column;padding:22px;background-position:center}.art-hero-logo{width:min(88vw,430px)}.art-hero-actions{flex-wrap:wrap}.art-action{min-height:38px;padding:0 10px;font-size:10px}.art-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.art-stat:last-child{grid-column:1/-1}.art-content-grid{grid-template-columns:1fr}.art-catalogs{grid-column:auto}.art-instagram-preview{grid-column:auto}.art-catalog-list{display:flex}.art-promo-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.art-promotions{grid-row:1}.activity-item{grid-template-columns:7px 54px 1fr}body>div.flex-1.flex.flex-col>header{padding:10px 14px!important}body>div.flex-1.flex.flex-col>header>div:last-child #current-date{display:none}}
     </style>
 </head>
 <body class="h-full bg-black text-slate-100 flex overflow-hidden select-none">
@@ -813,7 +873,7 @@
                 <div class="w-11 h-11 bg-zinc-900/40 group-hover:bg-zinc-900 flex items-center justify-center transition shadow-lg"><i data-lucide="images" class="w-5 h-5"></i></div>
                 <span class="text-[10px] font-medium tracking-tight">Obras</span>
             </a>
-            <a href="https://www.instagram.com/" target="_self" class="group flex flex-col items-center gap-1.5 text-zinc-400 hover:text-white transition">
+            <a href="#" onclick="event.preventDefault(); switchTab('instagram')" class="group flex flex-col items-center gap-1.5 text-zinc-400 hover:text-white transition">
                 <div class="w-11 h-11 bg-zinc-900/40 group-hover:bg-zinc-900 flex items-center justify-center transition shadow-lg">
                     <i class="fab fa-instagram fa-lg"></i>
                 </div>
@@ -887,7 +947,7 @@
                         <button onclick="switchTab('artworks')" class="art-action art-action-gold"><i data-lucide="plus"></i>Nueva obra</button>
                         <a href="https://frontline-zeta-ecru.vercel.app/movil/" class="art-action"><i data-lucide="file-text"></i>Crear catálogo</a>
                         <a href="https://docs.google.com/forms/d/e/1FAIpQLSdC-_if3uzNyq3BuU3YhlUD1ONInOwe4Cv_G4MM1PJrnsDRuw/viewform?usp=header" class="art-action"><i data-lucide="shield-check"></i>Generar certificado</a>
-                        <a href="https://www.instagram.com/" class="art-action"><i data-lucide="instagram"></i>Ir a Instagram</a>
+                        <button type="button" onclick="switchTab('instagram')" class="art-action"><i class="fab fa-instagram"></i>Ver Instagram</button>
                     </div>
                 </section>
 
@@ -909,6 +969,24 @@
                         <div id="artworks-carousel" class="art-promo-grid"></div>
                         <button id="show-more-btn" onclick="showMoreArtworks()" class="show-more-btn">Mostrar más obras <span id="total-artworks-count"></span></button>
                     </section>
+
+                    <!-- NUEVO: Instagram preview en el dashboard (arriba de Catálogos) -->
+                    <section class="art-panel art-instagram-preview">
+                        <div class="art-panel-heading">
+                            <h3 class="flex items-center gap-2">
+                                <i class="fab fa-instagram text-pink-400"></i> Instagram
+                            </h3>
+                            <button onclick="switchTab('instagram')">Ver todas <i data-lucide="arrow-right"></i></button>
+                        </div>
+                        <p class="text-[10px] text-orange-400 font-medium mb-2 flex items-center gap-1.5">
+                            <i data-lucide="clock" class="w-3 h-3"></i>
+                            Se actualiza a las 8:00 AM y 8:00 PM (hora de México) todos los días.
+                        </p>
+                        <div id="instagram-preview-grid" class="grid grid-cols-2 gap-2">
+                            <p class="text-xs text-zinc-500 col-span-full text-center py-6">Cargando publicaciones…</p>
+                        </div>
+                    </section>
+
                     <section class="art-panel art-catalogs">
                         <div class="art-panel-heading"><h3>Catálogos recientes</h3><button onclick="switchTab('tasks')">Ver todos <i data-lucide="arrow-right"></i></button></div>
                         <p id="dashboard-catalogs-count" class="sr-only"></p>
@@ -979,6 +1057,33 @@
                 <div class="w-full pb-10">
                     <div id="artworks-grid-container" class="gallery-grid w-full">
                         <!-- Populated dynamically -->
+                    </div>
+                </div>
+            </div>
+
+            <!-- TAB: INSTAGRAM (Feed embebido) -->
+            <div id="tab-instagram" class="w-full hidden flex-col gap-6">
+                <div class="px-6 sm:px-8 pt-8 max-w-7xl mx-auto w-full">
+                    <div class="flex items-center justify-between bg-zinc-950 p-6 shadow-2xl">
+                        <div class="flex items-center gap-3">
+                            <div class="p-3 bg-zinc-900 text-pink-400"><i class="fab fa-instagram text-xl"></i></div>
+                            <div>
+                                <h2 class="font-bold text-base text-white">Publicaciones de Instagram</h2>
+                                <p id="instagram-sub" class="text-xs text-zinc-400">Cargando…</p>
+                            </div>
+                        </div>
+                        <button type="button" onclick="loadInstagramFeed(true)" class="p-2 text-zinc-500 hover:text-white hover:bg-zinc-900 transition" title="Actualizar publicaciones" aria-label="Actualizar publicaciones">
+                            <i data-lucide="refresh-cw" class="w-4 h-4"></i>
+                        </button>
+                    </div>
+                </div>
+                <div class="w-full pb-10 px-6 sm:px-8 max-w-7xl mx-auto">
+                    <p class="text-[11px] text-orange-400 font-medium mb-3 flex items-center gap-2 bg-orange-500/10 border border-orange-500/20 px-3 py-2 rounded">
+                        <i data-lucide="clock" class="w-3.5 h-3.5"></i>
+                        Esta sección se actualiza automáticamente a las <strong>8:00 AM</strong> y <strong>8:00 PM</strong> (hora de México) todos los días.
+                    </p>
+                    <div id="instagram-grid" class="grid gap-4" style="grid-template-columns:repeat(auto-fill,minmax(240px,1fr));">
+                        <p class="text-xs text-zinc-500 col-span-full text-center py-10">Cargando publicaciones…</p>
                     </div>
                 </div>
             </div>
@@ -1288,6 +1393,7 @@
         const ENDPOINT_CHAT = 'https://script.google.com/macros/s/AKfycbzU6YqBsWekqjP-SOV1_LCV_GQnO1ZX9Gl0Th-U2dwTx2yJe0x1MmmnovRwT0qAYui6/exec';
         const ENDPOINT_CATALOGS = 'https://script.google.com/macros/s/AKfycbx1wIgADNvhYVbo9nNduz-jtz9s1pkvsZGXL3r6rmfjcWK0NWLFLHuw9zE5B21PF2OXow/exec';
         const CHAT_API_URL = 'https://bot-yy1q.onrender.com/send';
+        const INSTAGRAM_BASE = 'https://raw.githubusercontent.com/diegoturijancontacto-sudo/proyectBND/main/instagram';
 
         // ============================================================
         // ESTADO GLOBAL
@@ -1309,12 +1415,14 @@
         let taskFlow = { authenticatedUser: null };
         let pendingStatusChange = null;
         let pendingArtworkPromotion = null;
-        const tabsOrder = ['dashboard', 'tasks', 'artworks'];
+        const tabsOrder = ['dashboard', 'tasks', 'artworks', 'instagram'];
         let currentTabIdx = 0;
 
         const INITIAL_ARTWORKS = 12;
         const ARTWORKS_PER_PAGE = 12;
         let displayedArtworksCount = INITIAL_ARTWORKS;
+
+        let instagramLoaded = false;
 
         // ============================================================
         // INICIO
@@ -1384,6 +1492,7 @@
             initClock();
             updateChatSenderUI();
             fetchAllData();
+            loadInstagramFeed();   // llena preview del dashboard + tab de Instagram
             setInterval(fetchChatMessages, 8000);
             renderLocalTasks();
 
@@ -1510,6 +1619,7 @@
             if (currentTabIdx === -1) currentTabIdx = 0;
             tabsOrder.forEach(t => {
                 const el = document.getElementById(`tab-${t}`);
+                if (!el) return;
                 if (t === tabName) {
                     el.classList.replace('hidden', 'flex');
                 } else {
@@ -1519,6 +1629,9 @@
             lucide.createIcons();
             if (tabName === 'artworks') {
                 renderFullArtworksGrid();
+            }
+            if (tabName === 'instagram') {
+                loadInstagramFeed();
             }
         };
 
@@ -1583,6 +1696,7 @@
 
         function renderLocalTasks() {
             const container = document.getElementById('widget-tasks-yo-list');
+            if (!container) return;
             if (!localTasks || localTasks.length === 0) {
                 container.innerHTML = `<p class="text-xs text-slate-500 text-center py-6">No tienes tareas personales. Añade una arriba.</p>`;
                 return;
@@ -1685,6 +1799,98 @@
             e.preventDefault();
             const q = document.getElementById('search-input').value.trim();
             if (q) window.open(`https://www.google.com/search?q=${encodeURIComponent(q)}`, '_blank');
+        };
+
+        // ============================================================
+        // INSTAGRAM FEED (dashboard preview + tab completo)
+        // ============================================================
+        window.loadInstagramFeed = async function(force = false) {
+            const grid = document.getElementById('instagram-grid');
+            const preview = document.getElementById('instagram-preview-grid');
+            const sub = document.getElementById('instagram-sub');
+            if (!grid && !preview) return;
+            if (instagramLoaded && !force) return;
+
+            if (grid) grid.innerHTML = '<p class="text-xs text-zinc-500 col-span-full text-center py-10">Cargando publicaciones…</p>';
+            if (preview) preview.innerHTML = '<p class="text-xs text-zinc-500 col-span-full text-center py-6">Cargando publicaciones…</p>';
+            if (sub) sub.textContent = 'Cargando…';
+
+            try {
+                const res = await fetch(`${INSTAGRAM_BASE}/posts.json`, { cache: 'no-cache' });
+                if (!res.ok) throw new Error('HTTP ' + res.status);
+                const feed = await res.json();
+
+                const username = feed.username || 'instagram';
+                const updated = feed.updated_at
+                    ? new Date(feed.updated_at).toLocaleString('es-MX')
+                    : '';
+                if (sub) sub.textContent = `@${username}${updated ? ' · actualizado ' + updated : ''}`;
+
+                const posts = Array.isArray(feed.posts) ? feed.posts : [];
+                if (!posts.length) {
+                    if (grid) grid.innerHTML = '<p class="text-xs text-zinc-500 col-span-full text-center py-10">No hay publicaciones disponibles.</p>';
+                    if (preview) preview.innerHTML = '<p class="text-xs text-zinc-500 col-span-full text-center py-6">No hay publicaciones.</p>';
+                    instagramLoaded = true;
+                    return;
+                }
+
+                // ---- Vista completa (tab Instagram) ----
+                if (grid) {
+                    grid.innerHTML = posts.map(p => {
+                        const imgSrc = `${INSTAGRAM_BASE}/${p.image}`;
+                        const caption = escapeHtml(p.caption || '');
+                        const date = p.timestamp
+                            ? new Date(p.timestamp).toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' })
+                            : '';
+                        const linkLabel = p.is_video ? 'Ver video en Instagram' : 'Ver en Instagram';
+                        return `
+                            <article class="bg-zinc-950 border border-zinc-900 rounded-xl overflow-hidden flex flex-col">
+                                <img src="${imgSrc}" alt="${escapeHtml((p.caption || 'Publicación de Instagram').slice(0, 120))}" loading="lazy"
+                                     class="w-full aspect-square object-cover bg-zinc-900"
+                                     onerror="this.onerror=null;this.src='https://placehold.co/600x600/18181b/71717a?text=Instagram';">
+                                <div class="p-3 flex flex-col gap-2 flex-1">
+                                    <p class="text-xs text-zinc-300 whitespace-pre-line" style="display:-webkit-box;-webkit-line-clamp:5;-webkit-box-orient:vertical;overflow:hidden;">${caption}</p>
+                                    <div class="mt-auto flex items-center justify-between text-[10px] text-zinc-500">
+                                        <span>${escapeHtml(date)}</span>
+                                        <a href="${escapeHtml(p.permalink || '#')}" target="_blank" rel="noopener" class="hover:text-zinc-200 transition">${linkLabel}</a>
+                                    </div>
+                                </div>
+                            </article>
+                        `;
+                    }).join('');
+                }
+
+                // ---- Preview en el dashboard (últimas 4) ----
+                if (preview) {
+                    const last4 = posts.slice(0, 4);
+                    preview.innerHTML = last4.map(p => {
+                        const imgSrc = `${INSTAGRAM_BASE}/${p.image}`;
+                        const caption = escapeHtml(p.caption || '');
+                        const permalink = escapeHtml(p.permalink || '#');
+                        const videoBadge = p.is_video
+                            ? `<span class="ig-video-badge"><i data-lucide="play" class="w-2.5 h-2.5"></i> Video</span>`
+                            : '';
+                        return `
+                            <a href="${permalink}" target="_blank" rel="noopener" class="ig-preview-card" title="${caption.slice(0, 100)}">
+                                <img src="${imgSrc}" alt="${escapeHtml((p.caption || 'Publicación de Instagram').slice(0, 80))}" loading="lazy"
+                                     onerror="this.onerror=null;this.src='https://placehold.co/400x400/18181b/71717a?text=IG';">
+                                ${videoBadge}
+                                <div class="ig-overlay">
+                                    <span class="ig-caption">${caption}</span>
+                                </div>
+                            </a>
+                        `;
+                    }).join('');
+                }
+
+                instagramLoaded = true;
+                lucide.createIcons();
+            } catch (err) {
+                console.error('Error cargando Instagram:', err);
+                if (sub) sub.textContent = 'No se pudieron cargar las publicaciones.';
+                if (grid) grid.innerHTML = '<p class="text-xs text-rose-400 col-span-full text-center py-10">No se pudieron cargar las publicaciones por ahora.</p>';
+                if (preview) preview.innerHTML = '<p class="text-xs text-rose-400 col-span-full text-center py-6">No disponible.</p>';
+            }
         };
 
         // ============================================================
@@ -2332,6 +2538,7 @@
         function renderDashboardWidgets() {
             updateDashboardOverview();
             const tasksContainer = document.getElementById('widget-tasks-equipo-pane');
+            if (!tasksContainer) return;
 
             const inProgressTasks = [...appData.tasks]
                 .filter(t => (t.estatus || '').toLowerCase() === 'en_curso')
@@ -2384,6 +2591,7 @@
 
         function renderTasksTable() {
             const container = document.getElementById('tasks-table-container');
+            if (!container) return;
             if (appData.tasks.length === 0) {
                 container.innerHTML = `<p class="text-sm text-slate-500 text-center py-10">No se encontraron tareas.</p>`;
                 return;
@@ -2438,6 +2646,7 @@
         function renderGeneralPerformanceBar() {
             const barContainer = document.getElementById('general-performance-bar');
             const legendContainer = document.getElementById('general-performance-legend');
+            if (!barContainer || !legendContainer) return;
 
             const completedTasks = appData.tasks.filter(t => {
                 const st = (t.estatus || '').toLowerCase();
@@ -2912,6 +3121,7 @@
 
         function loadDirectorsList() {
             const container = document.getElementById('login-users-list');
+            if (!container) return;
             if (appData.responsables.length === 0) {
                 container.innerHTML = `<div class="text-center text-zinc-500 text-xs py-4">Cargando usuarios...</div>`;
                 setTimeout(() => {
@@ -2924,6 +3134,7 @@
 
         function renderDirectorsList() {
             const container = document.getElementById('login-users-list');
+            if (!container) return;
             const directors = appData.responsables.filter(r =>
                 r.rol && (r.rol.toLowerCase() === 'director' || r.rol.toLowerCase() === 'dirección')
             );
@@ -3009,6 +3220,7 @@
 
         function populateDocsProjectSelect() {
             const select = document.getElementById('docs-project-select');
+            if (!select) return;
             select.innerHTML = '<option value="">Selecciona un proyecto...</option>';
             if (appData.proyectos.length === 0) {
                 select.innerHTML = '<option value="">Cargando proyectos...</option>';
@@ -3035,6 +3247,7 @@
 
         function populateDocsSubprojectSelect(projectId) {
             const select = document.getElementById('docs-subproject-select');
+            if (!select) return;
             const subproyectos = appData.subproyectos.filter(sp => sp.id_proyecto === projectId);
 
             if (subproyectos.length === 0) {
@@ -3055,6 +3268,7 @@
 
         function populateDocsResponsibleSelect() {
             const select = document.getElementById('docs-responsible-select');
+            if (!select) return;
             if (appData.responsables.length === 0) {
                 select.innerHTML = `<option value="">Cargando...</option>`;
                 return;
