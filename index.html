@@ -787,6 +787,19 @@
         .art-promo-grid { display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:8px; }.art-promo-grid .artwork-item{aspect-ratio: .77;border:0;border-radius:6px}.art-promo-grid .status-badge{display:none}.art-promo-grid .promotion-badge{top:auto;bottom:7px;left:7px;right:auto;padding:3px 6px;color:#facc15;background:rgba(0,0,0,.8)}.art-promo-grid .hover-info{opacity:1;padding:9px 8px;background:linear-gradient(transparent,rgba(0,0,0,.94))}.art-promo-grid .hover-info .title{font-size:11px}.art-promo-grid .hover-info .sub,.art-promo-grid .hover-info .meta{display:none}.art-dashboard #show-more-btn{display:none!important}
         .art-catalog-list { display:flex;flex-direction:column;gap:8px;max-height:260px;overflow:auto; }.art-catalog-list .catalog-download-card{display:flex;align-items:center;gap:10px;padding:10px;background:#090d12;border:1px solid #1a2029;border-radius:6px}.art-catalog-list .catalog-download-card > div:first-child{flex:1}.art-catalog-list h4{font-size:12px}.art-catalog-list p{font-size:10px}.art-catalog-list .catalog-download-card > div:last-child{margin:0}.legacy-dashboard-runtime{display:none!important}
 
+
+        /* Comentarios recientes en el dashboard */
+        .art-center-col { display:flex; flex-direction:column; gap:10px; min-width:0; }
+        .art-comments .comments-list { display:flex; flex-direction:column; gap:8px; max-height:340px; overflow-y:auto; }
+        .comment-item { display:grid; grid-template-columns:54px 1fr; gap:12px; align-items:start; padding:10px; background:#090d12; border:1px solid #1a2029; border-radius:6px; cursor:pointer; transition:border-color .2s, background .2s; }
+        .comment-item:hover { border-color:#2a3340; background:#0b1017; }
+        .comment-item img { width:54px; height:54px; object-fit:cover; border-radius:6px; background:#171b21; }
+        .comment-item .comment-head { display:flex; align-items:baseline; justify-content:space-between; gap:8px; }
+        .comment-item .comment-obra { font-size:12px; font-weight:600; color:#f4f4f5; white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
+        .comment-item .comment-date { font-size:10px; color:#788493; white-space:nowrap; flex-shrink:0; }
+        .comment-item .comment-text { margin:4px 0 0; font-size:11px; color:#adb7c4; line-height:1.4; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; white-space:pre-line; }
+        .comment-item .comment-author { margin-top:4px; font-size:10px; color:#818cf8; }
+
         /* Preview Instagram en el dashboard */
         .art-instagram-preview { display: flex; flex-direction: column; }
         .art-instagram-preview #instagram-preview-grid { flex: 1; }
@@ -847,7 +860,7 @@
         }
 
         @media(max-width:1150px){body>aside{width:78px!important;padding:16px 8px!important;align-items:center!important}body>aside>div:first-child{align-items:center!important}body>aside>div:first-child>div:first-child{width:48px!important;justify-content:center!important;padding:0!important}.sidebar-logo{width:48px;height:38px;object-fit:contain}body>aside>div:first-child>a{flex-direction:column!important;padding:7px 3px;gap:3px!important}body>aside>div:first-child>a span{font-size:9px!important;text-align:center}.art-content-grid{grid-template-columns:minmax(220px,.8fr) minmax(400px,1.5fr)}.art-catalogs{grid-column:1/-1}.art-instagram-preview{grid-column:1/-1}.art-catalog-list{display:grid;grid-template-columns:repeat(3,1fr)}}
-        @media(max-width:760px){body>aside{display:none!important}.art-hero{min-height:260px;align-items:flex-start;flex-direction:column;padding:22px;background-position:center}.art-hero-logo{width:min(88vw,430px)}.art-hero-actions{flex-wrap:wrap}.art-action{min-height:38px;padding:0 10px;font-size:10px}.art-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.art-stat:last-child{grid-column:1/-1}.art-content-grid{grid-template-columns:1fr}.art-catalogs{grid-column:auto}.art-instagram-preview{grid-column:auto}.art-catalog-list{display:flex}.art-promo-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.art-promotions{grid-row:1}.activity-item{grid-template-columns:7px 54px 1fr}body>div.flex-1.flex.flex-col>header{padding:10px 14px!important}body>div.flex-1.flex.flex-col>header>div:last-child #current-date{display:none}}
+        @media(max-width:760px){body>aside{display:none!important}.art-hero{min-height:260px;align-items:flex-start;flex-direction:column;padding:22px;background-position:center}.art-hero-logo{width:min(88vw,430px)}.art-hero-actions{flex-wrap:wrap}.art-action{min-height:38px;padding:0 10px;font-size:10px}.art-stats{grid-template-columns:repeat(2,minmax(0,1fr))}.art-stat:last-child{grid-column:1/-1}.art-content-grid{grid-template-columns:1fr}.art-catalogs{grid-column:auto}.art-instagram-preview{grid-column:auto}.art-catalog-list{display:flex}.art-promo-grid{grid-template-columns:repeat(2,minmax(0,1fr))}.art-center-col{grid-row:1}.activity-item{grid-template-columns:7px 54px 1fr}body>div.flex-1.flex.flex-col>header{padding:10px 14px!important}body>div.flex-1.flex.flex-col>header>div:last-child #current-date{display:none}}
     </style>
 </head>
 <body class="h-full bg-black text-slate-100 flex overflow-hidden select-none">
@@ -970,11 +983,22 @@
                         <div class="art-panel-heading"><h3>Actividad reciente</h3><button onclick="switchTab('artworks')">Ver todas <i data-lucide="arrow-right"></i></button></div>
                         <div id="dashboard-activity" class="activity-list"><p class="text-xs text-zinc-500">Cargando actividad...</p></div>
                     </section>
+                    <div class="art-center-col">
                     <section class="art-panel art-promotions">
                         <div class="art-panel-heading"><h3>Obras en promoción</h3><button onclick="switchTab('artworks')">Ver todas <i data-lucide="arrow-right"></i></button></div>
                         <div id="artworks-carousel" class="art-promo-grid"></div>
                         <button id="show-more-btn" onclick="showMoreArtworks()" class="show-more-btn">Mostrar más obras <span id="total-artworks-count"></span></button>
                     </section>
+
+                    <!-- Comentarios recientes de obras -->
+                    <section class="art-panel art-comments">
+                        <div class="art-panel-heading">
+                            <h3 class="flex items-center gap-2"><i data-lucide="message-square" class="w-4 h-4 text-zinc-400"></i> Comentarios recientes</h3>
+                            <button onclick="switchTab('artworks')">Ver obras <i data-lucide="arrow-right"></i></button>
+                        </div>
+                        <div id="dashboard-comments" class="comments-list" aria-live="polite"><p class="text-xs text-zinc-500">Cargando comentarios...</p></div>
+                    </section>
+                    </div>
 
                     <!-- NUEVO: Instagram preview en el dashboard (arriba de Catálogos) -->
                     <section class="art-panel art-instagram-preview">
@@ -2738,6 +2762,40 @@
                     return `<article class="activity-item"><span class="activity-dot dot-${i % 5}"></span><img src="${img}" alt="" onerror="this.onerror=null;this.src='https://placehold.co/80x80/18181b/71717a?text=Obra'"><div><strong>${escapeHtml(label)}</strong><p>${escapeHtml(a.nombre_obra || 'Obra sin título')}</p><small>${escapeHtml(a.autor || a.fecha_registro || '')}</small></div></article>`;
                 }).join('') : '<p class="text-xs text-zinc-500">No hay actividad reciente.</p>';
             }
+            renderRecentComments();
+        }
+
+        function renderRecentComments() {
+            const container = document.getElementById('dashboard-comments');
+            if (!container) return;
+            const artworks = Array.isArray(appData.artworks) ? appData.artworks : [];
+            const all = [];
+            artworks.forEach(a => {
+                (Array.isArray(a.comentarios) ? a.comentarios : []).forEach(c => {
+                    if (c && c.texto) all.push({ obra: a, c });
+                });
+            });
+            all.sort((x, y) => new Date(y.c.fecha || 0) - new Date(x.c.fecha || 0));
+            const recent = all.slice(0, 6);
+            if (!recent.length) {
+                container.innerHTML = '<p class="text-xs text-zinc-500 text-center py-6">Aún no hay comentarios en las obras.</p>';
+                return;
+            }
+            container.innerHTML = recent.map(({ obra, c }) => {
+                const img = resolveImageUrl(obra.adjuntos, obra.nombre_obra);
+                const d = c.fecha ? new Date(c.fecha) : null;
+                const dateStr = d && !isNaN(d)
+                    ? d.toLocaleDateString('es-MX', { day: 'numeric', month: 'short', year: 'numeric' }) + ' · ' + d.toLocaleTimeString('es-MX', { hour: '2-digit', minute: '2-digit' })
+                    : '';
+                return `<article class="comment-item" onclick="openArtworkDetail('${escapeHtml(obra.id)}')">
+                    <img src="${img}" alt="${escapeHtml(obra.nombre_obra || 'Obra')}" loading="lazy" onerror="this.onerror=null;this.src='https://placehold.co/80x80/18181b/71717a?text=Obra'">
+                    <div class="min-w-0">
+                        <div class="comment-head"><span class="comment-obra">${escapeHtml(obra.nombre_obra || 'Obra sin título')}</span><span class="comment-date">${escapeHtml(dateStr)}</span></div>
+                        <p class="comment-text">${escapeHtml(c.texto)}</p>
+                        ${c.autor ? `<div class="comment-author">${escapeHtml(c.autor)}</div>` : ''}
+                    </div>
+                </article>`;
+            }).join('');
         }
 
         function renderArtworksCarousel() {

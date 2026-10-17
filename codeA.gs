@@ -50,6 +50,7 @@ const COL_REGISTROS_VERIFICADA = 26;     // Z
 const COL_REGISTROS_PROMOCIONAR = 27;    // AA
 const COL_REGISTROS_COMISION_VALOR = 28; // AB
 const COL_REGISTROS_COMISION_TIPO = 29;  // AC
+const COL_REGISTROS_COMENTARIOS = 30;    // AD (JSON - chat del director)
 
 // Índices de columnas (1-based) en hoja Comisiones
 const COL_COMISION_ID = 1;               // A
@@ -73,7 +74,7 @@ function ensureSchema_() {
     'Cliente', 'Documentos', 'Observaciones', 'Adjuntos', 'ID Responsable',
     'Autor', 'Asignación', 'Provenance', 'Clave',
     'Ancho (m)', 'Alto (m)', 'Largo (m)', 'Tags', 'Tipo de Moneda', 'Verificada',
-    'Promocionar', 'Comisión Valor', 'Comisión Tipo'
+    'Promocionar', 'Comisión Valor', 'Comisión Tipo', 'Comentarios'
   ]);
 
   // Comisiones
@@ -299,6 +300,35 @@ function stringifyAdjuntosObra_(adjuntos) {
   return JSON.stringify(adjuntos || []);
 }
 
+// Comentarios como chat (JSON) en la columna "Comentarios" (independiente de Observaciones).
+// Cada mensaje: { id, texto, id_autor, autor, fecha (ISO) }
+function parseComentariosObra_(cellValue) {
+  const raw = (cellValue || '').toString().trim();
+  if (!raw) return [];
+  try {
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed : [];
+  } catch (_) {
+    return [];
+  }
+}
+
+function stringifyComentariosObra_(mensajes) {
+  return JSON.stringify(mensajes || []);
+}
+
+function getResponsableNombre_(ss, actorId) {
+  const sh = ss.getSheetByName(SHEET_RESPONSABLES);
+  if (!sh) return '';
+  const rows = sh.getDataRange().getValues();
+  for (let i = 1; i < rows.length; i++) {
+    if ((rows[i][0] || '').toString() === actorId.toString()) {
+      return (rows[i][1] || '').toString();
+    }
+  }
+  return '';
+}
+
 function getRegistroObraById_(ss, obraId) {
   const sh = ss.getSheetByName(SHEET_REGISTROS_OBRA);
   const rows = sh.getDataRange().getValues();
@@ -404,7 +434,7 @@ function doGet(e) {
       }
     }
 
-    ensureSchema_();
+    //ensureSchema_();
     const ss = SpreadsheetApp.getActiveSpreadsheet();
 
     let response = {
@@ -482,7 +512,8 @@ function doGet(e) {
         verificada: (r[25] || '').toString() === 'Sí',
         promocionar: (r[26] || '').toString() === 'Sí',
         comision_valor: parseFloat(r[27]) || 0,
-        comision_tipo: normalizarComisionTipo_(r[28])
+        comision_tipo: normalizarComisionTipo_(r[28]),
+        comentarios: parseComentariosObra_(r[COL_REGISTROS_COMENTARIOS - 1])
       }));
       response.meta.totales.obras = total;
     }
@@ -617,7 +648,8 @@ function doPost(e) {
           'No',          // Verificada
           promocionar,   // Promocionar
           comisionValor, // Comisión Valor
-          comisionTipo   // Comisión Tipo
+          comisionTipo,  // Comisión Tipo
+          '[]'           // Comentarios (chat)
         ]);
 
         const lastRow = sh.getLastRow();
@@ -751,15 +783,36 @@ function doPost(e) {
       const documento = data.documento || {};
       if (!idObra) throw new Error('Falta data.id_obra');
       if (!actorId) throw new Error('Falta data.id_actor');
-      assertPrivileged_(ss, actorId);
       const obra = getRegistroObraById_(ss, idObra);
       if (!obra) throw new Error('Registro de obra no encontrado');
+      const tipoDocumento = (documento.tipo || '').toString().trim();
+      const esCertificado = tipoDocumento === 'Certificado' || tipoDocumento === 'Certificado Web' || tipoDocumento === 'Certificado PDF';
+      const responsableId = (obra.values[COL_REGISTROS_ID_RESPONSABLE - 1] || '').toString().trim();
+      if (esCertificado) {
+        if (!isPrivileged_(ss, actorId) && actorId !== responsableId) {
+          throw new Error('No autorizado: solo el responsable o supervisor puede registrar el certificado');
+        }
+      } else {
+        assertPrivileged_(ss, actorId);
+      }
       const prev = parseDocumentosObra_(obra.sh.getRange(obra.rowIndex, COL_REGISTROS_DOCUMENTOS).getValue());
+      const documentUrl = (documento.url || '').toString().trim();
+      const duplicate = prev.find(doc =>
+        (esCertificado && doc.tipo === tipoDocumento) ||
+        (documentUrl && doc.url === documentUrl)
+      );
+      if (duplicate) {
+        return ContentService.createTextOutput(JSON.stringify({
+          result: 'success',
+          duplicate: true,
+          documento: duplicate
+        })).setMimeType(ContentService.MimeType.JSON);
+      }
       const newDoc = {
         id: documento.id || ('doc_' + Date.now().toString()),
-        tipo: (documento.tipo || '').toString(),
+        tipo: tipoDocumento,
         nombre: (documento.nombre || '').toString(),
-        url: (documento.url || '').toString(),
+        url: documentUrl,
         fecha: (documento.fecha || new Date().toISOString().split('T')[0]),
         uploadedBy: actorId
       };
@@ -784,6 +837,82 @@ function doPost(e) {
       obra.sh.getRange(obra.rowIndex, COL_REGISTROS_DOCUMENTOS).setValue(stringifyDocumentosObra_(next));
       invalidarCache_();
       return ContentService.createTextOutput(JSON.stringify({ result: 'success' })).setMimeType(ContentService.MimeType.JSON);
+    }
+
+    // ======================================================
+    // REGISTROS OBRA - COMENTARIOS (CHAT, columna "Comentarios")
+    // ======================================================
+    else if (action === 'registro_obra_comentario_add') {
+      const idObra = (data.id_obra || '').toString().trim();
+      const actorId = (data.id_actor || '').toString().trim();
+      const texto = (data.texto || '').toString().trim();
+      if (!idObra) throw new Error('Falta data.id_obra');
+      if (!actorId) throw new Error('Falta data.id_actor');
+      if (!texto) throw new Error('El mensaje no puede estar vacío');
+      if (texto.length > 2000) throw new Error('El mensaje excede 2000 caracteres');
+      // Solo supervisor/director. Para limitarlo solo a director, cambiar la validación aquí.
+      assertPrivileged_(ss, actorId);
+
+      // Lock para que dos mensajes simultáneos no se pisen
+      const lock = LockService.getScriptLock();
+      lock.waitLock(10000);
+      try {
+        const obra = getRegistroObraById_(ss, idObra);
+        if (!obra) throw new Error('Registro de obra no encontrado');
+        const celda = obra.sh.getRange(obra.rowIndex, COL_REGISTROS_COMENTARIOS);
+        const prev = parseComentariosObra_(celda.getValue());
+        const mensaje = {
+          id: 'com_' + Date.now().toString() + '_' + Math.floor(Math.random() * 1000),
+          texto: texto,
+          id_autor: actorId,
+          autor: getResponsableNombre_(ss, actorId),
+          fecha: new Date().toISOString()
+        };
+        prev.push(mensaje);
+        celda.setValue(stringifyComentariosObra_(prev));
+        invalidarCache_();
+        return ContentService.createTextOutput(JSON.stringify({
+          result: 'success',
+          mensaje: mensaje,
+          comentarios: prev
+        })).setMimeType(ContentService.MimeType.JSON);
+      } finally {
+        lock.releaseLock();
+      }
+    }
+
+    else if (action === 'registro_obra_comentario_delete') {
+      const idObra = (data.id_obra || '').toString().trim();
+      const actorId = (data.id_actor || '').toString().trim();
+      const mensajeId = (data.mensaje_id || '').toString().trim();
+      if (!idObra) throw new Error('Falta data.id_obra');
+      if (!actorId) throw new Error('Falta data.id_actor');
+      if (!mensajeId) throw new Error('Falta data.mensaje_id');
+      assertPrivileged_(ss, actorId);
+
+      const lock = LockService.getScriptLock();
+      lock.waitLock(10000);
+      try {
+        const obra = getRegistroObraById_(ss, idObra);
+        if (!obra) throw new Error('Registro de obra no encontrado');
+        const celda = obra.sh.getRange(obra.rowIndex, COL_REGISTROS_COMENTARIOS);
+        const prev = parseComentariosObra_(celda.getValue());
+        const msg = prev.find(m => (m.id || '') === mensajeId);
+        if (!msg) throw new Error('Mensaje no encontrado');
+        // Solo el autor del mensaje puede borrarlo
+        if (msg.id_autor && msg.id_autor.toString() !== actorId) {
+          throw new Error('No autorizado: solo el autor puede eliminar su mensaje');
+        }
+        const next = prev.filter(m => (m.id || '') !== mensajeId);
+        celda.setValue(stringifyComentariosObra_(next));
+        invalidarCache_();
+        return ContentService.createTextOutput(JSON.stringify({
+          result: 'success',
+          comentarios: next
+        })).setMimeType(ContentService.MimeType.JSON);
+      } finally {
+        lock.releaseLock();
+      }
     }
 
     // ======================================================
@@ -1167,4 +1296,26 @@ function doPost(e) {
       message: error.toString()
     })).setMimeType(ContentService.MimeType.JSON);
   }
+}
+
+function testCache() {
+  const t0 = Date.now();
+  const cache = CacheService.getScriptCache();
+  const version = PropertiesService.getScriptProperties().getProperty('DATA_VERSION') || '0';
+  console.log('Version:', version);
+  
+  const key = 'TEST_KEY';
+  cache.put(key, 'HOLA', 3600);
+  const val = cache.get(key);
+  console.log('Cache funciona:', val === 'HOLA');
+  
+  // Prueba tu función cached_
+  const t1 = Date.now();
+  const result = cached_('obras_0_50', () => ({ test: 'data' }));
+  console.log('Primera llamada:', Date.now() - t1, 'ms');
+  
+  const t2 = Date.now();
+  const result2 = cached_('obras_0_50', () => ({ test: 'data2' }));
+  console.log('Segunda llamada (debe ser <100ms):', Date.now() - t2, 'ms');
+  console.log('Match:', result === result2);
 }
