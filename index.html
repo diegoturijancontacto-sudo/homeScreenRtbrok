@@ -2023,9 +2023,8 @@
                 if (payload.status !== 'success' || !Array.isArray(payload.data)) {
                     throw new Error(payload.message || 'Respuesta no válida');
                 }
-                appData.prospectos = payload.data.filter(c =>
-                    String(c.estadoComercial || '').trim().toLowerCase() === ESTADO_PROSPECTO.toLowerCase()
-                );
+                // 👇 SIN FILTRO: todos los clientes del CRM
+                appData.prospectos = payload.data;
             } catch (error) {
                 console.error('Error al cargar prospectos:', error);
                 appData.prospectos = [];
