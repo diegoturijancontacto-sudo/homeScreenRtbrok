@@ -3067,7 +3067,8 @@
                 activity.innerHTML = recent.length ? recent.map((a, i) => {
                     const img = resolveImageUrl(a.adjuntos, a.nombre_obra);
                     const label = (a.promocionar === true || String(a.promocionar).toLowerCase() === 'true') ? 'Obra en promoción' : 'Obra registrada';
-                    return `<article class="activity-item"><span class="activity-dot dot-${i % 5}"></span><img src="${img}" alt="" onerror="this.onerror=null;this.src='https://placehold.co/80x80/18181b/71717a?text=Obra'"><div><strong>${escapeHtml(label)}</strong><p>${escapeHtml(a.nombre_obra || 'Obra sin título')}</p><small>${escapeHtml(a.autor || a.fecha_registro || '')}</small></div></article>`;
+                    // 👇 CAMBIO: ahora abre el modal de detalle al hacer clic
+                    return `<article class="activity-item cursor-pointer hover:bg-zinc-900/40 transition" onclick="openArtworkDetail('${escapeHtml(a.id)}')" role="button" tabindex="0" title="Ver detalle de ${escapeHtml(a.nombre_obra || 'obra')}"><span class="activity-dot dot-${i % 5}"></span><img src="${img}" alt="" onerror="this.onerror=null;this.src='https://placehold.co/80x80/18181b/71717a?text=Obra'"><div><strong>${escapeHtml(label)}</strong><p>${escapeHtml(a.nombre_obra || 'Obra sin título')}</p><small>${escapeHtml(a.autor || a.fecha_registro || '')}</small></div></article>`;
                 }).join('') : '<p class="text-xs text-zinc-500">No hay actividad reciente.</p>';
             }
             renderRecentComments();
