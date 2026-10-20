@@ -864,7 +864,7 @@
         .custom-pdf-dropzone:hover, .custom-pdf-dropzone.dragover { border-color:#a97836; background:rgba(169,120,54,.08); }
         .custom-pdf-progress { height:4px; background:#1a2029; border-radius:2px; overflow:hidden; margin-top:10px; }
         .custom-pdf-progress.hidden { display:none; }
-        #custom-pdf-progress-bar { height:100%; width:0; background:#a97836; transition:width .2s; }
+        .custom-pdf-progress > div { height:100%; width:0; background:#a97836; transition:width .2s; }
         .custom-pdf-item { display:flex; align-items:center; justify-content:space-between; gap:8px; padding:10px; background:#000; border:1px solid #1a2029; border-radius:6px; }
         .custom-pdf-item .name { font-size:12px; font-weight:600; color:#f4f4f5; word-break:break-word; }
         .custom-pdf-item .meta { font-size:10px; color:#71717a; margin-top:2px; }
@@ -1036,7 +1036,18 @@
                         <p id="dashboard-catalogs-count" class="sr-only"></p>
                         <div id="dashboard-catalogs-list" class="art-catalog-list" aria-live="polite"><p class="text-xs text-zinc-500">Cargando catálogos...</p></div>
                         <div class="mt-4 pt-3 border-t border-zinc-900">
-                            <h4 class="text-xs font-semibold text-amber-300 flex items-center gap-2 mb-2"><i data-lucide="folder-up" class="w-3.5 h-3.5"></i> Personalizados <span id="custom-pdfs-dashboard-count" class="text-[10px] font-normal text-zinc-500"></span></h4>
+                            <div class="flex items-center justify-between gap-2 mb-2">
+                                <h4 class="text-xs font-semibold text-amber-300 flex items-center gap-2"><i data-lucide="folder-up" class="w-3.5 h-3.5"></i> Personalizados <span id="custom-pdfs-dashboard-count" class="text-[10px] font-normal text-zinc-500"></span></h4>
+                                <button type="button" id="custom-pdfs-dashboard-refresh" class="p-1 text-zinc-500 hover:text-white transition" title="Actualizar personalizados" aria-label="Actualizar personalizados">
+                                    <i data-lucide="refresh-cw" class="w-3.5 h-3.5"></i>
+                                </button>
+                            </div>
+                            <div id="custom-pdf-dashboard-dropzone" class="custom-pdf-dropzone !p-3" role="button" tabindex="0" aria-label="Subir PDF personalizado desde Inicio">
+                                <i data-lucide="upload" class="w-4 h-4 mx-auto text-zinc-400"></i>
+                                <p class="text-[10px] text-zinc-300 mt-1"><strong>Arrastra un PDF aquí</strong> o haz clic para seleccionar</p>
+                            </div>
+                            <input type="file" id="custom-pdf-dashboard-input" accept=".pdf,application/pdf" hidden>
+                            <div id="custom-pdf-dashboard-progress" class="custom-pdf-progress hidden"><div id="custom-pdf-dashboard-progress-bar"></div></div>
                             <div id="custom-pdfs-dashboard" class="space-y-2 max-h-[220px] overflow-y-auto pr-1" aria-live="polite"><p class="text-xs text-zinc-500">Cargando...</p></div>
                         </div>
                     </section>
@@ -2220,10 +2231,10 @@
                 return;
             }
 
-            const progress = document.getElementById('custom-pdf-progress');
-            const bar = document.getElementById('custom-pdf-progress-bar');
-            progress.classList.remove('hidden');
-            bar.style.width = '10%';
+            const progressBars = [...document.querySelectorAll('.custom-pdf-progress')];
+            const bars = [...document.querySelectorAll('.custom-pdf-progress > div')];
+            progressBars.forEach(progress => progress.classList.remove('hidden'));
+            bars.forEach(bar => bar.style.width = '10%');
 
             try {
                 const base64 = await new Promise((resolve, reject) => {
@@ -2232,7 +2243,7 @@
                     reader.onerror = reject;
                     reader.readAsDataURL(file);
                 });
-                bar.style.width = '40%';
+                bars.forEach(bar => bar.style.width = '40%');
 
                 // Sin headers para evitar preflight CORS (igual que ejemplo_de_uso.html)
                 const res = await fetch(PDF_WEB_APP_URL, {
@@ -2244,18 +2255,21 @@
                         fileData: base64
                     })
                 });
-                bar.style.width = '80%';
+                bars.forEach(bar => bar.style.width = '80%');
 
                 const data = await res.json();
                 if (data.status !== 'ok') throw new Error(data.message || 'Error desconocido');
-                bar.style.width = '100%';
+                bars.forEach(bar => bar.style.width = '100%');
                 showNotification('PDF subido correctamente');
                 loadCustomPdfs();
             } catch (err) {
                 console.error('Error subiendo PDF:', err);
                 showNotification('Error: ' + (err.message || 'no se pudo subir el PDF'));
             } finally {
-                setTimeout(() => { progress.classList.add('hidden'); bar.style.width = '0'; }, 800);
+                setTimeout(() => {
+                    progressBars.forEach(progress => progress.classList.add('hidden'));
+                    bars.forEach(bar => bar.style.width = '0');
+                }, 800);
             }
         }
 
@@ -2277,29 +2291,36 @@
         }
 
         function initCustomPdfs() {
-            const dz = document.getElementById('custom-pdf-dropzone');
-            const input = document.getElementById('custom-pdf-input');
             const refresh = document.getElementById('custom-pdfs-refresh');
-            if (!dz || !input) return;
+            const dashboardRefresh = document.getElementById('custom-pdfs-dashboard-refresh');
+            [
+                ['custom-pdf-dropzone', 'custom-pdf-input'],
+                ['custom-pdf-dashboard-dropzone', 'custom-pdf-dashboard-input']
+            ].forEach(([dropzoneId, inputId]) => {
+                const dz = document.getElementById(dropzoneId);
+                const input = document.getElementById(inputId);
+                if (!dz || !input) return;
 
-            dz.addEventListener('click', () => input.click());
-            dz.addEventListener('keydown', e => {
-                if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.click(); }
-            });
-            input.addEventListener('change', e => {
-                uploadCustomPdf(e.target.files[0]);
-                e.target.value = '';
-            });
-            ['dragenter', 'dragover'].forEach(ev => dz.addEventListener(ev, e => {
-                e.preventDefault(); dz.classList.add('dragover');
-            }));
-            ['dragleave', 'drop'].forEach(ev => dz.addEventListener(ev, e => {
-                e.preventDefault(); dz.classList.remove('dragover');
-            }));
-            dz.addEventListener('drop', e => {
-                if (e.dataTransfer.files.length) uploadCustomPdf(e.dataTransfer.files[0]);
+                dz.addEventListener('click', () => input.click());
+                dz.addEventListener('keydown', e => {
+                    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); input.click(); }
+                });
+                input.addEventListener('change', e => {
+                    uploadCustomPdf(e.target.files[0]);
+                    e.target.value = '';
+                });
+                ['dragenter', 'dragover'].forEach(ev => dz.addEventListener(ev, e => {
+                    e.preventDefault(); dz.classList.add('dragover');
+                }));
+                ['dragleave', 'drop'].forEach(ev => dz.addEventListener(ev, e => {
+                    e.preventDefault(); dz.classList.remove('dragover');
+                }));
+                dz.addEventListener('drop', e => {
+                    if (e.dataTransfer.files.length) uploadCustomPdf(e.dataTransfer.files[0]);
+                });
             });
             if (refresh) refresh.addEventListener('click', loadCustomPdfs);
+            if (dashboardRefresh) dashboardRefresh.addEventListener('click', loadCustomPdfs);
 
             loadCustomPdfs();
         }
