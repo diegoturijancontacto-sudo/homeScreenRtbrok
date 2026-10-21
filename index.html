@@ -3331,13 +3331,26 @@
                     text: getArtworkWhatsAppDescription(activeDetailArtwork)
                 });
             } catch (error) {
-                if (error.name !== 'AbortError') showNotification(error.message || 'No fue posible compartir la obra.');
+                // Si el usuario cancela el menú de compartir, no hacemos nada.
+                if (error && error.name === 'AbortError') return;
+                // Cualquier otro fallo (sin permisos, menú de compartir bloqueado o no disponible,
+                // error al obtener la imagen): abrir WhatsApp directamente con el mensaje.
+                openWhatsAppDirect(getArtworkWhatsAppDescription(activeDetailArtwork));
             } finally {
                 button.disabled = false;
                 button.innerHTML = originalContent;
                 lucide.createIcons();
             }
         };
+
+        function openWhatsAppDirect(text) {
+            const url = `https://wa.me/?text=${encodeURIComponent(text)}`;
+            showNotification('Abriendo WhatsApp con el mensaje (la imagen debes adjuntarla manualmente).');
+            // Tras un await el navegador puede bloquear window.open; si pasa, navegamos en la misma pestaña.
+            let opened = null;
+            try { opened = window.open(url, '_blank', 'noopener'); } catch (_) {}
+            if (!opened) window.location.href = url;
+        }
 
         window.openArtworkDetail = function(artworkId) {
             const artwork = appData.artworks.find(a => a.id === artworkId);
